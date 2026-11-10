@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "title": "FASTO FTS",
+    "description": "Dove un prodotto alimentare di qualità ha spazio per crescere, perché, e come entrarci."
+  },
+  "nav": {
+    "scout": "Scout",
+    "matrix": "Matrice",
+    "ask": "Chiedi",
+    "more": "Altro",
+    "main": "Navigazione principale"
+  },
+  "status": {
+    "expanding": "In espansione",
+    "consolidated": "Consolidato",
+    "threatened": "Minacciato",
+    "insufficient_data": "Dati insufficienti"
+  },
+  "grade": {
+    "A": "Dato misurato",
+    "B": "Stima da modello",
+    "C": "Segnale esplorativo"
+  },
+  "common": {
+    "demo": "DEMO",
+    "loading": "Caricamento…",
+    "error": "Qualcosa non ha funzionato.",
+    "retry": "Riprova",
+    "comingDay": "In arrivo: {day}."
+  },
+  "login": {
+    "title": "Accedi a FASTO FTS",
+    "lead": "Ti mandiamo un link via email. Niente password.",
+    "email": "Email",
+    "submit": "Inviami il link",
+    "sending": "Invio in corso…",
+    "sent": "Controlla la posta: il link per entrare è in arrivo a {email}.",
+    "error": "Non siamo riusciti a inviare il link. Riprova tra poco.",
+    "captcha": "Verifica di sicurezza",
+    "linkError": "Il link non è valido o è scaduto. Chiedine uno nuovo.",
+    "privacy": "Usiamo la tua email solo per farti accedere."
+  },
+  "scout": {
+    "title": "Scout",
+    "pickCategory": "Scegli una categoria",
+    "pickTerritory": "Scegli un territorio",
+    "categories": "Categorie",
+    "territories": "Territori",
+    "insufficientReason": "Non ci sono ancora abbastanza dati misurati per dare un verdetto su questa cella.",
+    "missing": "Mancano: {inputs}",
+    "coverage": "Copertura delle evidenze",
+    "gradeMix": "Composizione per grado",
+    "mos": "MOS",
+    "mosUnavailable": "MOS non disponibile",
+    "openCell": "Apri la scheda",
+    "pair": "{category} a {territory}"
+  },
+  "inputs": {
+    "trend": "trend",
+    "geo": "domanda locale",
+    "csi": "sentiment",
+    "competition": "concorrenza"
+  },
+  "more": {
+    "title": "Altro",
+    "theme": "Tema",
+    "dark": "Scuro",
+    "light": "Chiaro",
+    "language": "Lingua",
+    "signOut": "Esci",
+    "account": "Account"
+  },
+  "placeholder": {
+    "matrix": "La matrice 15 × 20 arriva con i primi dati reali.",
+    "ask": "La ricerca conversazionale con citazioni arriva con il modulo Advisor."
+  }
+}
