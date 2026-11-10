@@ -22,4 +22,9 @@ Still open on the project owner:
 - Logo file, to sample brand colours.
 - A domain, to move emails off the Gmail sender.
 
-Next (Day 1 remainder): licence check for sources 1-5, 8, 9 in `SOURCES.md`; data availability check to confirm the 20 cities.
+Day 1 remainder, done:
+- Licence check for sources 1-5, 8, 9 in `SOURCES.md`, read from the official pages. Eurostat, ISTAT, Wikimedia OK; OFF and OSM OK with ODbL share-alike; GISCO boundaries not used (non-commercial clause); eAmbrosia waiting for a documented interface; GDELT terms pending (host not reachable).
+- Data availability: all 20 cities confirmed with 2025 population and tourism; Amsterdam code corrected to NUTS 2024 `NL32B`; per-city statistical units recorded.
+- Admin role given to the project owner (audited). Cloud build environment `fasto-fts` with the source hosts allowed.
+
+Next: Day 2, data spine. Shared normaliser and run log first (lead), then Eurostat, ISTAT, Open Food Facts and OpenStreetMap connectors in parallel, trend status and local demand functions, matrix and admin sources screens.
