@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "title": "FASTO FTS",
+    "description": "Where a quality food product has room to grow, why, and how to enter."
+  },
+  "nav": {
+    "scout": "Scout",
+    "matrix": "Matrix",
+    "ask": "Ask",
+    "more": "More",
+    "main": "Main navigation"
+  },
+  "status": {
+    "expanding": "Expanding",
+    "consolidated": "Consolidated",
+    "threatened": "Threatened",
+    "insufficient_data": "Insufficient data"
+  },
+  "grade": {
+    "A": "Measured data",
+    "B": "Model estimate",
+    "C": "Exploratory signal"
+  },
+  "common": {
+    "demo": "DEMO",
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Try again",
+    "comingDay": "Coming: {day}."
+  },
+  "login": {
+    "title": "Sign in to FASTO FTS",
+    "lead": "We email you a link. No password.",
+    "email": "Email",
+    "submit": "Send me the link",
+    "sending": "Sending…",
+    "sent": "Check your inbox: the sign-in link is on its way to {email}.",
+    "error": "We could not send the link. Please try again shortly.",
+    "captcha": "Security check",
+    "linkError": "The link is invalid or has expired. Ask for a new one.",
+    "privacy": "We use your email only to sign you in."
+  },
+  "scout": {
+    "title": "Scout",
+    "pickCategory": "Pick a category",
+    "pickTerritory": "Pick a territory",
+    "categories": "Categories",
+    "territories": "Territories",
+    "insufficientReason": "There is not yet enough measured data to give a verdict on this cell.",
+    "missing": "Missing: {inputs}",
+    "coverage": "Evidence coverage",
+    "gradeMix": "Grade mix",
+    "mos": "MOS",
+    "mosUnavailable": "MOS not available",
+    "openCell": "Open the sheet",
+    "pair": "{category} in {territory}"
+  },
+  "inputs": {
+    "trend": "trend",
+    "geo": "local demand",
+    "csi": "sentiment",
+    "competition": "competition"
+  },
+  "more": {
+    "title": "More",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "language": "Language",
+    "signOut": "Sign out",
+    "account": "Account"
+  },
+  "placeholder": {
+    "matrix": "The 15 × 20 matrix arrives with the first real data.",
+    "ask": "Conversational search with citations arrives with the Advisor module."
+  }
+}
