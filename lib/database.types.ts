@@ -829,14 +829,14 @@ isOneToOne: false
                   ]
                 },"territories": {
                   Row: {
-                    "centroid": unknown,"country_code": string,"geom": unknown,"id": number,"is_pilot": boolean,"lau_code": string | null,"level": Database["public"]['Enums']["territory_level"],"name_en": string,"name_it": string,"nuts_code": string | null,"parent_id": number | null,"slug": string,"sort_order": number
+                    "centroid": unknown,"country_code": string,"geom": unknown,"id": number,"is_pilot": boolean,"lau_code": string | null,"level": Database["public"]['Enums']["territory_level"],"name_en": string,"name_it": string,"nuts_code": string | null,"parent_id": number | null,"slug": string,"sort_order": number,"stat_codes": NonNullable<Json>
                   }
                   ComputedFields: never
                   Insert: {
-                    "centroid"?: unknown,"country_code": string,"geom"?: unknown,"id"?: never,"is_pilot"?: boolean,"lau_code"?: string | null,"level": Database["public"]['Enums']["territory_level"],"name_en": string,"name_it": string,"nuts_code"?: string | null,"parent_id"?: number | null,"slug": string,"sort_order"?: number
+                    "centroid"?: unknown,"country_code": string,"geom"?: unknown,"id"?: never,"is_pilot"?: boolean,"lau_code"?: string | null,"level": Database["public"]['Enums']["territory_level"],"name_en": string,"name_it": string,"nuts_code"?: string | null,"parent_id"?: number | null,"slug": string,"sort_order"?: number,"stat_codes"?: NonNullable<Json>
                   }
                   Update: {
-                    "centroid"?: unknown,"country_code"?: string,"geom"?: unknown,"id"?: never,"is_pilot"?: boolean,"lau_code"?: string | null,"level"?: Database["public"]['Enums']["territory_level"],"name_en"?: string,"name_it"?: string,"nuts_code"?: string | null,"parent_id"?: number | null,"slug"?: string,"sort_order"?: number
+                    "centroid"?: unknown,"country_code"?: string,"geom"?: unknown,"id"?: never,"is_pilot"?: boolean,"lau_code"?: string | null,"level"?: Database["public"]['Enums']["territory_level"],"name_en"?: string,"name_it"?: string,"nuts_code"?: string | null,"parent_id"?: number | null,"slug"?: string,"sort_order"?: number,"stat_codes"?: NonNullable<Json>
                   }
                   Relationships: [
                     {
