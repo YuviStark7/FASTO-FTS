@@ -13,9 +13,13 @@ Shipped:
 - Scout screen: token carousel, territory chips, verdict with status word and icon, MOS, coverage bar, grade mix. Shows the honest insufficient-data state for all 300 cells.
 - Playwright: sign-in and Scout flows green at 390 px and 1440 px. CI workflow: typecheck, lint, Vitest, pgTAP, type drift check, build, Playwright.
 
-Blocked on the project owner:
-- Vercel connector authorisation for the `yuvi-stark` team.
-- Turnstile site key and secret (Cloudflare) for the captcha.
-- Logo file, to sample brand colours.
+Day 1 gate: **passed** on 10 November. A new user (non-member address) signed up by magic link on https://fasto-fts.vercel.app and landed on Scout.
+- Vercel project live, functions in Frankfurt. Branch protection on `main` (PR + green `checks` required).
+- Supabase Auth: Site URL and redirect list set, token-hash email templates, Brevo SMTP (Gmail sender, 30 emails/hour).
 
-Next (Day 1 remainder): push and protect `main`, apply migrations to production through the first PR, Vercel project with EU region and env vars, Supabase Auth URLs and SMTP, licence check for sources 1-5, 8, 9 in `SOURCES.md`, data availability check to confirm the 20 cities, Day 1 gate on a real phone.
+Still open on the project owner:
+- Turnstile site key and secret (captcha) before public launch.
+- Logo file, to sample brand colours.
+- A domain, to move emails off the Gmail sender.
+
+Next (Day 1 remainder): licence check for sources 1-5, 8, 9 in `SOURCES.md`; data availability check to confirm the 20 cities.
