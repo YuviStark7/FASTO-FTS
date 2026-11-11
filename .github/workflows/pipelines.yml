@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "all | queued | compute | <source slug>"
+        description: "all | queued | compute | score | eval | <source slug>"
         required: true
         default: queued
 
@@ -42,7 +42,7 @@ jobs:
           else mode="queued"; fi
           # Only known modes and connector slugs reach the shell command below.
           case "$mode" in
-            all|queued|compute|score|eurostat|istat|osm|openfoodfacts|gdelt) ;;
+            all|queued|compute|score|eval|eurostat|istat|osm|openfoodfacts|gdelt) ;;
             *) echo "::error::unknown mode '$mode'"; exit 1 ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
@@ -58,6 +58,7 @@ jobs:
             queued)  pnpm pipeline --queued ;;
             compute) pnpm pipeline compute ;;
             score)   pnpm pipeline score && pnpm pipeline compute ;;
+            eval)    pnpm eval:mention-score ;;
             all)     pnpm pipeline all ;;
             *)       pnpm pipeline "$MODE" && pnpm pipeline score && pnpm pipeline compute ;;
           esac
