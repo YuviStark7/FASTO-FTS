@@ -47,23 +47,33 @@ jobs:
             *) echo "::error::unknown mode '$mode'"; exit 1 ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
-      - name: Run
-        # The service key is given to this step only, never to dependency installation.
+      # Two steps so the Anthropic and Bluesky secrets only reach the modes that use them.
+      # The service key is given to these steps only, never to dependency installation.
+      - name: Run (statistics and signals)
+        if: steps.mode.outputs.mode != 'all' && steps.mode.outputs.mode != 'queued' && steps.mode.outputs.mode != 'score' && steps.mode.outputs.mode != 'eval' && steps.mode.outputs.mode != 'bluesky'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          # Each secret only reaches the modes that use it.
-          ANTHROPIC_API_KEY: ${{ contains(fromJSON('["all","queued","score","eval","bluesky"]'), steps.mode.outputs.mode) && secrets.ANTHROPIC_API_KEY || '' }}
-          BSKY_IDENTIFIER: ${{ contains(fromJSON('["all","queued","bluesky"]'), steps.mode.outputs.mode) && secrets.BSKY_IDENTIFIER || '' }}
-          BSKY_APP_PASSWORD: ${{ contains(fromJSON('["all","queued","bluesky"]'), steps.mode.outputs.mode) && secrets.BSKY_APP_PASSWORD || '' }}
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          case "$MODE" in
+            compute) pnpm pipeline compute ;;
+            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
+          esac
+      - name: Run (mentions and scoring)
+        if: steps.mode.outputs.mode == 'all' || steps.mode.outputs.mode == 'queued' || steps.mode.outputs.mode == 'score' || steps.mode.outputs.mode == 'eval' || steps.mode.outputs.mode == 'bluesky'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
           MODE: ${{ steps.mode.outputs.mode }}
         run: |
           case "$MODE" in
             queued)  pnpm pipeline --queued ;;
-            compute) pnpm pipeline compute ;;
             score)   pnpm pipeline score && pnpm pipeline compute ;;
             eval)    pnpm eval:mention-score ;;
             all)     pnpm pipeline all ;;
             bluesky) pnpm pipeline bluesky && pnpm pipeline score && pnpm pipeline compute ;;
-            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
           esac
