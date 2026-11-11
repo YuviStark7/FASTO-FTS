@@ -89,6 +89,9 @@ export type CellSheet = {
     touristNights: Figure | null;
   };
   consumers: null | {
+    /** Id of the csi_snapshots row behind this reading: the target of human feedback. */
+    csiSnapshotId: number | null;
+    isDemo: boolean;
     csi: Figure;
     components: { key: "liking" | "desirability" | "trust" | "perceived_value" | "purchase_intent"; value: number | null }[];
     nMentions: number;
@@ -311,6 +314,8 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
       : null,
     consumers: csi
       ? {
+          csiSnapshotId: csi.id,
+          isDemo: csi.is_demo,
           csi: {
             value: csi.csi == null ? null : Number(csi.csi),
             unit: "index_0_100",

@@ -1,6 +1,8 @@
 "use client";
 import { useLocale, useTranslations } from "next-intl";
 import type { CellSheet } from "@/lib/queries/cell";
+import { DemoBadge } from "@/components/cell/grade-badge";
+import { FeedbackControl } from "@/components/feedback/feedback-control";
 import { FigureValue } from "./figure-value";
 import { formatDate } from "./format";
 import { InsufficientState, Panel } from "./ui";
@@ -79,6 +81,7 @@ export function ConsumersTab({ consumers, attention }: { consumers: CellSheet["c
             <div className="flex flex-wrap items-center gap-5">
               <Dial value={consumers.csi.value!} label={t("dialLabel", { value: Math.round(consumers.csi.value!) })} />
               <FigureValue figure={consumers.csi} size="lg" />
+              {consumers.isDemo && <DemoBadge />}
             </div>
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
               {consumers.components.map((c) => (
@@ -105,6 +108,7 @@ export function ConsumersTab({ consumers, attention }: { consumers: CellSheet["c
               <dd>{consumers.representativenessNote}</dd>
             </dl>
             <p className="mt-3 text-sm text-muted">{t("neverSample")}</p>
+            {consumers.csiSnapshotId != null && <FeedbackControl targetType="csi_snapshot" targetId={consumers.csiSnapshotId} />}
           </Panel>
           <Items title={t("levers")} items={consumers.levers} locale={locale} />
           <Items title={t("barriers")} items={consumers.barriers} locale={locale} />
