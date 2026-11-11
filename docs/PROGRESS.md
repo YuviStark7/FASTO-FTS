@@ -28,3 +28,29 @@ Day 1 remainder, done:
 - Admin role given to the project owner (audited). Cloud build environment `fasto-fts` with the source hosts allowed.
 
 Next: Day 2, data spine. Shared normaliser and run log first (lead), then Eurostat, ISTAT, Open Food Facts and OpenStreetMap connectors in parallel, trend status and local demand functions, matrix and admin sources screens.
+
+## Day 2, Wednesday 11 November (data spine)
+
+Shipped (PR 5, merged; migrations up to `20261111150000` applied to production and fingerprint-verified):
+- Shared pipeline layer: connector contract, normaliser with grade and status flag, raw files in Storage with sha256, `source_runs` log with partial state on warnings. Runner modes `all`, `--queued`, `compute`, `<slug>`; scheduled GitHub Actions workflow with the mode allow-listed.
+- Connectors: Eurostat (HFCE, HICP weights and indices, population, tourism, regional income), ISTAT (comune population), Open Food Facts (product counts), OpenStreetMap (shop counts).
+- Methods `trend-v1` and `geo-v1` in `lib/scoring` with unit tests; compute step writes trend and geo snapshots and updates the 300 cells (status, coverage, grade mix, missing inputs).
+- Matrix screen with coverage mode, admin sources screen with re-run queue.
+- pgTAP for the pipeline tables; reviewer blockers fixed before merge (OFF missing from the run list, geo estimates on insufficient trends, workflow input injection).
+
+Production after the first runs: Eurostat 3950 rows, ISTAT 60, OFF 161. Cells: 56 expanding, 180 consolidated, 43 threatened, 21 insufficient; 279 local demand estimates.
+
+Day 2 gate: **passed**.
+
+Open: OpenStreetMap Overpass refuses requests from GitHub runners and the build sandbox (HTTP 406), so shop density stays neutral and listed as missing.
+
+## Day 3, Thursday 12 November (sentiment, map, cell sheet), in progress
+
+Merged into `day-3/spine`, not yet in `main`:
+- Mentions and offers in the connector contract (author ids never stored, excerpts scrubbed, unique by content hash). Migrations `20261112090000` (mentions and offers), `20261112100000` (relevance), `20261112120000` (Italian scope notes).
+- Module 04: Haiku mention scoring (`mention-score-v1`, structured output, cached prompt, eval fixtures run by `eval` mode, daily classification budget) and the Consumer Sentiment Index (`csi-v1`, grade C, 50-mention minimum, levers and barriers).
+- Connectors: GDELT news attention (15 categories × 8 country-language scopes), Wikimedia pageviews (23 items, 5 language editions, 36 months).
+- Cell sheet with six tabs, every figure opening its ledger rows in the Sources tab; credit lines for every source.
+- Map of the 20 pilot cities by status.
+
+In progress: Bluesky mentions, competitors and products from Open Food Facts, feedback controls for the human review loop.
