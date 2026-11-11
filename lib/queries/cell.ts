@@ -120,7 +120,7 @@ export type CellSheet = {
 
 const year = (d: string) => d.slice(0, 4);
 
-export async function getCellSheet(categorySlug: string, territorySlug: string): Promise<CellSheet | null> {
+export async function getCellSheet(categorySlug: string, territorySlug: string, locale: "it" | "en" = "it"): Promise<CellSheet | null> {
   const { supabase } = await requireUser();
 
   const [{ data: category }, { data: territories }] = await Promise.all([
@@ -203,8 +203,11 @@ export async function getCellSheet(categorySlug: string, territorySlug: string):
     flags: flagsOf(trendIds),
   });
 
-  const codes = (category.codes ?? {}) as { scope_note?: string };
-  const statCodes = (territory.stat_codes ?? {}) as Record<string, string>;
+  // Notes in the user's language; the English text is the stored original.
+  const codesRaw = (category.codes ?? {}) as { scope_note?: string; scope_note_it?: string };
+  const statRaw = (territory.stat_codes ?? {}) as Record<string, string>;
+  const codes = { scope_note: locale === "it" ? codesRaw.scope_note_it ?? codesRaw.scope_note : codesRaw.scope_note };
+  const statCodes = { ...statRaw, scope_note: locale === "it" ? statRaw.scope_note_it ?? statRaw.scope_note : statRaw.scope_note };
   const factors = (geo?.factors ?? {}) as Record<string, unknown>;
   const geoIds = geo?.input_observation_ids ?? [];
   const pick = (indicator: string) => ledger.filter((l) => geoIds.includes(l.id) && l.indicator === indicator && l.territory === territory.slug).at(-1);
@@ -333,7 +336,7 @@ export async function getCellSheet(categorySlug: string, territorySlug: string):
     competition: {
       assortment: [...latestAssortment.values()].map((o) => ({
         tag: o.series_key,
-        figure: { value: Number(o.value), unit: o.unit, grade: o.grade, period: o.period_start, methodVersion: "normalise-v1", observationIds: [o.id], note: "coverage of a crowd-sourced database, not market size" },
+        figure: { value: Number(o.value), unit: o.unit, grade: o.grade, period: o.period_start, methodVersion: "normalise-v1", observationIds: [o.id], note: locale === "it" ? "copertura di un database collaborativo, non quota di mercato" : "coverage of a crowd-sourced database, not market size" },
       })),
       offers: (offersRes.data ?? []).map((o) => ({
         productName: o.product_name,

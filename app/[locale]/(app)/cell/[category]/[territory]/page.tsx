@@ -6,7 +6,7 @@ import { SheetView } from "@/components/sheet/sheet-view";
 export default async function CellPage({ params }: { params: Promise<{ locale: string; category: string; territory: string }> }) {
   const { locale, category, territory } = await params;
   setRequestLocale(locale);
-  const sheet = await getCellSheet(category, territory);
+  const sheet = await getCellSheet(category, territory, locale === "en" ? "en" : "it");
   if (!sheet) notFound();
   return <SheetView sheet={sheet} />;
 }

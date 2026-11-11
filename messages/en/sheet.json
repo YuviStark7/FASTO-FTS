@@ -76,7 +76,12 @@
       "showChart": "Show the chart",
       "year": "Year",
       "tableCaption": "Annual series for the cell",
-      "insufficient": "There are not enough years of measured data to compute the national trend for this category. Missing data is not a low score: the cell stays out of the rankings."
+      "insufficient": "There are not enough years of measured data to compute the national trend for this category. Missing data is not a low score: the cell stays out of the rankings.",
+      "ruleExpanding": "Real value {real} a year and volume {volume} a year ({period}): real growth above the expansion threshold and volume not falling.",
+      "ruleThreatened": "Real value {real} a year and volume {volume} a year ({period}): at least one of them falls beyond the threat threshold.",
+      "ruleConsolidated": "Real value {real} a year and volume {volume} a year ({period}): between the thresholds, a consolidated market.",
+      "ruleInsufficient": "Fewer than three consecutive years of data, only exploratory signals, or no statistical class for this category.",
+      "technical": "Technical detail (method trend-v1)"
     },
     "territory": {
       "localDemand": "Estimated local demand",

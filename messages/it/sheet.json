@@ -76,7 +76,12 @@
       "showChart": "Mostra il grafico",
       "year": "Anno",
       "tableCaption": "Serie annuale della cella",
-      "insufficient": "Non ci sono abbastanza anni con dati misurati per calcolare il trend nazionale di questa categoria. Un dato mancante non è un punteggio basso: la cella resta fuori dalle classifiche."
+      "insufficient": "Non ci sono abbastanza anni con dati misurati per calcolare il trend nazionale di questa categoria. Un dato mancante non è un punteggio basso: la cella resta fuori dalle classifiche.",
+      "ruleExpanding": "Valore reale {real} l'anno e volume {volume} l'anno ({period}): crescita reale sopra la soglia di espansione e volume non in calo.",
+      "ruleThreatened": "Valore reale {real} l'anno e volume {volume} l'anno ({period}): almeno uno dei due cala oltre la soglia di minaccia.",
+      "ruleConsolidated": "Valore reale {real} l'anno e volume {volume} l'anno ({period}): tra le soglie, mercato consolidato.",
+      "ruleInsufficient": "Meno di tre anni consecutivi di dati, solo segnali esplorativi, oppure nessuna classe statistica per questa categoria.",
+      "technical": "Dettaglio tecnico (metodo trend-v1)"
     },
     "territory": {
       "localDemand": "Domanda locale stimata",

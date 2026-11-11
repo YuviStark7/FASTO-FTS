@@ -19,7 +19,8 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
       <div className="space-y-3">
         <InsufficientState title={tf("insufficient")}>
           <p>{t("insufficient")}</p>
-          {market?.reason && <p className="text-muted">{market.reason}</p>}
+          <p className="text-muted">{t("ruleInsufficient")}</p>
+          {market?.reason && <Technical label={t("technical")} text={market.reason} />}
           <p>{t("national")}</p>
         </InsufficientState>
       </div>
@@ -52,8 +53,13 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
         </div>
         <p className="mt-4 text-sm">
           <span className="text-muted">{t("rule")}: </span>
-          {market.reason}
+          {t(market.status === "expanding" ? "ruleExpanding" : market.status === "threatened" ? "ruleThreatened" : "ruleConsolidated", {
+            real: formatValue(market.realValueCagr.value ?? 0, "ratio_per_year", locale),
+            volume: formatValue(market.volumeCagr.value ?? 0, "ratio_per_year", locale),
+            period: market.realValueCagr.period,
+          })}
         </p>
+        <Technical label={t("technical")} text={market.reason} />
       </Panel>
 
       <Panel title={t("chartTitle")}>
@@ -122,5 +128,15 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
         </Panel>
       )}
     </div>
+  );
+}
+
+/** The stored rule text is the method's audit trail (English, as written by trend-v1). */
+function Technical({ label, text }: { label: string; text: string }) {
+  return (
+    <details className="mt-2 text-xs text-muted">
+      <summary className="cursor-pointer">{label}</summary>
+      <p className="mt-1 font-mono">{text}</p>
+    </details>
   );
 }
