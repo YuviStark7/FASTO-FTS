@@ -91,7 +91,8 @@ export async function runConnector(connector: Connector, opts: RunOptions): Prom
     return { runId, status, fetched: inputs.length, written, rejected, rows };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    if (!dryRun && runId) await finish(db, runId, "failed", 0, 0, [], [...logLines, `ERROR ${message}`]);
+    if (!dryRun && runId)
+      await finish(db, runId, "failed", 0, 0, [], [...logLines, ...warnings.map((w) => `WARN ${w}`), `ERROR ${message}`]);
     return { runId, status: "failed", fetched: 0, written: 0, rejected: [], rows: [], error: message };
   }
 }
