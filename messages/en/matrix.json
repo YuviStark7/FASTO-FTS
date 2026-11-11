@@ -1,1 +1,30 @@
-{}
+{
+  "matrix": {
+    "title": "Matrix",
+    "lead": "Every category and every pilot territory, with the status of each cell.",
+    "gridLabel": "Categories by territories matrix",
+    "category": "Category",
+    "colourBy": "Colour by",
+    "modeStatus": "Status",
+    "modeMos": "MOS",
+    "country": "Country",
+    "allCountries": "All countries",
+    "statusFilter": "Filter by status",
+    "allStatuses": "All statuses",
+    "sortBy": "Sort by",
+    "sortCategory": "Category order",
+    "sortCoverage": "Cells with data",
+    "filters": "Filters",
+    "legend": "Legend",
+    "cellsShown": "{count} cells shown",
+    "noMatch": "No cell matches the filters.",
+    "reset": "Clear filters",
+    "empty": "There are no cells to show yet.",
+    "allInsufficient": "Measured data is on its way: until the first connectors have loaded their sources, every cell stays at insufficient data.",
+    "mosUnavailable": "MOS is not available yet: no cell has a score, so every cell stays hatched.",
+    "mosLegend": "MOS not available",
+    "withData": "{count} of {total} with data",
+    "filteredOut": "Filtered out",
+    "tooltip": "{name}: {status}, coverage {coverage}%"
+  }
+}

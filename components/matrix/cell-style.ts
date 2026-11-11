@@ -1,0 +1,19 @@
+import type { CellStatus } from "@/components/cell/status";
+
+/** Status colours come from tokens only. Insufficient data is the hatched pattern, never a pale fill. */
+export const STATUS_ORDER: CellStatus[] = ["expanding", "consolidated", "threatened", "insufficient_data"];
+
+export const STATUS_CLASS: Record<CellStatus, string> = {
+  expanding: "bg-expanding/25 text-expanding border-expanding/60",
+  consolidated: "bg-consolidated/25 text-consolidated border-consolidated/60",
+  threatened: "bg-threatened/25 text-threatened border-threatened/60",
+  insufficient_data: "hatched text-muted border-border",
+};
+
+export type ColourMode = "status" | "mos";
+
+/** In MOS mode a cell is coloured only when it has a score; null is hatched, never a low value. */
+export function cellClass(status: CellStatus, mos: number | null, mode: ColourMode): string {
+  if (mode === "mos") return mos === null ? STATUS_CLASS.insufficient_data : "bg-brand/40 text-text border-brand/70";
+  return STATUS_CLASS[status];
+}
