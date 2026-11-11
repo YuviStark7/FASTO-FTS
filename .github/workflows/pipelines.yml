@@ -1,0 +1,46 @@
+name: Pipelines
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"     # weekly full refresh, Monday 03:17 UTC
+    - cron: "*/30 * * * *"   # sweep for runs queued from Admin
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "all | queued | compute | <source slug>"
+        required: true
+        default: queued
+
+concurrency:
+  group: pipelines
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Decide mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT";
+          elif [ "${{ github.event.schedule }}" = "17 3 * * 1" ]; then echo "mode=all" >> "$GITHUB_OUTPUT";
+          else echo "mode=queued" >> "$GITHUB_OUTPUT"; fi
+      - name: Run
+        run: |
+          case "${{ steps.mode.outputs.mode }}" in
+            queued)  pnpm pipeline --queued ;;
+            compute) pnpm pipeline compute ;;
+            all)     for s in eurostat istat osm openfoodfacts; do pnpm pipeline "$s" || echo "::warning::$s failed"; done; pnpm pipeline compute ;;
+            *)       pnpm pipeline "${{ steps.mode.outputs.mode }}" && pnpm pipeline compute ;;
+          esac
