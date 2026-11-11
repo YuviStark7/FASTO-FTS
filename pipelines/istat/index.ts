@@ -9,7 +9,7 @@ import { parsePopulation } from "./parse";
 
 const YEARS = 5;
 
-const connector: Connector = {
+const connector: Connector<ObservationInput[]> = {
   source: "istat",
   async run(ctx) {
     const out: ObservationInput[] = [];

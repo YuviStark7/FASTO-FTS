@@ -27,7 +27,7 @@ async function fetchCount(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
-const connector: Connector = {
+const connector: Connector<ObservationInput[]> = {
   source: "openfoodfacts",
   async run(ctx) {
     const period = dayPeriod(new Date().toISOString().slice(0, 10));
