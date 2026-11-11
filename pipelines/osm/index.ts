@@ -24,7 +24,7 @@ export function shopValues(categories: Iterable<{ codes: { osm_shop?: string[] }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const connector: Connector = {
+const connector: Connector<ObservationInput[]> = {
   source: "osm",
   async run(ctx) {
     const baseline = ctx.params.baseline_shops ? ctx.params.baseline_shops.split(",").map((s) => s.trim()).filter(Boolean) : BASELINE_SHOPS;

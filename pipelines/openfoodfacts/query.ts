@@ -40,3 +40,32 @@ export function createSpacer(
 }
 
 export const slugifyTag = (tag: string) => tag.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+export const PRODUCT_FIELDS = [
+  "code",
+  "product_name",
+  "product_name_it",
+  "product_name_fr",
+  "product_name_de",
+  "product_name_es",
+  "product_name_nl",
+  "product_name_en",
+  "brands",
+  "quantity",
+  "product_quantity",
+  "product_quantity_unit",
+  "labels_tags",
+  "origins_tags",
+  "stores",
+  "countries_tags",
+].join(",");
+
+export const OFFERS_PER_QUERY = 50;
+
+/**
+ * The single request per tag and country: same filter as buildQuery, but it also returns the most
+ * scanned products. `count` in the answer is unchanged by page_size. No image fields are requested.
+ */
+export function buildListQuery(kind: TagKind, tag: string, countryTag: string, pageSize = OFFERS_PER_QUERY): string {
+  return `/api/v2/search?${kind}_tags=${tag}&countries_tags=${countryTag}&page_size=${pageSize}&sort_by=unique_scans_n&fields=${PRODUCT_FIELDS}`;
+}

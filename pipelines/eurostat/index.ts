@@ -190,5 +190,5 @@ export async function run(ctx: ConnectorContext): Promise<ObservationInput[]> {
   return out;
 }
 
-const connector: Connector = { source: "eurostat", run };
+const connector: Connector<ObservationInput[]> = { source: "eurostat", run };
 export default connector;

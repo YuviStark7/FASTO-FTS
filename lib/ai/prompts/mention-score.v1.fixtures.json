@@ -1,0 +1,14 @@
+{
+  "prompt": "mention-score.v1",
+  "note": "Hand-labelled evaluation fixtures. Run `pnpm eval:mention-score` (calls the API, a few cents) after any change to the prompt or model; every check must pass before the change ships.",
+  "cases": [
+    { "id": 1, "category": "evo-oil", "language": "it", "text": "Finalmente ho trovato un olio extravergine pugliese fruttato e piccante, vale ogni euro. Ne ho già ordinate altre due bottiglie.", "expect": { "relevant": true, "liking": ">=70", "perceived_value": ">=60", "purchase_intent": ">=70", "levers_any": ["quality_taste", "origin_territory", "price_value"] } },
+    { "id": 2, "category": "cheese", "language": "it", "text": "Il parmigiano al supermercato ormai costa come l'oro, quest'anno a Natale ne faccio a meno.", "expect": { "relevant": true, "perceived_value": "<=40", "purchase_intent": "<=40", "barriers_any": ["price_high"] } },
+    { "id": 3, "category": "pasta", "language": "it", "text": "Che pasta d'uomo il mio vicino, mi ha aiutato a traslocare tutto il pomeriggio!", "expect": { "relevant": false } },
+    { "id": 4, "category": "honey", "language": "fr", "text": "Le miel de lavande de ce petit producteur de Provence est incroyable, rien à voir avec celui du supermarché.", "expect": { "relevant": true, "liking": ">=70", "levers_any": ["origin_territory", "artisanal_tradition", "quality_taste"] } },
+    { "id": 5, "category": "cured-meats", "language": "de", "text": "Ich habe gelesen, dass zu viel Wurst ungesund ist, deshalb kaufe ich kaum noch Salami.", "expect": { "relevant": true, "purchase_intent": "<=40", "barriers_any": ["health_concern"] } },
+    { "id": 6, "category": "coffee", "language": "es", "text": "Oferta! Café molido 2x1 solo hoy, haz clic en el enlace de la bio.", "expect": { "relevant": false } },
+    { "id": 7, "category": "vinegar-condiments", "language": "it", "text": "Mi hanno regalato un aceto balsamico tradizionale di Modena DOP invecchiato 25 anni, un regalo perfetto per chi ama cucinare.", "expect": { "relevant": true, "levers_any": ["gift_occasion", "certification"] } },
+    { "id": 8, "category": "chocolate", "language": "nl", "text": "Deze chocolade smaakt naar karton en de verpakking ging meteen kapot. Nooit meer.", "expect": { "relevant": true, "liking": "<=30", "purchase_intent": "<=30", "barriers_any": ["taste_dislike", "packaging"] } }
+  ]
+}

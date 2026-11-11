@@ -70,9 +70,28 @@ Production in a territory is never used as consumption (product rule 5): product
 
 `cells.status` is the trend status. `coverage_pct` is the share of the four inputs (trend, local demand, sentiment, competition) present. `grade_mix` counts the grades of the observations behind the cell. `missing_inputs` feeds the data gap map. Cells with insufficient data are excluded from rankings, never scored low.
 
+## Mention scoring — `mention-score-v1` (module 04, language model)
+
+The only step of module 04 that uses a language model, and it only classifies. Claude Haiku 5.5 (`app_config` `ai.model.classifier`) receives batches of 20 mentions with the prompt `lib/ai/prompts/mention-score.v1.md` and returns, for each mention, through a validated JSON schema:
+
+- `relevant`: is the text about the product as food or drink (idioms, names, ads, spam are not);
+- five scores 0-100 (liking, desirability, trust, perceived value, purchase intent; 50 = neutral or not expressed);
+- levers and barriers from a fixed vocabulary (`lib/ai/mention-score.ts`).
+
+Results that break the contract (a relevant mention without all five scores, an irrelevant one with scores) are dropped and the mention stays unscored. Scores are cached per mention, and mentions are unique by content hash, so a text is scored once. Spend is logged in `usage` (module 04, kind classification) and stopped by the kill switch, the global daily limit and `ai.daily_classification_budget_usd`. A prompt change must pass `lib/ai/prompts/mention-score.v1.fixtures.json` (`pnpm eval:mention-score`).
+
 ## Consumer Sentiment Index — `csi-v1` (module 04)
 
-Day 3. See SPEC section 5.
+```
+CSI = (0.30 G + 0.25 D + 0.20 F + 0.15 V + 0.10 P) / Σ weights
+```
+
+G, D, F, V, P are the means over the relevant mentions of the window (`window_days`, 365) of liking, desirability, trust, perceived value and purchase intent. Computed in `lib/scoring/csi.ts`, never by the model.
+
+- Scope: category × country. Mentions are tied to their language's country, not to a city; every pilot city shares its country's CSI and the note says so.
+- Not published below `min_mentions` (50): the snapshot is stored with `is_published = false` and the cell shows insufficient data, never a low score.
+- Always grade C. The representativeness note states the number of posts, sources, languages and period, and that online posts are not a representative sample.
+- Levers and barriers: share of relevant mentions expressing each code (once per mention), up to three example mention ids.
 
 ## Market Opportunity Score — `mos-v1` (module 06)
 

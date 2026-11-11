@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Map as MapIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import { getStaffRole } from "@/lib/admin";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -14,6 +14,7 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
   const { email } = await requireUser();
   const ta = await getTranslations("admin");
+  const tm = await getTranslations("map");
   const { role } = await getStaffRole();
 
   const seg = (active: boolean) =>
@@ -51,6 +52,14 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
           </Link>
         </div>
       </section>
+
+      <Link href="/map" className="flex min-h-12 items-center justify-between rounded-[var(--radius-card)] bg-surface p-5">
+        <span className="flex items-center gap-3">
+          <MapIcon aria-hidden className="size-5 text-muted" />
+          {tm("link")}
+        </span>
+        <ChevronRight aria-hidden className="size-4 text-muted" />
+      </Link>
 
       {role && (
         <Link href="/admin" className="flex min-h-12 items-center justify-between rounded-[var(--radius-card)] bg-surface p-5">

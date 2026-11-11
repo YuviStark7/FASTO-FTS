@@ -1,0 +1,25 @@
+{
+  "feedback": {
+    "csiQuestion": "Is this sentiment reading correct?",
+    "briefQuestion": "Is this brief correct?",
+    "right": "Right",
+    "partly_right": "Partly right",
+    "wrong": "Wrong",
+    "commentLabel": "Comment (optional, up to 2000 characters)",
+    "send": "Send comment",
+    "saved": "Rating saved.",
+    "error": "The rating could not be saved. Try again.",
+    "viewer": "Your role is read-only: you cannot rate readings.",
+    "loading": "Loading your rating",
+    "tileTitle": "Sentiment ratings",
+    "tileHint": "Control cases and reviewer comments.",
+    "adminTitle": "Sentiment ratings",
+    "controlCases": "Sentiment control cases: {count}",
+    "emptyTitle": "No ratings yet",
+    "emptyBody": "Once users rate sentiment readings, the cases appear here.",
+    "csiOf": "CSI {value}, {n} mentions",
+    "noComments": "No comments.",
+    "commentsTitle": "Comments",
+    "computed": "Computed on {date}"
+  }
+}

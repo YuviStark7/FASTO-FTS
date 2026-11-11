@@ -31,6 +31,44 @@ export type ObservationInput = {
   sourceRef: string;
 };
 
+/**
+ * A short public text about a product. Connectors strip author identifiers before returning it
+ * (handles, names, avatars, profile links); the runner scrubs again and hashes the excerpt.
+ */
+export type MentionInput = {
+  category: string;
+  /** Territory slug when the text is tied to a place; otherwise the country of its language, or null. */
+  territory: string | null;
+  /** ISO 639-1. */
+  language: string;
+  publishedOn: string | null;
+  /** At most 500 characters, no author identifiers. */
+  excerpt: string;
+  /** Link to the post itself (allowed: it is public and needed for traceability). */
+  url?: string;
+};
+
+export type OfferInput = {
+  category: string;
+  territory: string | null;
+  competitor?: { name: string; kind?: "brand" | "producer" | "retailer" | "consortium" | "other"; url?: string };
+  productName: string;
+  externalId: string;
+  price?: number | null;
+  currency?: string;
+  packSize?: number | null;
+  packUnit?: "g" | "kg" | "ml" | "l" | "unit" | null;
+  channel?: string | null;
+  attributes?: Record<string, unknown>;
+  url?: string;
+  observedOn: string;
+  grade?: Grade;
+};
+
+export type ConnectorOutput =
+  | ObservationInput[]
+  | { observations?: ObservationInput[]; mentions?: MentionInput[]; offers?: OfferInput[] };
+
 export type RawFile = { name: string; bytes: Uint8Array; contentType: string; url?: string };
 
 export type ConnectorContext = {
@@ -49,10 +87,10 @@ export type ConnectorContext = {
 
 export type HttpResult = { url: string; status: number; contentType: string; bytes: Uint8Array; text: () => string; json: <T = unknown>() => T };
 
-export type Connector = {
+export type Connector<O extends ConnectorOutput = ConnectorOutput> = {
   /** sources.slug */
   source: string;
-  run: (ctx: ConnectorContext) => Promise<ObservationInput[]>;
+  run: (ctx: ConnectorContext) => Promise<O>;
 };
 
 export function yearPeriod(year: number | string) {
