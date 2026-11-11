@@ -1,1 +1,30 @@
-{}
+{
+  "matrix": {
+    "title": "Matrice",
+    "lead": "Tutte le categorie e tutti i territori pilota, con lo stato di ogni cella.",
+    "gridLabel": "Matrice categorie per territori",
+    "category": "Categoria",
+    "colourBy": "Colora per",
+    "modeStatus": "Stato",
+    "modeMos": "MOS",
+    "country": "Paese",
+    "allCountries": "Tutti i paesi",
+    "statusFilter": "Filtra per stato",
+    "allStatuses": "Tutti gli stati",
+    "sortBy": "Ordina per",
+    "sortCategory": "Ordine delle categorie",
+    "sortCoverage": "Celle con dati",
+    "filters": "Filtri",
+    "legend": "Legenda",
+    "cellsShown": "{count} celle mostrate",
+    "noMatch": "Nessuna cella corrisponde ai filtri.",
+    "reset": "Azzera i filtri",
+    "empty": "Non ci sono ancora celle da mostrare.",
+    "allInsufficient": "I dati misurati sono in arrivo: finché i primi connettori non hanno caricato le fonti, ogni cella resta a dati insufficienti.",
+    "mosUnavailable": "Il MOS non è ancora disponibile: nessuna cella ha un punteggio, quindi tutte restano tratteggiate.",
+    "mosLegend": "MOS non disponibile",
+    "withData": "{count} su {total} con dati",
+    "filteredOut": "Fuori dal filtro",
+    "tooltip": "{name}: {status}, copertura {coverage}%"
+  }
+}
