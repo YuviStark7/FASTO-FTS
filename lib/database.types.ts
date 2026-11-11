@@ -471,14 +471,14 @@ isOneToOne: false
                   ]
                 },"mention_scores": {
                   Row: {
-                    "barriers": (string)[],"desirability": number,"levers": (string)[],"liking": number,"mention_id": number,"model": string,"perceived_value": number,"prompt_version": string,"purchase_intent": number,"scored_at": string,"trust": number
+                    "barriers": (string)[],"desirability": number | null,"levers": (string)[],"liking": number | null,"mention_id": number,"model": string,"perceived_value": number | null,"prompt_version": string,"purchase_intent": number | null,"relevant": boolean,"scored_at": string,"trust": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "barriers"?: (string)[],"desirability": number,"levers"?: (string)[],"liking": number,"mention_id": number,"model": string,"perceived_value": number,"prompt_version": string,"purchase_intent": number,"scored_at"?: string,"trust": number
+                    "barriers"?: (string)[],"desirability"?: number | null,"levers"?: (string)[],"liking"?: number | null,"mention_id": number,"model": string,"perceived_value"?: number | null,"prompt_version": string,"purchase_intent"?: number | null,"relevant"?: boolean,"scored_at"?: string,"trust"?: number | null
                   }
                   Update: {
-                    "barriers"?: (string)[],"desirability"?: number,"levers"?: (string)[],"liking"?: number,"mention_id"?: number,"model"?: string,"perceived_value"?: number,"prompt_version"?: string,"purchase_intent"?: number,"scored_at"?: string,"trust"?: number
+                    "barriers"?: (string)[],"desirability"?: number | null,"levers"?: (string)[],"liking"?: number | null,"mention_id"?: number,"model"?: string,"perceived_value"?: number | null,"prompt_version"?: string,"purchase_intent"?: number | null,"relevant"?: boolean,"scored_at"?: string,"trust"?: number | null
                   }
                   Relationships: [
                     {

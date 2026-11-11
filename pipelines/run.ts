@@ -3,6 +3,7 @@
  *   pnpm pipeline <source> [--dry-run] [--param key=value]   run one connector
  *   pnpm pipeline all                                         run every connector, then compute
  *   pnpm pipeline --queued                                    run every queued source_run (Admin reruns)
+ *   pnpm pipeline score                                       score new mentions (Haiku), then stop
  *   pnpm pipeline compute                                     recompute snapshots and cells
  */
 import { serviceClient } from "./shared/db";
@@ -21,6 +22,12 @@ async function main() {
   });
   const db = serviceClient();
 
+  if (args[0] === "score") {
+    const { scoreMentions } = await import("./score/score");
+    await scoreMentions(db);
+    return;
+  }
+
   if (args[0] === "compute") {
     const { computeAll } = await import("./compute/compute");
     await computeAll(db);
@@ -34,6 +41,8 @@ async function main() {
       const report = await safeRun(slug, { db });
       if (report !== "succeeded" && report !== "partial") failed++;
     }
+    const { scoreMentions } = await import("./score/score");
+    await scoreMentions(db);
     const { computeAll } = await import("./compute/compute");
     await computeAll(db);
     process.exitCode = failed ? 1 : 0;
@@ -54,6 +63,8 @@ async function main() {
       if (status !== "succeeded" && status !== "partial") failed++;
     }
     if ((data ?? []).length) {
+      const { scoreMentions } = await import("./score/score");
+      await scoreMentions(db);
       const { computeAll } = await import("./compute/compute");
       await computeAll(db);
     }

@@ -12,9 +12,11 @@
     "test:e2e": "playwright test --trace off",
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local --schema public > lib/database.types.ts",
-    "pipeline": "tsx pipelines/run.ts"
+    "pipeline": "tsx pipelines/run.ts",
+    "eval:mention-score": "tsx pipelines/eval/mention-score.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "class-variance-authority": "^0.7.1",

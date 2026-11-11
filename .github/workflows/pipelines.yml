@@ -42,7 +42,7 @@ jobs:
           else mode="queued"; fi
           # Only known modes and connector slugs reach the shell command below.
           case "$mode" in
-            all|queued|compute|eurostat|istat|osm|openfoodfacts) ;;
+            all|queued|compute|score|eurostat|istat|osm|openfoodfacts) ;;
             *) echo "::error::unknown mode '$mode'"; exit 1 ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
@@ -51,11 +51,13 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MODE: ${{ steps.mode.outputs.mode }}
         run: |
           case "$MODE" in
             queued)  pnpm pipeline --queued ;;
             compute) pnpm pipeline compute ;;
+            score)   pnpm pipeline score && pnpm pipeline compute ;;
             all)     pnpm pipeline all ;;
-            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
+            *)       pnpm pipeline "$MODE" && pnpm pipeline score && pnpm pipeline compute ;;
           esac
