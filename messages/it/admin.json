@@ -1,1 +1,71 @@
-{}
+{
+  "admin": {
+    "title": "Amministrazione",
+    "link": "Amministrazione",
+    "lead": "Fonti e esecuzioni dei connettori.",
+    "tiles": {
+      "sources": "Fonti",
+      "sourcesHint": "Licenza, grado, ultima esecuzione e riavvio.",
+      "runs": "Esecuzioni",
+      "runsHint": "Le ultime 50, con righe scritte e scartate."
+    },
+    "notAllowed": {
+      "title": "Accesso non consentito",
+      "body": "Quest'area è riservata ad analisti e amministratori. Se pensi di averne bisogno, chiedi a un amministratore di cambiare il tuo ruolo."
+    },
+    "sources": {
+      "title": "Fonti",
+      "licence": "Licenza",
+      "noLicence": "Non indicata",
+      "grade": "Grado predefinito",
+      "active": "Attiva",
+      "yes": "Sì",
+      "no": "No",
+      "terms": "Termini verificati",
+      "termsMissing": "Non verificati",
+      "lastRun": "Ultima esecuzione",
+      "noRun": "Nessuna esecuzione",
+      "written": "{n} scritte",
+      "rejected": "{n} scartate",
+      "noConnector": "Nessun connettore disponibile",
+      "empty": "Non ci sono fonti registrate."
+    },
+    "rerun": {
+      "button": "Riavvia",
+      "label": "Riavvia {source}",
+      "busy": "Esecuzione già in coda o in corso",
+      "sending": "Invio…",
+      "dispatched": "Avviato.",
+      "scheduled": "In coda: parte entro 30 minuti.",
+      "error": "Non è stato possibile mettere in coda l'esecuzione."
+    },
+    "toggle": {
+      "label": "Attiva {source}",
+      "error": "Non è stato possibile cambiare lo stato."
+    },
+    "runs": {
+      "title": "Esecuzioni",
+      "requestedAt": "Richiesta",
+      "duration": "Durata",
+      "fetched": "Lette",
+      "written": "Scritte",
+      "rejected": "Scartate",
+      "noDuration": "In attesa",
+      "errors": "Errori ({n})",
+      "noErrors": "Nessun errore",
+      "refreshing": "Aggiornamento automatico ogni 10 secondi.",
+      "emptyTitle": "Nessuna esecuzione, per ora",
+      "emptyBody": "Quando un analista riavvia un connettore, l'esecuzione compare qui.",
+      "emptyAction": "Vai alle fonti",
+      "seconds": "{n} s",
+      "minutes": "{n} min"
+    },
+    "run": {
+      "queued": "In coda",
+      "running": "In corso",
+      "succeeded": "Riuscita",
+      "partial": "Parziale",
+      "failed": "Fallita"
+    }
+  }
+}

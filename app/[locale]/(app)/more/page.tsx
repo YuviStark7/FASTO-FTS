@@ -1,4 +1,6 @@
+import { ChevronRight } from "lucide-react";
 import { cookies } from "next/headers";
+import { getStaffRole } from "@/lib/admin";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { requireUser } from "@/lib/auth";
@@ -11,6 +13,8 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("more");
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
   const { email } = await requireUser();
+  const ta = await getTranslations("admin");
+  const { role } = await getStaffRole();
 
   const seg = (active: boolean) =>
     cn("flex min-h-11 flex-1 items-center justify-center rounded-full text-sm", active ? "bg-brand text-brand-contrast" : "text-muted");
@@ -47,6 +51,13 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
           </Link>
         </div>
       </section>
+
+      {role && (
+        <Link href="/admin" className="flex min-h-12 items-center justify-between rounded-[var(--radius-card)] bg-surface p-5">
+          {ta("link")}
+          <ChevronRight aria-hidden className="size-4 text-muted" />
+        </Link>
+      )}
 
       <form action={signOut}>
         <button className="h-12 w-full rounded-full bg-surface-2 text-text">{t("signOut")}</button>
