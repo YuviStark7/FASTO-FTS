@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Category, CellRow, Territory } from "@/lib/queries/matrix";
+import { GapSummaryList, summariseGaps } from "./coverage";
 import { MatrixControls, type Filters } from "./controls";
 import { MatrixLegend } from "./legend";
 import { MatrixTable } from "./matrix-table";
@@ -86,6 +87,7 @@ export function MatrixView({ categories, territories, cells }: Props) {
             <>
               <MatrixTable model={model} mode={filters.mode} locale={locale} />
               <MatrixList model={model} mode={filters.mode} locale={locale} />
+              {filters.mode === "coverage" && <GapSummaryList model={model} summary={summariseGaps(model)} locale={locale} />}
             </>
           )}
         </>

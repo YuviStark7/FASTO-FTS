@@ -1,1 +1,27 @@
-{}
+{
+  "map": {
+    "title": "Map",
+    "lead": "The 20 pilot cities: circle size follows the estimated local demand, status is shown by icon and word.",
+    "link": "Pilot city map",
+    "pickCategory": "Pick a category",
+    "canvasLabel": "Map of the pilot cities",
+    "listLabel": "Pilot cities",
+    "cityItem": "{city}: {status}, local demand {demand}",
+    "noEstimate": "insufficient data",
+    "legend": "Legend",
+    "legendSize": "Circle size: local demand (estimate)",
+    "legendNoEstimate": "Small dashed circle: insufficient data",
+    "empty": "There are no cities to show yet.",
+    "noCoordinates": "{count} cities have no coordinates: they stay in the list.",
+    "tilesFailed": "The base map did not load: here is the list of cities.",
+    "listTitle": "City list",
+    "attribution": "© OpenStreetMap contributors · OpenFreeMap",
+    "sheetLabel": "City detail",
+    "close": "Close",
+    "localDemand": "Local demand",
+    "interval": "range {low}–{high}",
+    "period": "year {year}",
+    "demandUnavailable": "Local demand unavailable: insufficient data.",
+    "openCell": "Open the sheet"
+  }
+}

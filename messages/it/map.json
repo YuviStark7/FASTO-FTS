@@ -1,1 +1,27 @@
-{}
+{
+  "map": {
+    "title": "Mappa",
+    "lead": "Le 20 città pilota: la dimensione del cerchio segue la domanda locale stimata, lo stato è indicato da icona e parola.",
+    "link": "Mappa delle città pilota",
+    "pickCategory": "Scegli una categoria",
+    "canvasLabel": "Mappa delle città pilota",
+    "listLabel": "Città pilota",
+    "cityItem": "{city}: {status}, domanda locale {demand}",
+    "noEstimate": "dati insufficienti",
+    "legend": "Legenda",
+    "legendSize": "Dimensione del cerchio: domanda locale (stima)",
+    "legendNoEstimate": "Cerchio piccolo tratteggiato: dati insufficienti",
+    "empty": "Non ci sono ancora città da mostrare.",
+    "noCoordinates": "Mancano le coordinate di {count} città: restano nell'elenco.",
+    "tilesFailed": "La mappa di base non si carica: ecco l'elenco delle città.",
+    "listTitle": "Elenco delle città",
+    "attribution": "© OpenStreetMap contributors · OpenFreeMap",
+    "sheetLabel": "Dettaglio città",
+    "close": "Chiudi",
+    "localDemand": "Domanda locale",
+    "interval": "intervallo {low}–{high}",
+    "period": "anno {year}",
+    "demandUnavailable": "Domanda locale non disponibile: dati insufficienti.",
+    "openCell": "Apri la scheda"
+  }
+}

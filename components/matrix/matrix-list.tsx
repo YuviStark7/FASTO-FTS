@@ -6,6 +6,7 @@ import { Link } from "@/lib/i18n/navigation";
 import { CategoryIcon } from "@/components/cell/category-icon";
 import { statusIcon } from "@/components/cell/status";
 import { cn } from "@/lib/utils";
+import { CoverageCell, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
 import { cellKey, localName, type ViewModel } from "./model";
 
@@ -15,6 +16,9 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
   const s = useTranslations("status");
   const sc = useTranslations("scout");
   const [open, setOpen] = useState<number | null>(null);
+  const covLabel = useCoverageLabel();
+  const coverage = mode === "coverage";
+  const summary = coverage ? summariseGaps(model) : null;
 
   return (
     <ul data-testid="matrix-list" className="space-y-2 sm:hidden">
@@ -40,6 +44,9 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
               <span className="flex-1">
                 <span className="block font-medium">{localName(category, locale)}</span>
                 <span className="num block text-xs text-muted">{t("withData", { count: withData, total })}</span>
+                {summary && (
+                  <span className="num block text-xs text-muted">{t("missingCount", { count: summary.perCategory.get(category.id) ?? 0 })}</span>
+                )}
               </span>
               <ChevronDown aria-hidden className={cn("size-5 text-muted transition-transform", expanded && "rotate-180")} />
             </button>
@@ -55,14 +62,18 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
                     <li key={col.id} className="w-20 shrink-0">
                       <Link
                         href={`/cell/${category.slug}/${col.slug}`}
-                        aria-label={`${label}: ${status}`}
+                        aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
                         title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
                         className="flex flex-col items-center gap-1 py-1"
                       >
                         <span
-                          className={cn("grid size-11 place-items-center rounded-full border", cellClass(cell.status, cell.mos, mode))}
+                          className={cn(
+                            "grid place-items-center border",
+                            coverage ? "h-11 w-16 rounded-lg" : "size-11 rounded-full",
+                            cellClass(cell.status, cell.mos, mode),
+                          )}
                         >
-                          <Icon aria-hidden className="size-5" />
+                          {coverage ? <CoverageCell cell={cell} compact /> : <Icon aria-hidden className="size-5" />}
                         </span>
                         <span aria-hidden className="w-full truncate text-center text-xs">
                           {localName(col, locale)}

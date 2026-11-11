@@ -44,3 +44,25 @@ test("matrix shows all 300 cells and filters on the client", async ({ page }, in
   await page.waitForTimeout(400);
   await page.screenshot({ path: `test-results/matrix-${info.project.name}.png` });
 });
+
+test("coverage mode shows the data gap view", async ({ page }, info) => {
+  await signIn(page);
+  await page.goto("/matrix");
+  await page.getByRole("button", { name: "Copertura", exact: true }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  if (info.project.name.startsWith("desktop")) {
+    const table = page.getByRole("table", { name: "Matrice categorie per territori" });
+    await expect(table.getByRole("link")).toHaveCount(300);
+    // Every cell names its coverage in words, never by the bar alone.
+    const names = await table.getByRole("link").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? ""));
+    expect(names.every((n) => /copertura \d+%/.test(n))).toBe(true);
+    await expect(table.getByTestId("gap-city-row")).toHaveCount(1);
+    await expect(table.getByTestId("gap-category-count")).toHaveCount(15);
+  } else {
+    await expect(page.getByTestId("gap-summary-cities").getByRole("listitem")).toHaveCount(20);
+    await page.getByTestId("matrix-list").getByRole("button").first().click();
+    await expect(page.getByTestId("matrix-list").getByRole("link").first()).toHaveAttribute("aria-label", /copertura \d+%/);
+  }
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `test-results/coverage-${info.project.name}.png` });
+});

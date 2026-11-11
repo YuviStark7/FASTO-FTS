@@ -29,7 +29,7 @@ export function MatrixControls({
       <div role="group" aria-label={t("colourBy")} className="col-span-2 sm:col-span-1">
         <span className="mb-1 block text-xs text-muted">{t("colourBy")}</span>
         <div className="inline-flex rounded-full border border-border bg-surface p-1">
-          {(["status", "mos"] as const).map((m) => (
+          {(["status", "mos", "coverage"] as const).map((m) => (
             <button
               key={m}
               type="button"
@@ -40,7 +40,7 @@ export function MatrixControls({
                 filters.mode === m ? "bg-brand text-brand-contrast" : "text-muted",
               )}
             >
-              {t(m === "status" ? "modeStatus" : "modeMos")}
+              {t(m === "status" ? "modeStatus" : m === "mos" ? "modeMos" : "modeCoverage")}
             </button>
           ))}
         </div>
