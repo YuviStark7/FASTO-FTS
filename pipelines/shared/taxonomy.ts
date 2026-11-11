@@ -6,6 +6,8 @@ export type CategoryCodes = {
   coicop_group?: string | null;
   osm_shop?: string[];
   off_tags?: string[];
+  /** Open Food Facts labels (e.g. en:organic), queried with labels_tags. */
+  off_labels?: string[];
   scope_note?: string;
 };
 

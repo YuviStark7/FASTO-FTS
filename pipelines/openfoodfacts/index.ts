@@ -51,11 +51,9 @@ const connector: Connector = {
           ctx.log(`ERROR no count for ${query}: ${e instanceof Error ? e.message.slice(0, 160) : e}`);
           continue;
         }
-        // A storage error is not an OFF error: it propagates and fails the run. Raw storage is mandatory
-        // unless the caller passes --param skip_raw=1 (local stacks without the storage service); logged.
+        // Raw storage is mandatory (product rule 4): a storage error fails the run.
         const rawName = `${t.category}_${slugifyTag(t.tag)}_${territory}.json`;
-        if (ctx.params.skip_raw === "1") ctx.log(`WARN raw file not stored (skip_raw=1): ${rawName}`);
-        else await ctx.storeRaw({ name: rawName, bytes: got.bytes, contentType: "application/json", url: OFF_BASE + query });
+        await ctx.storeRaw({ name: rawName, bytes: got.bytes, contentType: "application/json", url: OFF_BASE + query });
         out.push({
           category: t.category,
           territory,
