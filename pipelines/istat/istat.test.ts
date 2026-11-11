@@ -55,6 +55,7 @@ function makeCtx(responder: (url: string) => string) {
     taxonomy: {},
     params: {},
     log: (m: string) => logs.push(m),
+    warn: (m: string) => logs.push(m),
     storeRaw: async (f: { name: string }) => void stored.push(f.name),
     get: async (url: string) => toResult(url, 200, "application/json", new TextEncoder().encode(responder(url))),
   } as unknown as ConnectorContext;

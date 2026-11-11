@@ -81,6 +81,7 @@ function fakeCtx() {
     },
     storeRaw: async (f) => void raw.push(f),
     log: (m) => void logs.push(m),
+    warn: (m) => void logs.push(m),
     params: {},
   };
   return { ctx, urls, raw, logs };

@@ -13,7 +13,7 @@
  *   pos_count              category null, city, series_key = "shop=<value>"
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { buildCategorySeries, classifyTrend, type ClassInputs, type Grade, type Series, type TrendParams } from "../../lib/scoring/trend";
+import { buildCategorySeries, classifyTrend, latestWindow, type ClassInputs, type Grade, type Series, type TrendParams } from "../../lib/scoring/trend";
 import { estimateLocalDemand, median, type GeoParams } from "../../lib/scoring/geo";
 import { loadTaxonomy, type Taxonomy } from "../shared/taxonomy";
 
@@ -65,8 +65,11 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
       const allItems = idx.series("price_index", country.id, "CP00", used);
 
       const points = classes.length ? buildCategorySeries({ classes, hfceByGroup, groupWeight, allItemsPrice: allItems }) : [];
+      // Grade and recorded inputs come only from the years inside the trend window.
+      const windowYears = new Set(latestWindow(points, params.trend.max_years).map((p) => p.year));
+      const windowUsed = used.filter((o) => windowYears.has(Number(o.period_start.slice(0, 4))));
       const result = classes.length
-        ? classifyTrend(points, used.map((o) => o.grade), params.trend)
+        ? classifyTrend(points, windowUsed.map((o) => o.grade), params.trend)
         : {
             status: "insufficient_data" as const,
             grade: null,
@@ -86,8 +89,7 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
           .map((c) => `${c.coicop} (${!c.price.size ? "no price index" : "no basket weight"})`);
         if (gaps.length) result.reason = `${result.reason}; missing for ${country.country_code}: ${gaps.join(", ")}`;
       }
-      const usedYears = new Set(points.map((p) => p.year));
-      const inputIds = used.filter((o) => usedYears.has(Number(o.period_start.slice(0, 4)))).map((o) => o.id);
+      const inputIds = [...new Set(windowUsed.map((o) => o.id))];
 
       const { data, error } = await db
         .from("trend_snapshots")
@@ -110,7 +112,8 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
         .select("id")
         .single();
       if (error) throw new Error(`trend ${cat.slug}/${countrySlug}: ${error.message}`);
-      const last = points.at(-1);
+      // Local demand needs a real national trend: no estimate hangs off an insufficient cell.
+      const last = result.status === "insufficient_data" ? undefined : points.at(-1);
       trendIds.set(`${cat.slug}|${countrySlug}`, {
         id: data.id,
         status: result.status,

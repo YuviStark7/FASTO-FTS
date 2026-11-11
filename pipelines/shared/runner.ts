@@ -58,10 +58,15 @@ export async function runConnector(connector: Connector, opts: RunOptions): Prom
   }
 
   const logLines: string[] = [];
+  const warnings: string[] = [];
   const ctx: ConnectorContext = {
     taxonomy,
     get: (url, init) => httpGet(url, init),
     storeRaw: (file) => storeRaw(file, { db, dryRun, runId, source: connector.source, outDir: opts.outDir }),
+    warn: (m) => {
+      warnings.push(m);
+      console.warn(`[${connector.source}] WARN ${m}`);
+    },
     log: (m) => {
       logLines.push(m);
       console.log(`[${connector.source}] ${m}`);
@@ -81,8 +86,8 @@ export async function runConnector(connector: Connector, opts: RunOptions): Prom
         written += chunk.length;
       }
     }
-    const status = rejected.length ? "partial" : "succeeded";
-    if (!dryRun) await finish(db, runId!, status, inputs.length, written, rejected, logLines);
+    const status = rejected.length || warnings.length ? "partial" : "succeeded";
+    if (!dryRun) await finish(db, runId!, status, inputs.length, written, rejected, [...logLines, ...warnings.map((w) => `WARN ${w}`)]);
     return { runId, status, fetched: inputs.length, written, rejected, rows };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
@@ -102,7 +107,7 @@ async function finish(
 ) {
   const errors = [
     ...rejected.slice(0, 50).map((r) => ({ reason: r.reason, ref: r.input.sourceRef })),
-    ...log.filter((l) => l.startsWith("ERROR")).map((l) => ({ reason: l })),
+    ...log.filter((l) => l.startsWith("ERROR") || l.startsWith("WARN")).map((l) => ({ reason: l })),
   ];
   const { error } = await db
     .from("source_runs")

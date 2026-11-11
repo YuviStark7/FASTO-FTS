@@ -23,7 +23,8 @@ export async function rerunSource(sourceId: number): Promise<RerunResult> {
 
 /** Admin only, enforced by RLS: a non-admin update changes zero rows. */
 export async function setSourceActive(sourceId: number, active: boolean): Promise<{ ok: boolean }> {
-  const { supabase } = await getStaffRole();
+  const { supabase, role } = await getStaffRole();
+  if (role !== "admin") return { ok: false }; // RLS also refuses; this is defence in depth
   const { data, error } = await supabase.from("sources").update({ is_active: active }).eq("id", sourceId).select("id");
   if (error || !data?.length) return { ok: false };
   revalidatePath("/", "layout");

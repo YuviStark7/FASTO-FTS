@@ -54,7 +54,9 @@ export function mapJsonStat(doc: JsonStat, o: MapOptions): ObservationInput[] {
       seriesKey: o.seriesKey(row),
       ...o.period(year),
       value: o.scale ? row.value * o.scale : row.value,
-      grade: "A",
+      // Estimated values (flag e, s) are Eurostat model estimates: grade B. Provisional (p),
+      // break (b) and definition (d) values are measured: grade A, flag kept beside the figure.
+      grade: row.flag && /[es]/.test(row.flag) ? "B" : "A",
       ...(row.flag ? { flag: row.flag } : {}),
       sourceRef: `${o.dataset}?${pinnedFilters(doc, row)}`,
     });

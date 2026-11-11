@@ -132,13 +132,6 @@ export function classifyTrend(points: TrendPoint[], inputGrades: Grade[], p: Tre
     lastYear: window.at(-1)?.year ?? null,
     series: points,
   };
-  if (!inputGrades.length) {
-    // Product rule 1: a figure without a grade never ships.
-    return { ...empty, status: "insufficient_data", grade: null, reason: "no graded inputs" };
-  }
-  if (inputGrades.every((g) => g === "C")) {
-    return { ...empty, status: "insufficient_data", grade: null, reason: "only grade C inputs" };
-  }
   if (window.length < p.min_annual_points) {
     return {
       ...empty,
@@ -146,6 +139,13 @@ export function classifyTrend(points: TrendPoint[], inputGrades: Grade[], p: Tre
       grade: null,
       reason: `${window.length} consecutive annual points, at least ${p.min_annual_points} needed`,
     };
+  }
+  if (!inputGrades.length) {
+    // Product rule 1: a figure without a grade never ships.
+    return { ...empty, status: "insufficient_data", grade: null, reason: "no graded inputs" };
+  }
+  if (inputGrades.every((g) => g === "C")) {
+    return { ...empty, status: "insufficient_data", grade: null, reason: "only grade C inputs" };
   }
   const first = window[0];
   const last = window.at(-1)!;

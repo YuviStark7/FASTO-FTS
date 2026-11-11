@@ -95,6 +95,7 @@ function fakeCtx(respond: (body: string) => Uint8Array | Error) {
     },
     storeRaw: async () => {},
     log: (m: string) => logs.push(m),
+    warn: (m: string) => logs.push(m),
     params: { baseline_shops: "deli" },
   } as unknown as ConnectorContext;
   return { ctx, logs };

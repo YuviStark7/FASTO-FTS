@@ -40,6 +40,9 @@ export type ConnectorContext = {
   /** Keep the raw response (hashed, stored in the raw-files bucket, logged in raw_files). */
   storeRaw: (file: RawFile) => Promise<void>;
   log: (message: string) => void;
+  /** Something is missing but the run still produced data (a city without an area, an empty
+   *  dataset). Recorded in source_runs.errors and the run ends as "partial", never "succeeded". */
+  warn: (message: string) => void;
   /** Free-form parameters from the source_runs row or the CLI (--param key=value). */
   params: Record<string, string>;
 };

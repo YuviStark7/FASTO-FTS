@@ -37,7 +37,7 @@ const connector: Connector = {
     for (const city of ctx.taxonomy.pilotCities) {
       const area = AREAS[city.slug];
       if (!area) {
-        ctx.log(`no area defined for ${city.slug}; skipped`);
+        ctx.warn(`no area defined for ${city.slug}; skipped`);
         failed.push(city.slug);
         continue;
       }
@@ -66,7 +66,7 @@ const connector: Connector = {
         ctx.log(`${city.slug}: relation ${parsed.relation.id} "${parsed.relation.name}" admin_level ${parsed.relation.adminLevel}, ${parsed.counts.size} shop values`);
       } catch (e) {
         failed.push(city.slug);
-        ctx.log(`${city.slug}: FAILED, no rows written: ${e instanceof Error ? e.message : String(e)}`);
+        ctx.warn(`${city.slug}: FAILED, no rows written: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
     if (failed.length) ctx.log(`cities without data: ${failed.join(", ")}`);

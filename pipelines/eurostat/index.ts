@@ -33,6 +33,7 @@ export async function run(ctx: ConnectorContext): Promise<ObservationInput[]> {
   const out: ObservationInput[] = [];
   let n = 0;
   const add = (label: string, rows: ObservationInput[]) => {
+    if (!rows.length) ctx.warn(`${label}: the dataset returned no usable values`);
     ctx.log(`${label}: ${rows.length} rows`);
     out.push(...rows);
   };
