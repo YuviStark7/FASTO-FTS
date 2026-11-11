@@ -129,6 +129,24 @@ describe("bluesky connector", () => {
     expect(warns.some((w) => w.includes("global cap"))).toBe(true);
   });
 
+  it("anonymous cursor pages are refused (403): keeps page 1 and warns once", async () => {
+    vi.unstubAllEnvs();
+    vi.stubEnv("BSKY_IDENTIFIER", "");
+    vi.stubEnv("BSKY_APP_PASSWORD", "");
+    let n = 0;
+    const { ctx, warns } = makeCtx(async (u) => {
+      if (n++ > 0) throw new Error(`HTTP 403 for ${u}`);
+      return toResult(u, 200, "application/json", new TextEncoder().encode(fixture));
+    });
+    const p = connector.run(ctx);
+    await vi.runAllTimersAsync();
+    const { mentions } = await p;
+    vi.unstubAllEnvs();
+    expect(n).toBe(2);
+    expect(mentions).toHaveLength(5);
+    expect(warns.filter((w) => w.includes("first page"))).toHaveLength(1);
+  });
+
   it("falls back to an app-password session when anonymous search is refused", async () => {
     vi.stubEnv("BSKY_IDENTIFIER", "x.example.test");
     vi.stubEnv("BSKY_APP_PASSWORD", "pw");

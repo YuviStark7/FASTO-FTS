@@ -14,9 +14,8 @@ export const WINDOW_DAYS = 365;
 export const PAGE_SIZE = 100;
 export const MAX_PER_QUERY = 500;
 export const MAX_TOTAL = 20_000;
-export const MIN_INTERVAL_MS = 700;
-/** The public endpoint answers 403 (not 429) when it throttles a burst; wait and retry before giving up. */
-export const THROTTLE_WAITS_MS = [30_000, 60_000, 120_000];
+export const MIN_INTERVAL_MS = 500;
+
 
 type SearchResponse = { posts?: Parameters<typeof cleanHit>[0][]; cursor?: string };
 
@@ -66,6 +65,7 @@ const connector: Connector<{ mentions: MentionInput[] }> = {
     const seen = new Set<string>();
     const out: MentionInput[] = [];
     const skips: Record<string, number> = {};
+    let paginationWarned = false;
 
     for (const spec of queries) {
       if (out.length >= total) {
@@ -76,7 +76,6 @@ const connector: Connector<{ mentions: MentionInput[] }> = {
       let fetched = 0;
       let cursor: string | undefined;
       let authTried = false;
-      let throttled = 0;
       try {
         while (fetched < perQuery) {
           let res;
@@ -93,10 +92,13 @@ const connector: Connector<{ mentions: MentionInput[] }> = {
               ctx.log("anonymous search refused, using an app-password session");
               continue;
             }
-            if (/HTTP (401|403)/.test(msg) && throttled < THROTTLE_WAITS_MS.length) {
-              ctx.log(`HTTP 403, waiting ${THROTTLE_WAITS_MS[throttled] / 1000}s before retrying`);
-              await sleep(THROTTLE_WAITS_MS[throttled++]);
-              continue;
+            if (/HTTP (401|403)/.test(msg) && cursor && !authTried) {
+              // Measured 11 Nov 2026: api.bsky.app serves page 1 anonymously and refuses cursor pages (403).
+              if (!paginationWarned) {
+                ctx.warn("anonymous search is limited to the first page (100 posts) per query; set BSKY_IDENTIFIER and BSKY_APP_PASSWORD for full pagination");
+                paginationWarned = true;
+              }
+              break;
             }
             throw e;
           }
