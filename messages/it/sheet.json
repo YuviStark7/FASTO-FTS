@@ -188,7 +188,11 @@
       "attrOsm": "© OpenStreetMap contributors (ODbL)",
       "attrOsmLink": "openstreetmap.org/copyright",
       "attrIstat": "Fonte: ISTAT",
-      "attrOff": "Open Food Facts, licenza ODbL"
+      "attrOff": "Open Food Facts, licenza ODbL",
+      "attrGdelt": "Fonte: The GDELT Project",
+      "attrWikimedia": "Visualizzazioni di Wikipedia: Wikimedia Foundation (CC0)",
+      "attrBluesky": "Post pubblici da Bluesky (estratti senza autori; non è un campione rappresentativo)",
+      "attrEurostatMod": "I valori derivati (spesa per categoria, domanda locale) sono elaborazioni FASTO FTS su dati Eurostat e ISTAT; Eurostat e ISTAT non ne sono responsabili."
     },
     "notFound": {
       "title": "Cella non trovata",

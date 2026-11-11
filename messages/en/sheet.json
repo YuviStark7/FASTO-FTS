@@ -188,7 +188,11 @@
       "attrOsm": "© OpenStreetMap contributors (ODbL)",
       "attrOsmLink": "openstreetmap.org/copyright",
       "attrIstat": "Source: ISTAT",
-      "attrOff": "Open Food Facts, ODbL licence"
+      "attrOff": "Open Food Facts, ODbL licence",
+      "attrGdelt": "Source: The GDELT Project",
+      "attrWikimedia": "Wikipedia pageviews: Wikimedia Foundation (CC0)",
+      "attrBluesky": "Public posts from Bluesky (excerpts without authors; not a representative sample)",
+      "attrEurostatMod": "Derived values (category spending, local demand) are FASTO FTS elaborations of Eurostat and ISTAT data; Eurostat and ISTAT are not responsible for them."
     },
     "notFound": {
       "title": "Cell not found",

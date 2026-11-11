@@ -89,7 +89,17 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
             </a>
           </li>
           <li>{t("attrOff")}</li>
+          <li>
+            {t("attrGdelt")}{" "}
+            <a href="https://www.gdeltproject.org/" target="_blank" rel="noreferrer" className="text-brand-alt underline">
+              gdeltproject.org
+            </a>
+          </li>
+          <li>{t("attrWikimedia")}</li>
+          <li>{t("attrBluesky")}</li>
         </ul>
+        {/* Eurostat and ISTAT ask that modified data be marked as such, with a non-responsibility note. */}
+        <p className="mt-3 text-xs text-muted">{t("attrEurostatMod")}</p>
       </Panel>
     </div>
   );
