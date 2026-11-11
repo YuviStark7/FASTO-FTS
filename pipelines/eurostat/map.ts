@@ -7,7 +7,7 @@ export const FIRST_YEAR = 2015;
  * Eurostat observation flags we do NOT turn into observations even when a value is present:
  * c confidential, z not applicable, f forecast (not a measurement). Everything else
  * (p provisional, e/s estimated, b break in series, d definition differs, u low reliability, ...)
- * is kept: the figure is Eurostat's own and the flag is stored in the raw file.
+ * is kept: the figure is Eurostat's own and the flag is stored with it (observations.status_flag).
  */
 const SKIPPED_FLAGS = new Set(["c", "z", "f"]);
 
@@ -55,6 +55,7 @@ export function mapJsonStat(doc: JsonStat, o: MapOptions): ObservationInput[] {
       ...o.period(year),
       value: o.scale ? row.value * o.scale : row.value,
       grade: "A",
+      ...(row.flag ? { flag: row.flag } : {}),
       sourceRef: `${o.dataset}?${pinnedFilters(doc, row)}`,
     });
   }

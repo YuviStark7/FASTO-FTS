@@ -607,14 +607,14 @@ isOneToOne: false
                   ]
                 },"observations": {
                   Row: {
-                    "category_id": number | null,"created_at": string,"grade": Database["public"]['Enums']["grade"],"high": number | null,"id": number,"indicator_id": number,"is_demo": boolean,"low": number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id": number | null,"series_key": string,"source_id": number,"source_ref": string | null,"territory_id": number,"unit": string,"value": number
+                    "category_id": number | null,"created_at": string,"grade": Database["public"]['Enums']["grade"],"high": number | null,"id": number,"indicator_id": number,"is_demo": boolean,"low": number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id": number | null,"series_key": string,"source_id": number,"source_ref": string | null,"status_flag": string | null,"territory_id": number,"unit": string,"value": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id"?: number | null,"created_at"?: string,"grade": Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id": number,"is_demo"?: boolean,"low"?: number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id"?: number | null,"series_key"?: string,"source_id": number,"source_ref"?: string | null,"territory_id": number,"unit": string,"value": number
+                    "category_id"?: number | null,"created_at"?: string,"grade": Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id": number,"is_demo"?: boolean,"low"?: number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id"?: number | null,"series_key"?: string,"source_id": number,"source_ref"?: string | null,"status_flag"?: string | null,"territory_id": number,"unit": string,"value": number
                   }
                   Update: {
-                    "category_id"?: number | null,"created_at"?: string,"grade"?: Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id"?: number,"is_demo"?: boolean,"low"?: number | null,"method_version_id"?: string,"period_end"?: string,"period_start"?: string,"run_id"?: number | null,"series_key"?: string,"source_id"?: number,"source_ref"?: string | null,"territory_id"?: number,"unit"?: string,"value"?: number
+                    "category_id"?: number | null,"created_at"?: string,"grade"?: Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id"?: number,"is_demo"?: boolean,"low"?: number | null,"method_version_id"?: string,"period_end"?: string,"period_start"?: string,"run_id"?: number | null,"series_key"?: string,"source_id"?: number,"source_ref"?: string | null,"status_flag"?: string | null,"territory_id"?: number,"unit"?: string,"value"?: number
                   }
                   Relationships: [
                     {

@@ -78,6 +78,14 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
             reason: cat.codes.scope_note ?? "no statistical class mapped to this category",
             series: [],
           };
+      if (result.status === "insufficient_data" && classes.length) {
+        // Say which input is missing instead of only counting points. A category is never
+        // silently redefined by dropping one of its classes.
+        const gaps = classes
+          .filter((c) => !c.weight.size || !c.price.size)
+          .map((c) => `${c.coicop} (${!c.price.size ? "no price index" : "no basket weight"})`);
+        if (gaps.length) result.reason = `${result.reason}; missing for ${country.country_code}: ${gaps.join(", ")}`;
+      }
       const usedYears = new Set(points.map((p) => p.year));
       const inputIds = used.filter((o) => usedYears.has(Number(o.period_start.slice(0, 4)))).map((o) => o.id);
 

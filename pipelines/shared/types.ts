@@ -25,6 +25,8 @@ export type ObservationInput = {
   unit?: string;
   /** Defaults to the source's default grade. */
   grade?: Grade;
+  /** Status flag exactly as the source publishes it (Eurostat: p, e, b, d, u ...). */
+  flag?: string;
   /** Dataset code plus filters that pin the exact figure, e.g. "demo_r_pjanaggr3?geo=ITI43&sex=T&age=TOTAL". */
   sourceRef: string;
 };

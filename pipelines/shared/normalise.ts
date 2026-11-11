@@ -20,6 +20,7 @@ export type ObservationRow = {
   method_version_id: string;
   is_demo: boolean;
   source_ref: string;
+  status_flag: string | null;
 };
 
 export type Rejected = { input: ObservationInput; reason: string };
@@ -64,6 +65,7 @@ export function normalise(
       method_version_id: NORMALISE_METHOD,
       is_demo: ctx.isDemo ?? false,
       source_ref: input.sourceRef,
+      status_flag: input.flag ?? null,
     };
     // Deduplicate inside one batch on the natural key; the last value wins.
     const key = [row.category_id, row.territory_id, row.indicator_id, row.series_key, row.period_start, row.period_end].join("|");
@@ -83,5 +85,6 @@ function check(o: ObservationInput, t: Taxonomy): string | null {
   if (o.high != null && (!Number.isFinite(o.high) || o.high < o.value)) return "high bound below value";
   if (o.grade && !["A", "B", "C"].includes(o.grade)) return `bad grade ${o.grade}`;
   if (!o.sourceRef || o.sourceRef.length > 1000) return "missing or oversized sourceRef";
+  if (o.flag != null && !/^[a-z]{1,4}$/.test(o.flag)) return `bad status flag ${o.flag}`;
   return null;
 }
