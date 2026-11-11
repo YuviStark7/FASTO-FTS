@@ -18,8 +18,8 @@ set local role authenticated;
 set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}';
 select throws_ok($$insert into public.source_runs (source_id) select id from public.sources where slug = 'eurostat'$$,
   '42501', null, 'member cannot queue a connector run');
-select lives_ok($$update public.sources set is_active = true where slug = 'eurostat'$$, 'member update of sources is filtered by RLS');
-select is((select is_active from public.sources where slug = 'eurostat'), false, 'source unchanged by member');
+select lives_ok($$update public.sources set is_active = true where slug = 'ismea'$$, 'member update of sources is filtered by RLS');
+select is((select is_active from public.sources where slug = 'ismea'), false, 'source unchanged by member');
 select is((select count(*)::int from storage.objects where bucket_id = 'raw-files'), 0, 'member cannot list raw files');
 select throws_ok($$insert into public.trend_snapshots (category_id, territory_id, status, reason, method_version_id)
                   values (1, 1, 'expanding', 'x', 'trend-v1')$$, '42501', null, 'member cannot write trend snapshots');
@@ -30,7 +30,7 @@ reset role;
 -- ---------------------------------------------------------------- analyst
 set local role authenticated;
 set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}';
-select lives_ok($$insert into public.source_runs (source_id) select id from public.sources where slug = 'eurostat'$$,
+select lives_ok($$insert into public.source_runs (source_id) select id from public.sources where slug = 'ismea'$$,
   'analyst queues a connector run');
 select is((select status::text from public.source_runs order by id desc limit 1), 'queued', 'queued run starts as queued');
 select is((select requested_by from public.source_runs order by id desc limit 1), '00000000-0000-0000-0000-0000000000b1'::uuid,
@@ -38,14 +38,14 @@ select is((select requested_by from public.source_runs order by id desc limit 1)
 select throws_ok($$insert into public.source_runs (source_id, status) select id, 'succeeded' from public.sources where slug = 'istat'$$,
   '42501', null, 'analyst cannot insert a run with its own status');
 select throws_ok($$update public.source_runs set status = 'succeeded'$$, '42501', null, 'analyst cannot change a run status');
-select lives_ok($$update public.sources set is_active = true where slug = 'eurostat'$$, 'analyst update of sources is filtered by RLS');
-select is((select is_active from public.sources where slug = 'eurostat'), false, 'only admins activate sources');
+select lives_ok($$update public.sources set is_active = true where slug = 'ismea'$$, 'analyst update of sources is filtered by RLS');
+select is((select is_active from public.sources where slug = 'ismea'), false, 'only admins activate sources');
 reset role;
 
 -- ---------------------------------------------------------------- admin
 set local role authenticated;
 set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}';
-select lives_ok($$update public.sources set is_active = true where slug = 'eurostat'$$, 'admin activates a source');
+select lives_ok($$update public.sources set is_active = true where slug = 'ismea'$$, 'admin activates a source');
 reset role;
 select ok((select count(*) from public.audit_log where table_name = 'sources' and new_row->>'is_active' = 'true') >= 1,
   'source activation is audited');
