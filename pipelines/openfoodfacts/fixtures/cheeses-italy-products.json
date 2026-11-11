@@ -1,0 +1,5 @@
+{"count":6452,"page":1,"page_count":130,"page_size":50,"skip":0,"products":[
+{"code":"8001234500011","product_name":"","product_name_it":"Parmigiano Reggiano DOP 24 mesi","brands":"Caseificio Esempio,Altra Marca","quantity":"200 g","product_quantity":"200","product_quantity_unit":"g","labels_tags":["en:pdo","en:organic","en:nutriscore","en:green-dot","it:parmigiano-reggiano"],"origins_tags":["en:italy"],"stores":"Coop","countries_tags":["en:italy"]},
+{"code":"8001234500028","product_name":"Formaggio fresco","brands":"","quantity":"","labels_tags":[],"origins_tags":[],"countries_tags":["en:italy"]},
+{"code":"8001234500035","product_name":"Latte intero","brands":"Marca Latte","quantity":"1 l","product_quantity":1,"product_quantity_unit":"l","labels_tags":["en:fair-trade","en:igp"],"origins_tags":["en:italy","en:france"],"countries_tags":["en:italy"]}
+]}

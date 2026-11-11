@@ -37,7 +37,7 @@ describe("openfoodfacts connector", () => {
     });
     const promise = connector.run(ctx);
     await vi.runAllTimersAsync();
-    const rows = await promise;
+    const { observations: rows } = await promise;
 
     expect(rows).toHaveLength(TAGS.length * Object.keys(COUNTRY_TAGS).length);
     expect(stored).toHaveLength(rows.length);
@@ -67,11 +67,30 @@ describe("openfoodfacts connector", () => {
     });
     const promise = connector.run(ctx);
     await vi.runAllTimersAsync();
-    const rows = await promise;
+    const { observations: rows } = await promise;
 
     const total = TAGS.length * Object.keys(COUNTRY_TAGS).length;
     expect(rows).toHaveLength(total - 1);
     expect(rows.find((r) => r.category === "cheese" && r.territory === "fr")).toBeUndefined();
     expect(calls).toBe(total - 1 + 4); // 4 attempts for the failing one
+  });
+
+  it("returns offers from the same single request, deduplicated, and honours only=", async () => {
+    const urls: string[] = [];
+    const prod = readFileSync(path.join(__dirname, "fixtures", "cheeses-italy-products.json"));
+    const { ctx } = makeCtx(async (url) => {
+      urls.push(url);
+      return toResult(url, 200, "application/json", new Uint8Array(prod));
+    });
+    ctx.params = { only: "cured-meats:it" };
+    const promise = connector.run(ctx);
+    await vi.runAllTimersAsync();
+    const { observations, offers } = await promise;
+
+    expect(urls).toHaveLength(3); // three cured-meats tags, Italy only, one request each
+    expect(observations).toHaveLength(3);
+    expect(urls[0]).toContain("page_size=50");
+    expect(offers).toHaveLength(3); // the same 3 barcodes under 3 tags collapse to 3 offers
+    expect(offers.every((o) => o.category === "cured-meats" && o.territory === "it" && o.price === null)).toBe(true);
   });
 });
