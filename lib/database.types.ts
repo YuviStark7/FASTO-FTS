@@ -959,6 +959,11 @@ isOneToOne: false
           Functions: {
             "ai_quota_check":
 { Args: { "p_kind": string,"p_user": string }; Returns: string
+                           },
+"feedback_summary":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "category_slug": string,"comments": (string)[],"computed_at": string,"csi": number,"csi_snapshot_id": number,"is_demo": boolean,"n_mentions": number,"n_partly_right": number,"n_right": number,"n_wrong": number,"territory_slug": string
+            }[]
                            }
           }
           Enums: {
