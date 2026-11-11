@@ -1,4 +1,5 @@
 import "server-only";
+import { CSI_EVIDENCE } from "./evidence";
 import { requireUser } from "@/lib/auth";
 import type { Database } from "@/lib/database.types";
 
@@ -25,6 +26,8 @@ export type Figure = {
   /** Source status flags present among the inputs (p, e, b, d ...). */
   flags?: string[];
   note?: string | null;
+  /** For figures built from mentions rather than observations: id of the in-page provenance panel. */
+  evidence?: string;
 };
 
 export type LedgerRow = {
@@ -93,14 +96,19 @@ export type CellSheet = {
     csiSnapshotId: number | null;
     isDemo: boolean;
     csi: Figure;
-    components: { key: "liking" | "desirability" | "trust" | "perceived_value" | "purchase_intent"; value: number | null }[];
-    nMentions: number;
+    components: { key: "liking" | "desirability" | "trust" | "perceived_value" | "purchase_intent"; figure: Figure }[];
+    nMentions: Figure;
+    /** Where the mentions behind the reading come from (product rule 4). */
+    provenance: {
+      sources: { slug: string; name: string; url: string; licence: string | null; mentions: number; lastRun: { id: number; finishedAt: string | null } | null }[];
+      scoring: { model: string; promptVersion: string } | null;
+    };
     languages: string[];
     period: { start: string; end: string };
     representativenessNote: string;
     published: boolean;
-    levers: { label_it: string; label_en: string; share: number | null; mentionCount: number; examples: string[] }[];
-    barriers: { label_it: string; label_en: string; share: number | null; mentionCount: number; examples: string[] }[];
+    levers: { label_it: string; label_en: string; share: Figure; mentionCount: number; examples: string[] }[];
+    barriers: { label_it: string; label_en: string; share: Figure; mentionCount: number; examples: string[] }[];
   };
   attention: { indicator: "pageviews" | "media_attention"; figure: Figure; series: { period: string; value: number }[] }[];
   competition: {
@@ -313,29 +321,31 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
         }
       : null,
     consumers: csi
-      ? {
-          csiSnapshotId: csi.id,
-          isDemo: csi.is_demo,
-          csi: {
-            value: csi.csi == null ? null : Number(csi.csi),
-            unit: "index_0_100",
+      ? await (async () => {
+          const base = {
             grade: csi.grade,
             period: `${csi.period_start} – ${csi.period_end}`,
             methodVersion: csi.method_version_id,
             observationIds: [],
-            note: csi.representativeness_note,
-          },
-          components: (["liking", "desirability", "trust", "perceived_value", "purchase_intent"] as const).map((key) => ({
-            key,
-            value: csi[key] == null ? null : Number(csi[key]),
-          })),
-          nMentions: csi.n_mentions,
-          languages: csi.languages,
-          period: { start: csi.period_start, end: csi.period_end },
-          representativenessNote: csi.representativeness_note,
-          published: csi.is_published,
-          ...(await loadLeversBarriers(supabase, csi.id)),
-        }
+            evidence: CSI_EVIDENCE,
+          };
+          return {
+            csiSnapshotId: csi.id,
+            isDemo: csi.is_demo,
+            csi: { ...base, value: csi.csi == null ? null : Number(csi.csi), unit: "index_0_100", note: csi.representativeness_note },
+            components: (["liking", "desirability", "trust", "perceived_value", "purchase_intent"] as const).map((key) => ({
+              key,
+              figure: { ...base, value: csi[key] == null ? null : Number(csi[key]), unit: "index_0_100" },
+            })),
+            nMentions: { ...base, value: csi.n_mentions, unit: "count" },
+            languages: csi.languages,
+            period: { start: csi.period_start, end: csi.period_end },
+            representativenessNote: csi.representativeness_note,
+            published: csi.is_published,
+            provenance: await loadCsiProvenance(supabase, csi),
+            ...(await loadLeversBarriers(supabase, csi.id, base)),
+          };
+        })()
       : null,
     attention: [attentionBy("pageviews"), attentionBy("media_attention")].filter((x): x is NonNullable<typeof x> => x != null),
     competition: {
@@ -404,7 +414,57 @@ async function loadLedger(
   return out.sort((a, b) => a.indicator.localeCompare(b.indicator) || a.seriesKey.localeCompare(b.seriesKey) || a.periodStart.localeCompare(b.periodStart));
 }
 
-async function loadLeversBarriers(supabase: Awaited<ReturnType<typeof requireUser>>["supabase"], csiId: number) {
+
+type Db = Awaited<ReturnType<typeof requireUser>>["supabase"];
+
+async function loadCsiProvenance(
+  supabase: Db,
+  csi: { category_id: number; territory_id: number; period_start: string; period_end: string; source_ids: number[] },
+): Promise<NonNullable<CellSheet["consumers"]>["provenance"]> {
+  const sources = await Promise.all(
+    csi.source_ids.map(async (sourceId) => {
+      const [src, count, run] = await Promise.all([
+        supabase.from("sources").select("slug, name, url, licence").eq("id", sourceId).single(),
+        supabase
+          .from("mentions")
+          .select("id, mention_scores!inner(relevant)", { count: "exact", head: true })
+          .eq("source_id", sourceId)
+          .eq("category_id", csi.category_id)
+          .eq("territory_id", csi.territory_id)
+          .eq("mention_scores.relevant", true)
+          .gte("published_on", csi.period_start)
+          .lte("published_on", csi.period_end),
+        supabase
+          .from("source_runs")
+          .select("id, finished_at")
+          .eq("source_id", sourceId)
+          .in("status", ["succeeded", "partial"])
+          .order("finished_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      return {
+        slug: src.data?.slug ?? String(sourceId),
+        name: src.data?.name ?? String(sourceId),
+        url: src.data?.url ?? "",
+        licence: src.data?.licence ?? null,
+        mentions: count.count ?? 0,
+        lastRun: run.data ? { id: run.data.id, finishedAt: run.data.finished_at } : null,
+      };
+    }),
+  );
+  const { data: scored } = await supabase
+    .from("mentions")
+    .select("mention_scores!inner(model, prompt_version)")
+    .eq("category_id", csi.category_id)
+    .eq("territory_id", csi.territory_id)
+    .limit(1)
+    .maybeSingle();
+  const ms = (scored?.mention_scores as unknown as { model: string; prompt_version: string } | null) ?? null;
+  return { sources, scoring: ms ? { model: ms.model, promptVersion: ms.prompt_version } : null };
+}
+
+async function loadLeversBarriers(supabase: Db, csiId: number, base: Omit<Figure, "value" | "unit">) {
   const [l, b] = await Promise.all([
     supabase.from("levers").select("label_it, label_en, share, mention_count, example_mention_ids").eq("csi_snapshot_id", csiId).order("mention_count", { ascending: false }),
     supabase.from("barriers").select("label_it, label_en, share, mention_count, example_mention_ids").eq("csi_snapshot_id", csiId).order("mention_count", { ascending: false }),
@@ -416,7 +476,7 @@ async function loadLeversBarriers(supabase: Awaited<ReturnType<typeof requireUse
     (rows ?? []).map((r) => ({
       label_it: r.label_it,
       label_en: r.label_en,
-      share: r.share == null ? null : Number(r.share),
+      share: { ...base, value: r.share == null ? null : Number(r.share), unit: "share" } as Figure,
       mentionCount: r.mention_count,
       examples: r.example_mention_ids.slice(0, 2).map((id) => text.get(id)).filter((x): x is string => Boolean(x)),
     }));

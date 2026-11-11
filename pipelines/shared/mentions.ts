@@ -5,9 +5,12 @@ import type { MentionInput, OfferInput } from "./types";
 /** Defensive second pass: no handle, e-mail or profile link survives, whatever the connector did. */
 export function scrubExcerpt(text: string): string {
   return text
-    .replace(/https?:\/\/\S+/g, "[link]")
+    .replace(/https?:\/\/\S+/gi, "[link]")
+    .replace(/\bwww\.\S+\.\S+/gi, "[link]")
+    .replace(/\bdid:[a-z0-9]+:[A-Za-z0-9._:%-]+/g, "[id]")
     .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[email]")
-    .replace(/(^|\s)@[\w.-]+/g, "$1@…")
+    .replace(/(^|[^\w])@[\w.-]+/g, "$1@…")
+    .replace(/\b[\w-]+\.bsky\.social\b/gi, "[handle]")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 500);

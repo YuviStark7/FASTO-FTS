@@ -404,8 +404,14 @@ async function computeCsiSnapshots(
           share: x.share,
           example_mention_ids: x.examples,
         }));
-      if (r.levers.length) await db.from("levers").insert(mk(r.levers, LEVER_LABELS));
-      if (r.barriers.length) await db.from("barriers").insert(mk(r.barriers, BARRIER_LABELS));
+      if (r.levers.length) {
+        const { error: le } = await db.from("levers").insert(mk(r.levers, LEVER_LABELS));
+        if (le) throw new Error(`write levers: ${le.message}`);
+      }
+      if (r.barriers.length) {
+        const { error: be } = await db.from("barriers").insert(mk(r.barriers, BARRIER_LABELS));
+        if (be) throw new Error(`write barriers: ${be.message}`);
+      }
       out.set(`${cat.slug}|${countrySlug}`, { id: data.id, published: r.published });
     }
   }

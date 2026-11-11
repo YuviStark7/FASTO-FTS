@@ -41,6 +41,10 @@ test("member rates a published CSI reading, it persists after reload; viewer can
     const control = page.getByTestId("feedback-control");
     await expect(control.getByText("Questa lettura del sentiment è corretta?")).toBeVisible();
     await expect(page.getByRole("tabpanel").getByText("DEMO").first()).toBeVisible();
+    // Every sentiment figure is graded and opens its provenance (product rules 1 and 4).
+    await page.getByRole("button", { name: /^Dettaglio del dato/ }).first().click();
+    await page.getByRole("button", { name: "Vedi provenienza" }).click();
+    await expect(page.locator("#csi-provenance")).toBeFocused();
 
     const wrong = control.getByRole("button", { name: "Sbagliata" });
     await expect(wrong).toBeVisible();

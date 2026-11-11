@@ -5,6 +5,7 @@ import { DemoBadge } from "@/components/cell/grade-badge";
 import { FeedbackControl } from "@/components/feedback/feedback-control";
 import { FigureValue } from "./figure-value";
 import { formatDate } from "./format";
+import { CSI_EVIDENCE } from "@/lib/queries/evidence";
 import { InsufficientState, Panel } from "./ui";
 
 type Consumers = NonNullable<CellSheet["consumers"]>;
@@ -46,9 +47,8 @@ function Items({ title, items, locale }: { title: string; items: Consumers["leve
             <li key={i}>
               <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="font-medium">{locale === "en" ? it.label_en : it.label_it}</span>
-                <span className="num text-sm text-muted">
-                  {it.share != null ? t("share", { share: Math.round(it.share * 100) }) : t("mentions", { count: it.mentionCount })}
-                </span>
+                <FigureValue figure={it.share} />
+                <span className="num text-sm text-muted">{t("mentions", { count: it.mentionCount })}</span>
               </div>
               {it.examples.length > 0 && (
                 <ul className="mt-1 space-y-1">
@@ -67,9 +67,41 @@ function Items({ title, items, locale }: { title: string; items: Consumers["leve
   );
 }
 
+function Provenance({ provenance }: { provenance: Consumers["provenance"] }) {
+  const t = useTranslations("sheet.consumers");
+  const locale = useLocale();
+  return (
+    <section id={CSI_EVIDENCE} tabIndex={-1} className="scroll-mt-24 rounded-[var(--radius-card)] focus:outline-2 focus:outline-brand">
+      <Panel title={t("provenance")}>
+        <p className="mb-3 text-sm text-muted">{t("provenanceNote")}</p>
+        {provenance.sources.length === 0 ? (
+          <p className="text-sm">{t("provenanceNone")}</p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {provenance.sources.map((s) => (
+              <li key={s.slug} className="flex flex-wrap items-baseline gap-x-3">
+                <a href={s.url} target="_blank" rel="noreferrer" className="text-brand-alt underline">
+                  {s.name}
+                </a>
+                <span className="num text-muted">{t("mentions", { count: s.mentions })}</span>
+                {s.licence && <span className="text-muted">{s.licence}</span>}
+                <span className="num text-muted">
+                  {s.lastRun ? t("lastRun", { id: s.lastRun.id, date: s.lastRun.finishedAt ? formatDate(s.lastRun.finishedAt, locale) : "-" }) : t("noRun")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {provenance.scoring && (
+          <p className="num mt-3 text-xs text-muted">{t("scoredWith", { model: provenance.scoring.model, prompt: provenance.scoring.promptVersion })}</p>
+        )}
+      </Panel>
+    </section>
+  );
+}
+
 export function ConsumersTab({ consumers, attention }: { consumers: CellSheet["consumers"]; attention: CellSheet["attention"] }) {
   const t = useTranslations("sheet.consumers");
-  const tf = useTranslations("sheet.figure");
   const locale = useLocale();
   const ready = consumers && consumers.published && consumers.csi.value != null;
 
@@ -87,17 +119,15 @@ export function ConsumersTab({ consumers, attention }: { consumers: CellSheet["c
               {consumers.components.map((c) => (
                 <li key={c.key} className="flex items-center justify-between gap-3 text-sm">
                   <span>{t(`componentNames.${c.key}`)}</span>
-                  {c.value == null ? (
-                    <span className="hatched rounded-md border border-border px-2 py-0.5 text-xs">{tf("insufficient")}</span>
-                  ) : (
-                    <span className="num">{Math.round(c.value)}</span>
-                  )}
+                  <FigureValue figure={c.figure} />
                 </li>
               ))}
             </ul>
             <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
               <dt className="text-muted">n</dt>
-              <dd className="num">{t("mentions", { count: consumers.nMentions })}</dd>
+              <dd>
+                <FigureValue figure={consumers.nMentions} />
+              </dd>
               <dt className="text-muted">{t("period")}</dt>
               <dd className="num">
                 {formatDate(consumers.period.start, locale)} – {formatDate(consumers.period.end, locale)}
@@ -117,9 +147,15 @@ export function ConsumersTab({ consumers, attention }: { consumers: CellSheet["c
         <InsufficientState title={t("insufficientTitle")}>
           <p>{t("insufficient")}</p>
           <p>{t("neverSample")}</p>
-          {consumers && <p className="num">{t("mentions", { count: consumers.nMentions })}</p>}
+          {consumers && (
+            <p className="flex flex-wrap items-center gap-2">
+              {t("mentionsLabel")} <FigureValue figure={consumers.nMentions} />
+            </p>
+          )}
         </InsufficientState>
       )}
+
+      {consumers && <Provenance provenance={consumers.provenance} />}
 
       <Panel title={t("attention")}>
         <p className="mb-3 text-sm text-muted">{t("attentionNote")}</p>

@@ -5,10 +5,18 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { PROMPT_VERSION, scoreBatch, type MentionForScoring } from "../../lib/ai/mention-score";
+import { priceFor, PROMPT_VERSION, scoreBatch, type BatchResult, type MentionForScoring } from "../../lib/ai/mention-score";
 
-export async function scoreMentions(db: SupabaseClient, log: (m: string) => void = console.log, limit = 2000) {
-  if (!process.env.ANTHROPIC_API_KEY) {
+/** Consecutive failed batches before the run stops (failed mentions stay queued for the next run). */
+export const MAX_CONSECUTIVE_FAILURES = 3;
+
+export async function scoreMentions(
+  db: SupabaseClient,
+  log: (m: string) => void = console.log,
+  limit = 2000,
+  client: Pick<Anthropic, "messages"> | null = null,
+) {
+  if (!client && !process.env.ANTHROPIC_API_KEY) {
     log("score: ANTHROPIC_API_KEY not set; mentions stay unscored");
     return { scored: 0, skipped: "no_key" as const };
   }
@@ -16,6 +24,7 @@ export async function scoreMentions(db: SupabaseClient, log: (m: string) => void
   const model = cfg?.find((r) => r.key === "ai.model.classifier")?.value as string;
   const budget = Number(cfg?.find((r) => r.key === "ai.daily_classification_budget_usd")?.value ?? 0);
   if (!model) throw new Error("app_config ai.model.classifier is not set");
+  priceFor(model); // unknown model: stop before any spend
 
   const { data: pending, error } = await db
     .from("mentions")
@@ -32,8 +41,9 @@ export async function scoreMentions(db: SupabaseClient, log: (m: string) => void
   }));
   log(`score: ${queue.length} mentions to score with ${model}`);
 
-  const client = new Anthropic();
+  const api = client ?? new Anthropic();
   let scored = 0;
+  let failures = 0;
   for (let i = 0; i < queue.length; i += 20) {
     const gate = await allowed(db, budget);
     if (gate !== "ok") {
@@ -41,13 +51,35 @@ export async function scoreMentions(db: SupabaseClient, log: (m: string) => void
       return { scored, skipped: gate };
     }
     const batch = queue.slice(i, i + 20);
-    let result;
+    let result: BatchResult;
     try {
-      result = await scoreBatch(client, model, batch);
+      result = await scoreBatch(api as Anthropic, model, batch);
     } catch (e) {
-      log(`score: batch starting at mention ${batch[0].id} failed: ${e instanceof Error ? e.message : String(e)}`);
+      // The request itself failed (network, API error): nothing was billed.
+      result = { scores: [], inputTokens: 0, outputTokens: 0, costUsd: 0, error: e instanceof Error ? e.message : String(e) };
+    }
+    // Spend first: a billed call is logged even when its output is unusable.
+    if (result.inputTokens || result.outputTokens) {
+      const { error: ue } = await db.from("usage").insert({
+        module: "04",
+        kind: "classification",
+        model,
+        input_tokens: result.inputTokens,
+        output_tokens: result.outputTokens,
+        cost_usd: result.costUsd,
+      });
+      if (ue) throw new Error(`write usage: ${ue.message}`);
+    }
+    if (result.error) {
+      failures++;
+      log(`score: batch starting at mention ${batch[0].id} failed: ${result.error}`);
+      if (failures >= MAX_CONSECUTIVE_FAILURES) {
+        log(`score: stopped after ${failures} failed batches in a row`);
+        return { scored, skipped: "failures" as const };
+      }
       continue;
     }
+    failures = 0;
     if (result.scores.length) {
       const { error: e } = await db.from("mention_scores").upsert(
         result.scores.map((s) => ({
@@ -67,27 +99,20 @@ export async function scoreMentions(db: SupabaseClient, log: (m: string) => void
       );
       if (e) throw new Error(`write scores: ${e.message}`);
     }
-    await db.from("usage").insert({
-      module: "04",
-      kind: "classification",
-      model,
-      input_tokens: result.inputTokens,
-      output_tokens: result.outputTokens,
-      cost_usd: result.costUsd,
-    });
     scored += result.scores.length;
   }
   log(`score: ${scored} mentions scored`);
   return { scored, skipped: null };
 }
 
-async function allowed(db: SupabaseClient, budget: number): Promise<string> {
+export async function allowed(db: SupabaseClient, budget: number): Promise<string> {
   const { data: gate, error } = await db.rpc("ai_quota_check", { p_user: null, p_kind: "classification" });
   if (error) throw new Error(`quota check: ${error.message}`);
   if (gate !== "ok") return String(gate);
   const since = new Date();
   since.setUTCHours(0, 0, 0, 0);
-  const { data } = await db.from("usage").select("cost_usd").eq("kind", "classification").gte("created_at", since.toISOString());
+  const { data, error: se } = await db.from("usage").select("cost_usd").eq("kind", "classification").gte("created_at", since.toISOString());
+  if (se) throw new Error(`read usage: ${se.message}`);
   const spent = (data ?? []).reduce((a, r) => a + Number(r.cost_usd), 0);
   return spent >= budget ? "classification_budget" : "ok";
 }

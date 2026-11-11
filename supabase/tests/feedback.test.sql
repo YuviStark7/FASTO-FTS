@@ -1,13 +1,15 @@
 -- Human review loop: ratings stay private to their author; admins read aggregates only.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(6);
+select plan(7);
 
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a2', 'f-admin@test.local',  'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000c2', 'f-member@test.local', 'authenticated', 'authenticated'),
-  ('00000000-0000-0000-0000-0000000000c3', 'f-member2@test.local', 'authenticated', 'authenticated');
+  ('00000000-0000-0000-0000-0000000000c3', 'f-member2@test.local', 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000d2', 'f-viewer@test.local', 'authenticated', 'authenticated');
 update public.memberships set role = 'admin' where user_id = '00000000-0000-0000-0000-0000000000a2';
+update public.memberships set role = 'viewer' where user_id = '00000000-0000-0000-0000-0000000000d2';
 
 insert into public.csi_snapshots (category_id, territory_id, period_start, period_end, csi, n_mentions,
   representativeness_note, is_published, method_version_id, is_demo)
@@ -37,6 +39,14 @@ select is((select n_right + n_wrong from public.feedback_summary() where csi_sna
   'admin sees both ratings in the summary');
 select is((select comments from public.feedback_summary() where csi_snapshot_id = (select id from snap)),
   array['matches our panel'], 'summary carries comment texts');
+reset role;
+
+-- viewer
+set local role authenticated;
+set local request.jwt.claims to '{"sub":"00000000-0000-0000-0000-0000000000d2","role":"authenticated"}';
+select throws_ok($$insert into public.feedback (org_id, user_id, target_type, target_id, rating)
+  select org_id, user_id, 'csi_snapshot', (select id from snap), 'right' from public.memberships
+  where user_id = '00000000-0000-0000-0000-0000000000d2'$$, '42501', null, 'viewer cannot rate');
 reset role;
 
 -- anon

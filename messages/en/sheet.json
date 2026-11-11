@@ -40,7 +40,8 @@
       "viewSources": "See sources",
       "noObservations": "No single observation is linked to this figure.",
       "perYear": "/year",
-      "perCapita": "/resident"
+      "perCapita": "/resident",
+      "viewProvenance": "View provenance"
     },
     "flag": {
       "p": "provisional",
@@ -57,7 +58,8 @@
       "persons": "persons",
       "nights": "nights",
       "count": "count",
-      "views": "views"
+      "views": "views",
+      "share": "share of relevant mentions"
     },
     "market": {
       "national": "National data: the trend covers the whole country, not the city.",
@@ -137,14 +139,21 @@
         "pageviews": "Wikipedia pageviews",
         "media_attention": "Media attention"
       },
-      "attentionNone": "No interest signals available."
+      "attentionNone": "No interest signals available.",
+      "provenance": "Sentiment provenance",
+      "provenanceNote": "The relevant mentions behind this reading, by source. Excerpts carry no author identifiers.",
+      "provenanceNone": "No source recorded for this reading.",
+      "lastRun": "last run #{id}, {date}",
+      "noRun": "no run recorded",
+      "scoredWith": "Classified by {model}, prompt {prompt}. The model classifies; the index is computed in code.",
+      "mentionsLabel": "Mentions:"
     },
     "competition": {
       "assortment": "Assortment by tag",
       "assortmentNote": "Coverage of a crowd-sourced database, not market size.",
       "assortmentEmpty": "No assortment counts available for this category.",
       "offers": "Observed offers",
-      "offersEmpty": "No priced offers observed: the price ladder per pack size appears once there is data.",
+      "offersEmpty": "No products observed for this category and country.",
       "ladder": "Price ladder per pack size",
       "pack": "Pack size",
       "product": "Product",
@@ -155,7 +164,8 @@
       "min": "min",
       "max": "max",
       "offerCount": "{count} offers",
-      "noPrice": "n/a"
+      "noPrice": "n/a",
+      "noPrices": "The source publishes no prices: the price ladder per pack size appears once a priced source is connected."
     },
     "opportunity": {
       "title": "Entry opportunity",

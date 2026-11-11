@@ -40,7 +40,8 @@
       "viewSources": "Vedi fonti",
       "noObservations": "Nessuna osservazione singola collegata a questo dato.",
       "perYear": "/anno",
-      "perCapita": "/abitante"
+      "perCapita": "/abitante",
+      "viewProvenance": "Vedi provenienza"
     },
     "flag": {
       "p": "provvisorio",
@@ -56,8 +57,9 @@
       "index_0_100": "indice 0-100",
       "persons": "persone",
       "nights": "notti",
-      "count": "numero",
-      "views": "visualizzazioni"
+      "count": "conteggio",
+      "views": "visualizzazioni",
+      "share": "quota delle menzioni pertinenti"
     },
     "market": {
       "national": "Dati nazionali: il trend riguarda l'intero paese, non la città.",
@@ -137,14 +139,21 @@
         "pageviews": "Visualizzazioni Wikipedia",
         "media_attention": "Attenzione dei media"
       },
-      "attentionNone": "Nessun segnale di interesse disponibile."
+      "attentionNone": "Nessun segnale di interesse disponibile.",
+      "provenance": "Provenienza del sentiment",
+      "provenanceNote": "Le menzioni pertinenti dietro questa lettura, per fonte. Gli estratti non contengono identificativi degli autori.",
+      "provenanceNone": "Nessuna fonte registrata per questa lettura.",
+      "lastRun": "ultima esecuzione #{id}, {date}",
+      "noRun": "nessuna esecuzione registrata",
+      "scoredWith": "Classificate da {model}, prompt {prompt}. Il modello classifica; l'indice è calcolato nel codice.",
+      "mentionsLabel": "Menzioni:"
     },
     "competition": {
       "assortment": "Assortimento per tag",
       "assortmentNote": "Copertura di un database collaborativo, non dimensione del mercato.",
       "assortmentEmpty": "Nessun conteggio di assortimento disponibile per questa categoria.",
       "offers": "Offerte osservate",
-      "offersEmpty": "Nessuna offerta con prezzo osservata: la scala dei prezzi per formato compare quando ci sono dati.",
+      "offersEmpty": "Nessun prodotto osservato per questa categoria e questo paese.",
       "ladder": "Scala dei prezzi per formato",
       "pack": "Formato",
       "product": "Prodotto",
@@ -155,7 +164,8 @@
       "min": "min",
       "max": "max",
       "offerCount": "{count} offerte",
-      "noPrice": "n.d."
+      "noPrice": "n.d.",
+      "noPrices": "La fonte non pubblica prezzi: la scala dei prezzi per formato compare quando una fonte con prezzi è collegata."
     },
     "opportunity": {
       "title": "Opportunità di ingresso",

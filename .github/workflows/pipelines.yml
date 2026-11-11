@@ -21,6 +21,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
+    # A full run is about an hour: GDELT (120 queries, 5 s spacing), Bluesky (188 queries), OFF (161 queries, 6.5 s spacing), then scoring.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -51,9 +52,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
-          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          # Each secret only reaches the modes that use it.
+          ANTHROPIC_API_KEY: ${{ contains(fromJSON('["all","queued","score","eval","bluesky"]'), steps.mode.outputs.mode) && secrets.ANTHROPIC_API_KEY || '' }}
+          BSKY_IDENTIFIER: ${{ contains(fromJSON('["all","queued","bluesky"]'), steps.mode.outputs.mode) && secrets.BSKY_IDENTIFIER || '' }}
+          BSKY_APP_PASSWORD: ${{ contains(fromJSON('["all","queued","bluesky"]'), steps.mode.outputs.mode) && secrets.BSKY_APP_PASSWORD || '' }}
           MODE: ${{ steps.mode.outputs.mode }}
         run: |
           case "$MODE" in
@@ -62,5 +64,6 @@ jobs:
             score)   pnpm pipeline score && pnpm pipeline compute ;;
             eval)    pnpm eval:mention-score ;;
             all)     pnpm pipeline all ;;
-            *)       pnpm pipeline "$MODE" && pnpm pipeline score && pnpm pipeline compute ;;
+            bluesky) pnpm pipeline bluesky && pnpm pipeline score && pnpm pipeline compute ;;
+            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
           esac

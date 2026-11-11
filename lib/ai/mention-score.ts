@@ -45,12 +45,24 @@ export function systemPrompt(): string {
 }
 
 /** Haiku 5.5 list prices, USD per token (cached 2026-11-03); logged spend is an estimate. */
-const PRICE = { "claude-haiku-5-5": { input: 0.1 / 1e6, output: 0.5 / 1e6 } } as Record<string, { input: number; output: number }>;
+const PRICE: Record<string, { input: number; output: number }> = { "claude-haiku-5-5": { input: 0.1 / 1e6, output: 0.5 / 1e6 } };
 
-export type BatchResult = { scores: MentionScore[]; inputTokens: number; outputTokens: number; costUsd: number };
+/** Prices for a model; an unknown model is an error, never a free model (a zero cost would bypass the budget gates). */
+export function priceFor(model: string): { input: number; output: number } {
+  const p = PRICE[model];
+  if (!p) throw new Error(`no price for model ${model}: add it to PRICE in lib/ai/mention-score.ts before using it`);
+  return p;
+}
+
+/**
+ * `error` is set when the call was billed but produced nothing usable (refusal, truncation,
+ * schema mismatch). Usage is always filled for a billed call so spend is logged either way.
+ */
+export type BatchResult = { scores: MentionScore[]; inputTokens: number; outputTokens: number; costUsd: number; error?: string };
 
 export async function scoreBatch(client: Anthropic, model: string, batch: MentionForScoring[]): Promise<BatchResult> {
-  const response = await client.messages.parse({
+  const p = priceFor(model);
+  const response = await client.messages.create({
     model,
     max_tokens: 8000,
     output_config: { effort: "low", format: zodOutputFormat(ScoreSchema) },
@@ -62,27 +74,37 @@ export async function scoreBatch(client: Anthropic, model: string, batch: Mentio
       },
     ],
   });
-  if (response.stop_reason === "refusal") throw new Error("classifier refused the batch");
-  if (response.stop_reason === "max_tokens") throw new Error("classifier output truncated");
-  const parsed = response.parsed_output;
-  if (!parsed) throw new Error("classifier output did not match the schema");
+  const u = response.usage;
+  const cacheWrite = u.cache_creation_input_tokens ?? 0;
+  const cacheRead = u.cache_read_input_tokens ?? 0;
+  const usage = {
+    inputTokens: u.input_tokens + cacheWrite + cacheRead,
+    outputTokens: u.output_tokens,
+    // Cache writes cost 1.25x and reads 0.1x the input price.
+    costUsd: (u.input_tokens + 1.25 * cacheWrite + 0.1 * cacheRead) * p.input + u.output_tokens * p.output,
+  };
+  const fail = (error: string): BatchResult => ({ scores: [], ...usage, error });
+  if (response.stop_reason === "refusal") return fail("classifier refused the batch");
+  if (response.stop_reason === "max_tokens") return fail("classifier output truncated");
+  const text = response.content.find((b) => b.type === "text")?.text ?? "";
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    return fail("classifier output is not JSON");
+  }
+  const parsed = ScoreSchema.safeParse(json);
+  if (!parsed.success) return fail("classifier output did not match the schema");
 
   // Keep only results for ids we sent, once each; a mention without a valid result stays unscored.
   const want = new Set(batch.map((m) => m.id));
   const seen = new Set<number>();
-  const scores = parsed.results.filter((r) => {
+  const scores = parsed.data.results.filter((r) => {
     if (!want.has(r.id) || seen.has(r.id)) return false;
     seen.add(r.id);
     return isConsistent(r);
   });
-  const p = PRICE[model] ?? { input: 0, output: 0 };
-  const inputTokens = response.usage.input_tokens + (response.usage.cache_creation_input_tokens ?? 0) + (response.usage.cache_read_input_tokens ?? 0);
-  return {
-    scores,
-    inputTokens,
-    outputTokens: response.usage.output_tokens,
-    costUsd: inputTokens * p.input + response.usage.output_tokens * p.output,
-  };
+  return { scores, ...usage };
 }
 
 /** Relevant mentions carry all five scores; irrelevant ones carry none. */

@@ -9,6 +9,10 @@ export function formatValue(value: number, unit: string, locale: string): string
         : new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
     case "EUR_per_capita":
       return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
+    case "share":
+      return new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 }).format(value);
+    case "count":
+      return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
     case "index_0_100":
       return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
     default:

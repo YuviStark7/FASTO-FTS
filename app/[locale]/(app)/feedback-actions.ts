@@ -29,6 +29,12 @@ export async function saveFeedback(targetType: FeedbackTarget, targetId: number,
   const { data: mem } = await supabase.from("memberships").select("org_id, role, created_at").eq("user_id", userId).order("created_at", { ascending: true });
   const m = (mem ?? []).find((x) => x.role !== "viewer");
   if (!m) return { ok: false };
+  // Only an existing target the user can read (a published CSI reading, or a brief version RLS shows them).
+  const target =
+    targetType === "csi_snapshot"
+      ? await supabase.from("csi_snapshots").select("id").eq("id", targetId).eq("is_published", true).maybeSingle()
+      : await supabase.from("brief_versions").select("id").eq("id", targetId).maybeSingle();
+  if (!target.data) return { ok: false };
   const { error } = await supabase.from("feedback").upsert(
     { org_id: m.org_id, user_id: userId, target_type: targetType, target_id: targetId, rating, comment: comment.trim() === "" ? null : comment },
     { onConflict: "user_id,target_type,target_id" },

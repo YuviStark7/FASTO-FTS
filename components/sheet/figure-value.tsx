@@ -160,6 +160,19 @@ export function FigureValue({
             >
               {t("viewSources")}
             </button>
+          ) : figure.evidence ? (
+            <button
+              type="button"
+              onClick={() => {
+                dialog.current?.close();
+                const el = document.getElementById(figure.evidence!);
+                el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                el?.focus({ preventScroll: true });
+              }}
+              className="h-11 rounded-full bg-brand px-6 font-medium text-brand-contrast"
+            >
+              {t("viewProvenance")}
+            </button>
           ) : (
             <p className="text-sm text-muted">{t("noObservations")}</p>
           )}

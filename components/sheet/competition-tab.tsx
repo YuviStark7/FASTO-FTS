@@ -5,6 +5,11 @@ import { GradeBadge } from "@/components/cell/grade-badge";
 import { FigureValue } from "./figure-value";
 import { formatDate } from "./format";
 import { Panel } from "./ui";
+import type { Grade } from "@/lib/queries/cell";
+
+const ORDER: Grade[] = ["A", "B", "C"];
+/** Weakest grade of a group: a summary is never better than its weakest input (product rule 1). */
+const weakest = (gs: Grade[]) => gs.reduce((w, g) => (ORDER.indexOf(g) > ORDER.indexOf(w) ? g : w), "A" as Grade);
 
 type Offer = CellSheet["competition"]["offers"][number];
 
@@ -41,10 +46,11 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
       </Panel>
 
       <Panel title={t("offers")}>
-        {priced.length === 0 ? (
+        {competition.offers.length === 0 ? (
           <p className="hatched rounded-lg border border-border p-3 text-sm">{t("offersEmpty")}</p>
         ) : (
           <div className="space-y-5">
+            {priced.length === 0 && <p className="hatched rounded-lg border border-border p-3 text-sm">{t("noPrices")}</p>}
             {ladder.size > 0 && (
               <div>
                 <h4 className="mb-1 text-sm font-medium">{t("ladder")}</h4>
@@ -52,8 +58,9 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
                   {[...ladder.entries()].map(([pack, os]) => {
                     const ps = os.map((o) => o.price!);
                     return (
-                      <li key={pack}>
+                      <li key={pack} className="flex flex-wrap items-center gap-1.5">
                         {pack}: {t("min")} {money(Math.min(...ps))}, {t("max")} {money(Math.max(...ps))} ({t("offerCount", { count: os.length })})
+                        <GradeBadge grade={weakest(os.map((o) => o.grade))} />
                       </li>
                     );
                   })}
@@ -76,9 +83,25 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
                 <tbody className="num">
                   {competition.offers.map((o, i) => (
                     <tr key={i} className="border-t border-border align-top">
-                      <td className="py-1 pr-3">{o.productName}</td>
+                      <td className="py-1 pr-3">
+                        {o.url ? (
+                          <a href={o.url} target="_blank" rel="noreferrer" className="text-brand-alt underline">
+                            {o.productName}
+                          </a>
+                        ) : (
+                          o.productName
+                        )}
+                      </td>
                       <td className="py-1 pr-3">{o.competitor ?? "-"}</td>
-                      <td className="py-1 pr-3">{o.packSize != null ? `${o.packSize} ${o.packUnit ?? ""}` : "-"}</td>
+                      <td className="py-1 pr-3 whitespace-nowrap">
+                        {o.packSize != null ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            {o.packSize} {o.packUnit ?? ""} <GradeBadge grade={o.grade} />
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="py-1 pr-3 whitespace-nowrap">
                         {o.price != null ? (
                           <span className="inline-flex items-center gap-1.5">
