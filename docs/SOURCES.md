@@ -21,7 +21,7 @@ Licence and access terms are verified before a connector is written. A source wh
 - eAmbrosia: data.europa.eu dataset `eambrosia-eu-geographical-indications-register` — one HTML distribution under "European Commission reuse notice".
 - Open Food Facts: https://world.openfoodfacts.org/terms-of-use — database under ODbL, contents under DbCL, images under CC BY-SA; terms of use also apply to re-users.
 - OpenStreetMap: https://www.openstreetmap.org/copyright — ODbL; credit OpenStreetMap and make clear the data is under ODbL; "If you alter or build upon our data, you may distribute the result only under the same licence."
-- Wikimedia: https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/documentation/access-policy.html — CC0 1.0; User-Agent required, format `<client>/<version> (<contact>)`; wait for each request to finish before the next.
+- Wikimedia: https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/documentation/access-policy.html — CC0 1.0; User-Agent required, format `<client>/<version> (<contact>)`; wait for each request to finish before the next. Verified 11 Nov 2026 for the connector: endpoint `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/{lang}.wikipedia/all-access/user/{article}/monthly/{YYYYMMDD}/{YYYYMMDD}` (agent=user; unknown article returns 404; months with no data are omitted, never zero); article titles come from Wikidata sitelinks (`https://www.wikidata.org/w/api.php?action=wbgetentities`, CC0), also rate-limited (HTTP 429 with retry). Views are by language edition, not by country: Belgium has no rows and Austria shares German with Germany.
 
 ## Rules every connector follows
 

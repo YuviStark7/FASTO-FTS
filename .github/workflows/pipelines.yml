@@ -42,7 +42,7 @@ jobs:
           else mode="queued"; fi
           # Only known modes and connector slugs reach the shell command below.
           case "$mode" in
-            all|queued|compute|score|eval|eurostat|istat|osm|openfoodfacts|gdelt) ;;
+            all|queued|compute|score|eval|eurostat|istat|osm|openfoodfacts|gdelt|wikimedia) ;;
             *) echo "::error::unknown mode '$mode'"; exit 1 ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
