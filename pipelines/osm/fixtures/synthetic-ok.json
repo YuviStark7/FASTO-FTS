@@ -1,0 +1,11 @@
+{
+  "_fixture": "SYNTHETIC: hand-built in the Overpass out:json shape for parser tests; counts are test values, not real OSM data. Overpass was unreachable from the build sandbox, so no real response could be recorded.",
+  "version": 0.6,
+  "generator": "Overpass API (synthetic fixture)",
+  "elements": [
+    { "type": "relation", "id": 1, "tags": { "boundary": "administrative", "admin_level": "8", "name": "Testville", "wikidata": "Q1" } },
+    { "type": "count", "id": 0, "tags": { "nodes": "7", "ways": "2", "relations": "1", "total": "10" } },
+    { "type": "count", "id": 0, "tags": { "nodes": "0", "ways": "0", "relations": "0", "total": "0" } },
+    { "type": "count", "id": 0, "tags": { "nodes": "3", "ways": "0", "relations": "0", "total": "3" } }
+  ]
+}
