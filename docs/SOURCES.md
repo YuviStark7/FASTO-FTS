@@ -12,6 +12,7 @@ Licence and access terms are verified before a connector is written. A source wh
 | 5 | OpenStreetMap | ODbL 1.0 | "© OpenStreetMap contributors" and link to openstreetmap.org/copyright | Overpass API / extracts | B | **OK with conditions**: ODbL share-alike on derived database |
 | 8 | Wikimedia pageviews | CC0 1.0 | None required; credited as good practice | Analytics API; **User-Agent with contact required**; one request at a time | C | **OK with conditions** |
 | 9 | GDELT | *pending*: terms page at gdeltproject.org not reachable from the build environment | *pending* | DOC 2.0 API, no key, rate-limited (HTTP 429 observed) | C | **Pending** primary-text check before the connector (Day 3) |
+| 10 | Bluesky (public posts) | Posts remain the author's Content (Terms of Service s.3: "You retain ownership of your Content"); no licence to re-users. Developer Guidelines forbid spam and require honouring deletions. Search is an open, unauthenticated AppView endpoint | Link to each post (DID URL); no author names, handles, avatars or profile data stored | `app.bsky.feed.searchPosts` on api.bsky.app, anonymous (public.api.bsky.app answered 403 from the build sandbox); app-password session via bsky.social as fallback | C | **OK with conditions**: short excerpts (<=500 chars) with identifiers removed, aggregate sentiment only, no profiling; deletions must be honoured (see caveat) |
 
 ## Pages read
 
@@ -22,6 +23,7 @@ Licence and access terms are verified before a connector is written. A source wh
 - Open Food Facts: https://world.openfoodfacts.org/terms-of-use — database under ODbL, contents under DbCL, images under CC BY-SA; terms of use also apply to re-users.
 - OpenStreetMap: https://www.openstreetmap.org/copyright — ODbL; credit OpenStreetMap and make clear the data is under ODbL; "If you alter or build upon our data, you may distribute the result only under the same licence."
 - Wikimedia: https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/documentation/access-policy.html — CC0 1.0; User-Agent required, format `<client>/<version> (<contact>)`; wait for each request to finish before the next.
+- Bluesky: https://bsky.social/about/support/tos (read 11 Nov 2026) — "You retain ownership of your Content on the Bluesky application and website"; Bluesky "does not control how others may use your Content"; the ToS contains no clause against reading or indexing public posts. Developer Guidelines (bluesky-social/bsky-docs, docs/support/developer-guidelines.md; docs.bsky.app itself was blocked from the sandbox): "Don't spam" (automated or bulk interactions such as follows, likes, replies; we only read), "All services must have a method for deleting content a user has requested to be deleted." Our use is read-only, aggregate, with a representativeness note. Open point: a deleted post must disappear from `mentions`; no deletion sync exists yet.
 
 ## Rules every connector follows
 

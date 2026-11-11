@@ -42,7 +42,7 @@ jobs:
           else mode="queued"; fi
           # Only known modes and connector slugs reach the shell command below.
           case "$mode" in
-            all|queued|compute|eurostat|istat|osm|openfoodfacts) ;;
+            all|queued|compute|eurostat|istat|osm|openfoodfacts|bluesky) ;;
             *) echo "::error::unknown mode '$mode'"; exit 1 ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
@@ -51,6 +51,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
           MODE: ${{ steps.mode.outputs.mode }}
         run: |
           case "$MODE" in
