@@ -62,6 +62,8 @@ interval  = base × Π min(factor) … base × Π max(factor) over the parameter
 
 *Y* is the last year of the national trend series. Shop density = relevant OSM shops (the category's `osm_shop` types) per 10,000 residents. A missing correction is neutral (factor 1) and listed in `factors.missing`; a missing national spend or population means no estimate. Where the statistical unit is wider than the city (`stat_codes.scope_note`), the note travels with the estimate.
 
+What the interval covers: only the uncertainty of the three correction parameters. It does not include sampling error in the inputs or the mismatch between years (spending is from the last trend year, population and tourism from their latest year; `factors.years` records each). Read it as "how much the corrections could move the estimate", not as a confidence interval.
+
 Production in a territory is never used as consumption (product rule 5): production indicators feed the Territory tab separately.
 
 ## Cells
