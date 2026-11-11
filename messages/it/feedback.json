@@ -1,0 +1,15 @@
+{
+  "feedback": {
+    "csiQuestion": "Questa lettura del sentiment è corretta?",
+    "briefQuestion": "Questo brief è corretto?",
+    "right": "Corretta",
+    "partly_right": "Parzialmente corretta",
+    "wrong": "Sbagliata",
+    "commentLabel": "Commento (facoltativo, massimo 2000 caratteri)",
+    "send": "Invia commento",
+    "saved": "Valutazione salvata.",
+    "error": "Non è stato possibile salvare la valutazione. Riprova.",
+    "viewer": "Il tuo ruolo è di sola lettura: non puoi valutare le letture.",
+    "loading": "Caricamento della valutazione"
+  }
+}
