@@ -10,10 +10,12 @@ export const STATUS_CLASS: Record<CellStatus, string> = {
   insufficient_data: "hatched text-muted border-border",
 };
 
-export type ColourMode = "status" | "mos";
+export type ColourMode = "status" | "mos" | "coverage";
 
 /** In MOS mode a cell is coloured only when it has a score; null is hatched, never a low value. */
 export function cellClass(status: CellStatus, mos: number | null, mode: ColourMode): string {
+  // Coverage mode: neutral surface (the thin bar and the icons carry the information); unknown stays hatched.
+  if (mode === "coverage") return status === "insufficient_data" ? STATUS_CLASS.insufficient_data : "bg-surface-2 text-text border-border";
   if (mode === "mos") return mos === null ? STATUS_CLASS.insufficient_data : "bg-brand/40 text-text border-brand/70";
   return STATUS_CLASS[status];
 }

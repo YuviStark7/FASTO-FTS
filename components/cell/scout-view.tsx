@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Category, CellRow, Territory } from "@/lib/queries/scout";
+import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
 import { DemoBadge, type Grade } from "./grade-badge";
@@ -57,7 +58,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
         className="flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-10 pb-6 text-center lg:order-2 lg:px-12"
       >
         <Pair category={category} territory={territory} cell={cell} name={name} />
-        <Verdict cell={cell} key={`${catSlug}-${terSlug}`} />
+        <Verdict cell={cell} category={category.slug} territory={territory.slug} key={`${catSlug}-${terSlug}`} />
       </section>
 
       {/* Tray (phone) / left panel (desktop) */}
@@ -120,7 +121,7 @@ function Pair({
   );
 }
 
-function Verdict({ cell }: { cell?: CellRow }) {
+function Verdict({ cell, category, territory }: { cell?: CellRow; category: string; territory: string }) {
   const t = useTranslations("scout");
   const ts = useTranslations("status");
   const ti = useTranslations("inputs");
@@ -136,6 +137,12 @@ function Verdict({ cell }: { cell?: CellRow }) {
         <StatusLabel status={status} />
         {cell?.is_demo && <DemoBadge />}
       </div>
+      <Link
+        href={`/cell/${category}/${territory}`}
+        className="inline-flex h-11 items-center rounded-full bg-brand px-6 font-medium text-brand-contrast"
+      >
+        {t("openCell")}
+      </Link>
       <p className="num text-muted">
         {cell?.mos != null ? (
           <>
@@ -203,7 +210,7 @@ function GradeMix({ label, mix }: { label: string; mix: Record<Grade, number> })
 type Token = { id: string; label: string; color: string; icon: string };
 
 /** Round coloured tokens; the selected one is enlarged and scrolled to the centre. Radio-group keyboard model. */
-function TokenCarousel({ label, items, value, onChange }: { label: string; items: Token[]; value: string; onChange: (id: string) => void }) {
+export function TokenCarousel({ label, items, value, onChange }: { label: string; items: Token[]; value: string; onChange: (id: string) => void }) {
   const refs = useRef(new Map<string, HTMLButtonElement>());
   const selected = items.find((i) => i.id === value);
 

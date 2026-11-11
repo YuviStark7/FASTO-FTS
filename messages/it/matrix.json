@@ -25,6 +25,15 @@
     "mosLegend": "MOS non disponibile",
     "withData": "{count} su {total} con dati",
     "filteredOut": "Fuori dal filtro",
-    "tooltip": "{name}: {status}, copertura {coverage}%"
+    "tooltip": "{name}: {status}, copertura {coverage}%",
+    "modeCoverage": "Copertura",
+    "coverageLegendBar": "Barra: copertura degli input",
+    "coverageLegendMissing": "Icona: input mancante (trend, domanda locale, sentiment, concorrenza)",
+    "coverageComplete": "copertura {coverage}%, nessun input mancante",
+    "coverageMissing": "copertura {coverage}%, mancano: {inputs}",
+    "missingInputs": "Input mancanti",
+    "missingCount": "{count} input mancanti",
+    "gapSummary": "Mappa dei dati mancanti",
+    "gapTotal": "{count} input mancanti nelle celle mostrate"
   }
 }
