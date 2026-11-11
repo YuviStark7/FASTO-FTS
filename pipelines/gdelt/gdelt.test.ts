@@ -45,7 +45,7 @@ describe("query building", () => {
   });
 
   it("has a query for every category and language, and Austria and Belgium scopes", () => {
-    expect(Object.keys(KEYWORDS)).toHaveLength(12);
+    expect(Object.keys(KEYWORDS)).toHaveLength(15);
     for (const k of Object.values(KEYWORDS)) expect(Object.keys(k).sort()).toEqual(["de", "es", "fr", "it", "nl"]);
     expect(SCOPES.find((s) => s.territory === "at")).toMatchObject({ lang: "de", gdelt: "AU" });
     expect(SCOPES.filter((s) => s.territory === "be").map((s) => s.lang).sort()).toEqual(["fr", "nl"]);

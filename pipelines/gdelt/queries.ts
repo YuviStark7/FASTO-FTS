@@ -34,7 +34,11 @@ export const SCOPES: { lang: Lang; territory: string; gdelt: string }[] = [
   { lang: "nl", territory: "be", gdelt: "BE" },
 ];
 
-/** Core categories only (the 12 of the brief); the three added categories have no news query yet. */
+/**
+ * All 15 categories. Added categories: "café" and "caffè" also mean the bar, so they must co-occur
+ * with a roasting or bean word; vinegar-condiments is queried through vinegar only (the narrowest
+ * term that names the family without matching every recipe article).
+ */
 export const KEYWORDS: Record<string, Record<Lang, string>> = {
   "evo-oil": {
     it: '"olio extravergine"',
@@ -90,6 +94,15 @@ export const KEYWORDS: Record<string, Record<Lang, string>> = {
     es: '"productos ecológicos"',
     nl: '"biologische producten"',
   },
+  coffee: {
+    it: "caffè (torrefazione OR miscela OR arabica OR robusta)",
+    fr: "café (torréfaction OR arabica OR robusta OR torréfacteur)",
+    de: "Kaffee",
+    es: "café (tostado OR arabica OR robusta OR cafetero)",
+    nl: "koffie",
+  },
+  chocolate: { it: "cioccolato", fr: "chocolat", de: "Schokolade", es: "chocolate", nl: "chocolade" },
+  "vinegar-condiments": { it: "aceto", fr: "vinaigre", de: "Essig", es: "vinagre", nl: "azijn" },
 };
 
 const API = "https://api.gdeltproject.org/api/v2/doc/doc";
