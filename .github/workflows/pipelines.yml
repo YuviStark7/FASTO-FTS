@@ -1,0 +1,61 @@
+name: Pipelines
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"     # weekly full refresh, Monday 03:17 UTC
+    - cron: "*/30 * * * *"   # sweep for runs queued from Admin
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "all | queued | compute | <source slug>"
+        required: true
+        default: queued
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipelines
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Decide mode
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then mode="$INPUT_MODE";
+          elif [ "$SCHEDULE" = "17 3 * * 1" ]; then mode="all";
+          else mode="queued"; fi
+          # Only known modes and connector slugs reach the shell command below.
+          case "$mode" in
+            all|queued|compute|eurostat|istat|osm|openfoodfacts) ;;
+            *) echo "::error::unknown mode '$mode'"; exit 1 ;;
+          esac
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+      - name: Run
+        # The service key is given to this step only, never to dependency installation.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          case "$MODE" in
+            queued)  pnpm pipeline --queued ;;
+            compute) pnpm pipeline compute ;;
+            all)     pnpm pipeline all ;;
+            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
+          esac

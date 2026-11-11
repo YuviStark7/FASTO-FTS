@@ -1,0 +1,71 @@
+{
+  "admin": {
+    "title": "Administration",
+    "link": "Administration",
+    "lead": "Sources and connector runs.",
+    "tiles": {
+      "sources": "Sources",
+      "sourcesHint": "Licence, grade, last run and rerun.",
+      "runs": "Runs",
+      "runsHint": "The latest 50, with rows written and rejected."
+    },
+    "notAllowed": {
+      "title": "Access not allowed",
+      "body": "This area is for analysts and admins. If you need it, ask an admin to change your role."
+    },
+    "sources": {
+      "title": "Sources",
+      "licence": "Licence",
+      "noLicence": "Not stated",
+      "grade": "Default grade",
+      "active": "Active",
+      "yes": "Yes",
+      "no": "No",
+      "terms": "Terms verified",
+      "termsMissing": "Not verified",
+      "lastRun": "Last run",
+      "noRun": "No runs yet",
+      "written": "{n} written",
+      "rejected": "{n} rejected",
+      "noConnector": "No connector available",
+      "empty": "No sources are registered."
+    },
+    "rerun": {
+      "button": "Rerun",
+      "label": "Rerun {source}",
+      "busy": "A run is already queued or running",
+      "sending": "Sending…",
+      "dispatched": "Started.",
+      "scheduled": "Queued: starts within 30 minutes.",
+      "error": "The run could not be queued."
+    },
+    "toggle": {
+      "label": "Activate {source}",
+      "error": "The status could not be changed."
+    },
+    "runs": {
+      "title": "Runs",
+      "requestedAt": "Requested",
+      "duration": "Duration",
+      "fetched": "Fetched",
+      "written": "Written",
+      "rejected": "Rejected",
+      "noDuration": "Waiting",
+      "errors": "Errors ({n})",
+      "noErrors": "No errors",
+      "refreshing": "Refreshing automatically every 10 seconds.",
+      "emptyTitle": "No runs yet",
+      "emptyBody": "When an analyst reruns a connector, the run shows up here.",
+      "emptyAction": "Go to sources",
+      "seconds": "{n} s",
+      "minutes": "{n} min"
+    },
+    "run": {
+      "queued": "Queued",
+      "running": "Running",
+      "succeeded": "Succeeded",
+      "partial": "Partial",
+      "failed": "Failed"
+    }
+  }
+}

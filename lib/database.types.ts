@@ -607,14 +607,14 @@ isOneToOne: false
                   ]
                 },"observations": {
                   Row: {
-                    "category_id": number | null,"created_at": string,"grade": Database["public"]['Enums']["grade"],"high": number | null,"id": number,"indicator_id": number,"is_demo": boolean,"low": number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id": number | null,"source_id": number,"source_ref": string | null,"territory_id": number,"unit": string,"value": number
+                    "category_id": number | null,"created_at": string,"grade": Database["public"]['Enums']["grade"],"high": number | null,"id": number,"indicator_id": number,"is_demo": boolean,"low": number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id": number | null,"series_key": string,"source_id": number,"source_ref": string | null,"status_flag": string | null,"territory_id": number,"unit": string,"value": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id"?: number | null,"created_at"?: string,"grade": Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id": number,"is_demo"?: boolean,"low"?: number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id"?: number | null,"source_id": number,"source_ref"?: string | null,"territory_id": number,"unit": string,"value": number
+                    "category_id"?: number | null,"created_at"?: string,"grade": Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id": number,"is_demo"?: boolean,"low"?: number | null,"method_version_id": string,"period_end": string,"period_start": string,"run_id"?: number | null,"series_key"?: string,"source_id": number,"source_ref"?: string | null,"status_flag"?: string | null,"territory_id": number,"unit": string,"value": number
                   }
                   Update: {
-                    "category_id"?: number | null,"created_at"?: string,"grade"?: Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id"?: number,"is_demo"?: boolean,"low"?: number | null,"method_version_id"?: string,"period_end"?: string,"period_start"?: string,"run_id"?: number | null,"source_id"?: number,"source_ref"?: string | null,"territory_id"?: number,"unit"?: string,"value"?: number
+                    "category_id"?: number | null,"created_at"?: string,"grade"?: Database["public"]['Enums']["grade"],"high"?: number | null,"id"?: never,"indicator_id"?: number,"is_demo"?: boolean,"low"?: number | null,"method_version_id"?: string,"period_end"?: string,"period_start"?: string,"run_id"?: number | null,"series_key"?: string,"source_id"?: number,"source_ref"?: string | null,"status_flag"?: string | null,"territory_id"?: number,"unit"?: string,"value"?: number
                   }
                   Relationships: [
                     {
@@ -849,14 +849,14 @@ isOneToOne: false
                   ]
                 },"trend_snapshots": {
                   Row: {
-                    "category_id": number,"computed_at": string,"first_year": number | null,"grade": Database["public"]['Enums']["grade"] | null,"id": number,"input_observation_ids": (number)[],"is_demo": boolean,"last_year": number | null,"method_version_id": string,"nominal_value_cagr": number | null,"real_value_cagr": number | null,"reason": string,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"volume_cagr": number | null
+                    "category_id": number,"computed_at": string,"first_year": number | null,"grade": Database["public"]['Enums']["grade"] | null,"id": number,"input_observation_ids": (number)[],"is_demo": boolean,"last_year": number | null,"method_version_id": string,"nominal_value_cagr": number | null,"real_value_cagr": number | null,"reason": string,"scope": string,"series": NonNullable<Json>,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"volume_cagr": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id": number,"computed_at"?: string,"first_year"?: number | null,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_observation_ids"?: (number)[],"is_demo"?: boolean,"last_year"?: number | null,"method_version_id": string,"nominal_value_cagr"?: number | null,"real_value_cagr"?: number | null,"reason": string,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"volume_cagr"?: number | null
+                    "category_id": number,"computed_at"?: string,"first_year"?: number | null,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_observation_ids"?: (number)[],"is_demo"?: boolean,"last_year"?: number | null,"method_version_id": string,"nominal_value_cagr"?: number | null,"real_value_cagr"?: number | null,"reason": string,"scope"?: string,"series"?: NonNullable<Json>,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"volume_cagr"?: number | null
                   }
                   Update: {
-                    "category_id"?: number,"computed_at"?: string,"first_year"?: number | null,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_observation_ids"?: (number)[],"is_demo"?: boolean,"last_year"?: number | null,"method_version_id"?: string,"nominal_value_cagr"?: number | null,"real_value_cagr"?: number | null,"reason"?: string,"status"?: Database["public"]['Enums']["cell_status"],"territory_id"?: number,"volume_cagr"?: number | null
+                    "category_id"?: number,"computed_at"?: string,"first_year"?: number | null,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_observation_ids"?: (number)[],"is_demo"?: boolean,"last_year"?: number | null,"method_version_id"?: string,"nominal_value_cagr"?: number | null,"real_value_cagr"?: number | null,"reason"?: string,"scope"?: string,"series"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["cell_status"],"territory_id"?: number,"volume_cagr"?: number | null
                   }
                   Relationships: [
                     {
