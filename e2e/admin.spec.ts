@@ -26,7 +26,10 @@ test("the More page links to Administration for analysts only", async ({ page, c
   void info;
 });
 
-test("an analyst reruns Eurostat and sees the queued run", async ({ page }, info) => {
+test("an analyst reruns a connector and sees the queued run", async ({ page }, info) => {
+  // Each viewport reruns a different source: projects run in parallel and a source with a
+  // queued run cannot be queued again.
+  const source = info.project.name.startsWith("phone") ? "OpenStreetMap" : "Eurostat";
   const { userId } = await signIn(page, "analyst", "adm");
   try {
     await page.goto("/admin");
@@ -35,7 +38,7 @@ test("an analyst reruns Eurostat and sees the queued run", async ({ page }, info
     // Analysts do not get the active toggle.
     await expect(page.getByRole("switch")).toHaveCount(0);
 
-    const rerun = page.getByRole("button", { name: /Riavvia Eurostat/ });
+    const rerun = page.getByRole("button", { name: new RegExp(`Riavvia ${source}`) });
     await expect(rerun).toBeEnabled();
     await rerun.click();
     await expect(page.getByText(/^(Avviato\.|In coda: parte entro 30 minuti\.)$/)).toBeVisible();
@@ -46,7 +49,7 @@ test("an analyst reruns Eurostat and sees the queued run", async ({ page }, info
 
     await page.goto("/admin/runs");
     await expect(page.getByRole("heading", { level: 1, name: "Esecuzioni" })).toBeVisible();
-    const run = page.getByTestId("run").filter({ hasText: "In coda" }).filter({ hasText: /Eurostat/i }).first();
+    const run = page.getByTestId("run").filter({ hasText: "In coda" }).filter({ hasText: new RegExp(source, "i") }).first();
     await expect(run).toBeVisible();
     await expect(page.getByText("Aggiornamento automatico ogni 10 secondi.")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { getStaffRole } from "@/lib/admin";
 import { dispatchQueuedRuns } from "@/lib/pipelines/dispatch";
-import { CONNECTORS } from "@/pipelines/registry";
+import { CONNECTORS } from "@/pipelines/connectors";
 
 export type RerunResult = { ok: true; mode: "dispatched" | "scheduled" } | { ok: false };
 

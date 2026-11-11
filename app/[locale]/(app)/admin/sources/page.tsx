@@ -4,7 +4,7 @@ import { RerunButton } from "@/components/admin/rerun-button";
 import { RunStatusLabel, type RunStatus } from "@/components/admin/run-status";
 import { GradeBadge } from "@/components/cell/grade-badge";
 import { getStaffRole } from "@/lib/admin";
-import { CONNECTORS } from "@/pipelines/registry";
+import { CONNECTORS } from "@/pipelines/connectors";
 
 export default async function AdminSources({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

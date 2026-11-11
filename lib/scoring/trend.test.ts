@@ -327,3 +327,13 @@ describe("classifyTrend", () => {
     expect(classifyTrend(three(100, 121, 100, 100), A, P).nominalCagr).toBeCloseTo(0.1, 10);
   });
 });
+
+describe("classifyTrend without input grades", () => {
+  it("is insufficient data, never an ungraded status (product rule 1)", () => {
+    const pts = [2018, 2019, 2020, 2021].map((year, i) => ({ year, nominal: 100 + i * 10, real: 100 + i * 10, volume: 100 + i * 10, priceIndex: 100 }));
+    const r = classifyTrend(pts, [], { expanding_min_real_cagr: 0.02, threatened_max_cagr: -0.02, min_annual_points: 3, max_years: 5 });
+    expect(r.status).toBe("insufficient_data");
+    expect(r.grade).toBeNull();
+    expect(r.reason).toBe("no graded inputs");
+  });
+});

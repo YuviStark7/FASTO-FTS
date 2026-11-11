@@ -69,6 +69,7 @@ describe("normalise", () => {
         method_version_id: "normalise-v1",
         is_demo: false,
         source_ref: "demo_pjan?geo=IT",
+        status_flag: null,
       },
     ]);
     expect(NORMALISE_METHOD).toBe("normalise-v1");
@@ -158,5 +159,20 @@ describe("normalise", () => {
       expect(rows[0].series_key).toBe("");
       expect(rows[0].value).toBe(2);
     });
+  });
+});
+
+describe("normalise status flags", () => {
+  it("carries a source flag and rejects a malformed one", () => {
+    const t = buildTaxonomy(
+      [],
+      [{ id: 2, slug: "it", level: "country", country_code: "IT", nuts_code: null, parent_id: null, is_pilot: false, stat_codes: {}, name_it: "Italia", name_en: "Italy", centroid: null }],
+      [{ id: 5, slug: "population", unit: "persons" }],
+      [{ id: 31, slug: "eurostat", default_grade: "A" }],
+    );
+    const base = { category: null, territory: "it", indicator: "population", periodStart: "2022-01-01", periodEnd: "2022-01-01", value: 1, sourceRef: "x" };
+    const { rows, rejected } = normalise([{ ...base, flag: "p" }, { ...base, seriesKey: "b", flag: "P!" }], t, { source: "eurostat", runId: 1 });
+    expect(rows.map((r) => r.status_flag)).toEqual(["p"]);
+    expect(rejected[0].reason).toMatch(/bad status flag/);
   });
 });

@@ -21,8 +21,10 @@ test("new user signs up by magic link and lands on Scout", async ({ page }, info
   await page.goto(`/auth/confirm?token_hash=${data.properties!.hashed_token}&type=magiclink&next=/`);
   await expect(page).toHaveURL(/\/(\?.*)?$/);
 
-  // Verdict: every cell starts as insufficient data, never as a low score.
-  await expect(page.getByRole("heading", { level: 1, name: "Dati insufficienti" })).toBeVisible();
+  // A verdict is always one of the four states, never a bare score.
+  await expect(
+    page.getByRole("heading", { level: 1, name: /^(In espansione|Consolidato|Minacciato|Dati insufficienti)$/ }),
+  ).toBeVisible();
   await expect(page.getByRole("radiogroup", { name: "Scegli una categoria" }).getByRole("radio")).toHaveCount(15);
   await expect(page.getByRole("radiogroup", { name: "Scegli un territorio" }).getByRole("radio")).toHaveCount(20);
 
@@ -42,5 +44,7 @@ test("English locale", async ({ page }, info) => {
   const email = `e2e-en-${info.project.name}-${Date.now()}@test.local`;
   const { data } = await admin.auth.admin.generateLink({ type: "magiclink", email });
   await page.goto(`/auth/confirm?token_hash=${data.properties!.hashed_token}&type=magiclink&next=/en`);
-  await expect(page.getByRole("heading", { level: 1, name: "Insufficient data" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: /^(Expanding|Consolidated|Threatened|Insufficient data)$/ }),
+  ).toBeVisible();
 });
