@@ -10,6 +10,16 @@
     "saved": "Valutazione salvata.",
     "error": "Non è stato possibile salvare la valutazione. Riprova.",
     "viewer": "Il tuo ruolo è di sola lettura: non puoi valutare le letture.",
-    "loading": "Caricamento della valutazione"
+    "loading": "Caricamento della valutazione",
+    "tileTitle": "Valutazioni del sentiment",
+    "tileHint": "Casi di controllo e commenti dei revisori.",
+    "adminTitle": "Valutazioni del sentiment",
+    "controlCases": "Casi di controllo sentiment: {count}",
+    "emptyTitle": "Nessuna valutazione ancora",
+    "emptyBody": "Quando gli utenti valuteranno le letture del sentiment, i casi compaiono qui.",
+    "csiOf": "CSI {value}, {n} menzioni",
+    "noComments": "Nessun commento.",
+    "commentsTitle": "Commenti",
+    "computed": "Calcolato il {date}"
   }
 }
