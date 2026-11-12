@@ -25,12 +25,15 @@ test("new user signs up by magic link and lands on Scout", async ({ page }, info
   await expect(
     page.getByRole("heading", { level: 1, name: /^(In espansione|Consolidato|Minacciato|Dati insufficienti)$/ }),
   ).toBeVisible();
+  // Two interactions: bloom the flower, pick a category and a territory (details in scout.spec.ts).
+  await page.getByTestId("scout-chip-category").click();
   await expect(page.getByRole("radiogroup", { name: "Scegli una categoria" }).getByRole("radio")).toHaveCount(15);
-  await expect(page.getByRole("radiogroup", { name: "Scegli un territorio" }).getByRole("radio")).toHaveCount(20);
-
-  // Two interactions: pick a category, pick a territory.
-  await page.getByRole("radio", { name: "Miele" }).click();
-  await page.getByRole("radio", { name: /Bologna/ }).click();
+  await page.getByTestId("scout-category-tag").click();
+  await page.getByRole("combobox", { name: "Cambia categoria" }).fill("miele");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("scout-territory-tag").click();
+  await page.getByRole("combobox", { name: "Cambia città" }).fill("bolo");
+  await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/c=honey&t=bologna/);
   await expect(page.getByRole("radio", { name: "Miele" })).toHaveAttribute("aria-checked", "true");
 

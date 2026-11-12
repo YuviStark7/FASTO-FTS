@@ -5,13 +5,13 @@ import { statusIcon } from "@/components/cell/status";
 import { cn } from "@/lib/utils";
 import { CoverageCell, type GapSummary, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
-import { cellKey, localName, type ViewModel } from "./model";
+import { cellKey, localName, type Highlight, type ViewModel } from "./model";
 
 /**
  * Tablet and desktop grid: a real table. It scrolls inside its own box (both axes), headers stay put,
  * and the page itself never scrolls sideways. Hidden on phones, where MatrixList takes over.
  */
-export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: ColourMode; locale: string }) {
+export function MatrixTable({ model, mode, locale, highlight }: { model: ViewModel; mode: ColourMode; locale: string; highlight?: Highlight | null }) {
   const t = useTranslations("matrix");
   const s = useTranslations("status");
   const sc = useTranslations("scout");
@@ -88,7 +88,13 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
                       href={`/cell/${category.slug}/${col.slug}`}
                       aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
                       title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
-                      className={cn("grid h-11 min-w-20 place-items-center rounded-lg border", cellClass(cell.status, cell.mos, mode))}
+                      aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
+                        data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
+                      className={cn(
+                        "grid h-11 min-w-20 place-items-center rounded-lg border",
+                        cellClass(cell.status, cell.mos, mode),
+                        highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",
+                      )}
                     >
                       {coverage ? <CoverageCell cell={cell} /> : <Icon aria-hidden className="size-4" />}
                     </Link>

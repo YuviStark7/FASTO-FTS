@@ -54,7 +54,30 @@
     "mosUnavailable": "MOS non disponibile",
     "openCell": "Apri la scheda",
     "pair": "{category} a {territory}",
-    "nationalScope": "Trend nazionale ({country}): le città dello stesso paese lo condividono"
+    "nationalScope": "Trend nazionale ({country}): le città dello stesso paese lo condividono",
+    "cellName": "{category}, {territory}",
+    "mosValue": "MOS {value}",
+    "flowerLabel": "Selettore di categoria e città",
+    "editCategory": "Cambia categoria",
+    "editTerritory": "Cambia città",
+    "typeCategory": "Scrivi una categoria",
+    "typeTerritory": "Scrivi una città",
+    "noMatches": "Nessun risultato",
+    "bloom": "Cambia categoria o città",
+    "framesLabel": "Dati chiave di questa cella",
+    "framesLoading": "Carico i dati chiave",
+    "openFrame": "{label}: {value}, apri la scheda",
+    "range": "intervallo {low} – {high}",
+    "frame": {
+      "realValueCagr": "Crescita reale annua",
+      "volumeCagr": "Crescita in volume",
+      "latestNominal": "Spesa nominale (ultimo anno)",
+      "localDemand": "Domanda locale stimata",
+      "perCapita": "Spesa pro capite stimata",
+      "csi": "Sentiment (CSI)",
+      "pageviews": "Attenzione: visualizzazioni",
+      "mediaAttention": "Attenzione nei media"
+    }
   },
   "inputs": {
     "trend": "trend",

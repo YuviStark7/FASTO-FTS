@@ -8,14 +8,14 @@ import { STATUS_TEXT, statusIcon, type CellStatus } from "@/components/cell/stat
 import { cn } from "@/lib/utils";
 import { CoverageCell, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
-import { cellKey, localName, type ViewModel } from "./model";
+import { cellKey, localName, type Highlight, type ViewModel } from "./model";
 
 /** Phone: categories as a list; one expands into a horizontal strip of territory dots. */
-export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: ColourMode; locale: string }) {
+export function MatrixList({ model, mode, locale, highlight }: { model: ViewModel; mode: ColourMode; locale: string; highlight?: Highlight | null }) {
   const t = useTranslations("matrix");
   const s = useTranslations("status");
   const sc = useTranslations("scout");
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(() => model.rows.find((r) => r.category.slug === highlight?.category)?.category.id ?? null);
   const covLabel = useCoverageLabel();
   const coverage = mode === "coverage";
   const summary = coverage ? summariseGaps(model) : null;
@@ -64,7 +64,12 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
                         href={`/cell/${category.slug}/${col.slug}`}
                         aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
                         title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
-                        className="flex flex-col items-center gap-1 py-1"
+                        aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
+                        data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
+                        className={cn(
+                          "flex flex-col items-center gap-1 rounded-xl py-1",
+                          highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",
+                        )}
                       >
                         <span
                           className={cn(
