@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatValue } from "@/components/sheet/format";
 import { X } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { DemoBadge, GradeBadge } from "@/components/cell/grade-badge";
@@ -20,7 +21,7 @@ export type CityDetail = {
 /** Bottom sheet on phones, side card on desktop. Not modal: the map and list stay usable behind it. */
 export function CitySheet({ detail, onClose }: { detail: CityDetail; onClose: () => void }) {
   const t = useTranslations("map");
-  const f = useFormatter();
+  const locale = useLocale();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export function CitySheet({ detail, onClose }: { detail: CityDetail; onClose: ()
   }, [detail.territorySlug, onClose]);
 
   const e = detail.estimate;
-  const num = (n: number) => f.number(n, { maximumFractionDigits: 0 });
+  // Rounded: the estimate is grade B, euro-level digits would claim false precision.
+  const num = (n: number) => formatValue(n, e?.unit ?? "EUR", locale);
   return (
     <div
       ref={ref}
@@ -66,7 +68,7 @@ export function CitySheet({ detail, onClose }: { detail: CityDetail; onClose: ()
         {e ? (
           <>
             <p className="num flex items-center gap-2 text-2xl">
-              {num(e.value)} {e.unit}
+              {num(e.value)}
               <GradeBadge grade={e.grade} />
               {e.is_demo && <DemoBadge />}
             </p>

@@ -5,8 +5,8 @@ import type { Category, CellRow, Territory } from "@/lib/queries/scout";
 import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
-import { DemoBadge, type Grade } from "./grade-badge";
-import { StatusLabel } from "./status";
+import { DemoBadge, GradeBadge, type Grade } from "./grade-badge";
+import { STATUS_TEXT, statusIcon } from "./status";
 
 type Props = {
   categories: Category[];
@@ -58,7 +58,14 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
         className="flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-10 pb-6 text-center lg:order-2 lg:px-12"
       >
         <Pair category={category} territory={territory} cell={cell} name={name} />
-        <Verdict cell={cell} category={category.slug} territory={territory.slug} key={`${catSlug}-${terSlug}`} />
+        <Verdict
+          cell={cell}
+          category={category.slug}
+          territory={territory.slug}
+          title={`${name(category)} · ${name(territory)}`}
+          country={territory.country_code ?? ""}
+          key={`${catSlug}-${terSlug}`}
+        />
       </section>
 
       {/* Tray (phone) / left panel (desktop) */}
@@ -121,7 +128,7 @@ function Pair({
   );
 }
 
-function Verdict({ cell, category, territory }: { cell?: CellRow; category: string; territory: string }) {
+function Verdict({ cell, category, territory, title, country }: { cell?: CellRow; category: string; territory: string; title: string; country: string }) {
   const t = useTranslations("scout");
   const ts = useTranslations("status");
   const ti = useTranslations("inputs");
@@ -129,14 +136,20 @@ function Verdict({ cell, category, territory }: { cell?: CellRow; category: stri
   const mix = (cell?.grade_mix ?? { A: 0, B: 0, C: 0 }) as Record<Grade, number>;
   const coverage = Number(cell?.coverage_pct ?? 0);
   const missing = (cell?.missing_inputs ?? []).map((k) => (ti.has(k) ? ti(k) : k));
+  const StatusIcon = statusIcon(status);
 
   return (
     <div className="flex max-w-md animate-[fade_300ms_ease-out] flex-col items-center gap-4">
-      <h1 className="text-[40px] leading-tight font-light tracking-tight sm:text-[56px]">{ts(status)}</h1>
-      <div className="flex items-center gap-3">
-        <StatusLabel status={status} />
+      <p className="flex items-center gap-2 text-sm font-medium text-muted">
+        {title}
         {cell?.is_demo && <DemoBadge />}
-      </div>
+      </p>
+      {/* Status by icon, word and colour together, never colour alone. */}
+      <h1 className={cn("flex items-center gap-3 text-[40px] leading-tight font-light tracking-tight sm:text-[56px]", STATUS_TEXT[status])}>
+        <StatusIcon aria-hidden className="size-9 shrink-0 sm:size-11" />
+        <span className="text-text">{ts(status)}</span>
+      </h1>
+      {status !== "insufficient_data" && <p className="-mt-2 text-xs text-muted">{t("nationalScope", { country })}</p>}
       <Link
         href={`/cell/${category}/${territory}`}
         className="inline-flex h-11 items-center rounded-full bg-brand px-6 font-medium text-brand-contrast"
@@ -189,20 +202,21 @@ function ThinBar({ label, value }: { label: string; value: number }) {
 
 function GradeMix({ label, mix }: { label: string; mix: Record<Grade, number> }) {
   const total = mix.A + mix.B + mix.C;
-  const pct = (n: number) => (total ? (n / total) * 100 : 0);
   return (
-    <div>
-      <div className="mb-1 flex justify-between">
-        <span>{label}</span>
-        <span className="num">
-          A {mix.A} · B {mix.B} · C {mix.C}
+    <div className="flex items-center justify-between gap-3">
+      <span>{label}</span>
+      {total ? (
+        <span className="num flex items-center gap-2 text-text">
+          {(["A", "B", "C"] as const).map((g) => (
+            <span key={g} className={cn("inline-flex items-center gap-1", !mix[g] && "opacity-40")}>
+              <GradeBadge grade={g} />
+              {mix[g]}
+            </span>
+          ))}
         </span>
-      </div>
-      <div aria-hidden className={cn("flex h-1 overflow-hidden rounded-full", total ? "bg-surface-2" : "hatched")}>
-        <div className="h-full bg-text" style={{ width: `${pct(mix.A)}%` }} />
-        <div className="h-full bg-muted" style={{ width: `${pct(mix.B)}%` }} />
-        <div className="h-full bg-border" style={{ width: `${pct(mix.C)}%` }} />
-      </div>
+      ) : (
+        <span className="hatched rounded px-2">-</span>
+      )}
     </div>
   );
 }

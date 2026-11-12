@@ -22,7 +22,13 @@
       "gradeMixItem": "{grade}: {share}%",
       "updated": "Aggiornata il {date}",
       "territoryNote": "Nota sul territorio",
-      "categoryNote": "Nota sulla categoria"
+      "categoryNote": "Nota sulla categoria",
+      "inputNames": {
+        "trend": "trend",
+        "geo": "domanda locale",
+        "csi": "sentiment",
+        "competition": "concorrenza"
+      }
     },
     "figure": {
       "insufficient": "Dati insufficienti",

@@ -24,6 +24,11 @@ export function StatusLabel({ status, className }: { status: CellStatus; classNa
   );
 }
 
+/** Text colour class of a status (icon colour; the word stays in the body colour). */
+export const STATUS_TEXT: Record<CellStatus, string> = Object.fromEntries(
+  Object.entries(META).map(([k, v]) => [k, v.text]),
+) as Record<CellStatus, string>;
+
 export function statusIcon(status: CellStatus) {
   return META[status].Icon;
 }

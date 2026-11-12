@@ -34,6 +34,7 @@
     "missingInputs": "Missing inputs",
     "missingCount": "{count} missing inputs",
     "gapSummary": "Data gap map",
-    "gapTotal": "{count} missing inputs across the cells shown"
+    "gapTotal": "{count} missing inputs across the cells shown",
+    "nationalNote": "Status is the category's national trend: cities in the same country share it. Local differences show in local demand and, from Day 4, in the MOS."
   }
 }

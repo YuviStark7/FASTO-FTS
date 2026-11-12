@@ -53,7 +53,8 @@
     "mos": "MOS",
     "mosUnavailable": "MOS not available",
     "openCell": "Open the sheet",
-    "pair": "{category} in {territory}"
+    "pair": "{category} in {territory}",
+    "nationalScope": "National trend ({country}): cities in the same country share it"
   },
   "inputs": {
     "trend": "trend",
