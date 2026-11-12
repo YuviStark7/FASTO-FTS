@@ -73,6 +73,7 @@ export function MatrixView({ categories, territories, cells }: Props) {
           )}
           <MatrixControls filters={filters} onChange={setFilters} onReset={() => setFilters(INITIAL)} countries={countries} />
           <MatrixLegend mode={filters.mode} mosMissing={mosMissing} />
+          {filters.mode === "status" && <p className="text-xs text-muted">{t("nationalNote")}</p>}
           <p className="num text-sm text-muted" aria-live="polite">
             {t("cellsShown", { count: shown })}
           </p>

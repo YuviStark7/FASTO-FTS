@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { CategoryIcon } from "@/components/cell/category-icon";
-import { statusIcon } from "@/components/cell/status";
+import { STATUS_TEXT, statusIcon, type CellStatus } from "@/components/cell/status";
 import { cn } from "@/lib/utils";
 import { CoverageCell, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
@@ -43,7 +43,7 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
               </span>
               <span className="flex-1">
                 <span className="block font-medium">{localName(category, locale)}</span>
-                <span className="num block text-xs text-muted">{t("withData", { count: withData, total })}</span>
+                <StatusCounts model={model} categoryId={category.id} label={t("withData", { count: withData, total })} />
                 {summary && (
                   <span className="num block text-xs text-muted">{t("missingCount", { count: summary.perCategory.get(category.id) ?? 0 })}</span>
                 )}
@@ -88,5 +88,30 @@ export function MatrixList({ model, mode, locale }: { model: ViewModel; mode: Co
         );
       })}
     </ul>
+  );
+}
+
+const ORDER: CellStatus[] = ["expanding", "consolidated", "threatened", "insufficient_data"];
+
+/** Counts per status for one category, each with its icon (never colour alone); the full sentence is for screen readers. */
+function StatusCounts({ model, categoryId, label }: { model: ViewModel; categoryId: number; label: string }) {
+  const counts = new Map<CellStatus, number>();
+  for (const col of model.cols) {
+    const c = model.byKey.get(cellKey(categoryId, col.id));
+    if (c) counts.set(c.status, (counts.get(c.status) ?? 0) + 1);
+  }
+  return (
+    <span className="num mt-0.5 flex items-center gap-3 text-xs text-muted">
+      <span className="sr-only">{label}</span>
+      {ORDER.filter((k) => counts.get(k)).map((k) => {
+        const Icon = statusIcon(k);
+        return (
+          <span key={k} aria-hidden className="inline-flex items-center gap-1">
+            <Icon className={cn("size-3.5", STATUS_TEXT[k])} />
+            {counts.get(k)}
+          </span>
+        );
+      })}
+    </span>
   );
 }

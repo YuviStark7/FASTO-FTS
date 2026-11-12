@@ -53,7 +53,8 @@
     "mos": "MOS",
     "mosUnavailable": "MOS non disponibile",
     "openCell": "Apri la scheda",
-    "pair": "{category} a {territory}"
+    "pair": "{category} a {territory}",
+    "nationalScope": "Trend nazionale ({country}): le città dello stesso paese lo condividono"
   },
   "inputs": {
     "trend": "trend",

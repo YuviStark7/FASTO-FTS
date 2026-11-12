@@ -18,9 +18,14 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
   const covLabel = useCoverageLabel();
   const coverage = mode === "coverage";
   const summary: GapSummary | null = coverage ? summariseGaps(model) : null;
+  // A thicker rule where a new country starts: cities of one country share the national trend.
+  const startsCountry = (i: number) => i > 0 && model.cols[i].country_code !== model.cols[i - 1].country_code;
 
   return (
-    <div className="hidden max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto rounded-[var(--radius-card)] border border-border bg-surface sm:block">
+    <div className="relative hidden sm:block">
+    {/* Fade on the right edge: the grid scrolls sideways inside its box. */}
+    <div aria-hidden className="pointer-events-none absolute inset-y-px right-px z-40 w-10 rounded-r-[var(--radius-card)] bg-gradient-to-l from-bg/90 to-transparent" />
+    <div className="max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto rounded-[var(--radius-card)] border border-border bg-surface">
       <table aria-label={t("gridLabel")} className="border-separate border-spacing-0 text-sm">
         <thead>
           <tr>
@@ -30,11 +35,11 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
             >
               {t("category")}
             </th>
-            {model.cols.map((col) => (
+            {model.cols.map((col, i) => (
               <th
                 key={col.id}
                 scope="col"
-                className="sticky top-0 z-20 min-w-24 border-b border-border bg-surface px-2 py-2 text-center font-medium"
+                className={cn("sticky top-0 z-20 min-w-24 border-b border-border bg-surface px-2 py-2 text-center font-medium", startsCountry(i) && "border-l-2")}
               >
                 <span className="block truncate">{localName(col, locale)}</span>
                 <span className="num block text-xs font-normal text-muted">{col.country_code}</span>
@@ -65,11 +70,11 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
                   {localName(category, locale)}
                 </span>
               </th>
-              {model.cols.map((col) => {
+              {model.cols.map((col, i) => {
                 const cell = model.byKey.get(cellKey(category.id, col.id));
                 if (!cell || !model.matches(cell)) {
                   return (
-                    <td key={col.id} className="border-b border-border p-1 text-center text-muted/50" title={t("filteredOut")}>
+                    <td key={col.id} className={cn("border-b border-border p-1 text-center text-muted/50", startsCountry(i) && "border-l-2")} title={t("filteredOut")}>
                       <span aria-hidden>·</span>
                     </td>
                   );
@@ -78,7 +83,7 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
                 const label = sc("pair", { category: localName(category, locale), territory: localName(col, locale) });
                 const status = s(cell.status);
                 return (
-                  <td key={col.id} className="border-b border-border p-1">
+                  <td key={col.id} className={cn("border-b border-border p-1", startsCountry(i) && "border-l-2")}>
                     <Link
                       href={`/cell/${category.slug}/${col.slug}`}
                       aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
@@ -114,6 +119,7 @@ export function MatrixTable({ model, mode, locale }: { model: ViewModel; mode: C
           </tfoot>
         )}
       </table>
+    </div>
     </div>
   );
 }

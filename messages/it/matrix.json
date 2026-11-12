@@ -34,6 +34,7 @@
     "missingInputs": "Input mancanti",
     "missingCount": "{count} input mancanti",
     "gapSummary": "Mappa dei dati mancanti",
-    "gapTotal": "{count} input mancanti nelle celle mostrate"
+    "gapTotal": "{count} input mancanti nelle celle mostrate",
+    "nationalNote": "Lo stato è il trend nazionale della categoria: le città dello stesso paese lo condividono. Le differenze locali sono nella domanda locale e, dal Giorno 4, nel MOS."
   }
 }
