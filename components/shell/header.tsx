@@ -9,8 +9,9 @@ export async function Header() {
   const { email } = await requireUser();
   const { role } = await getStaffRole();
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
+  // Transparent header over a scrim that fades the page out under the chip, so scrolled content never collides with it.
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[var(--header-h)] px-3 pt-[calc(env(safe-area-inset-top)+1rem)]">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[var(--header-h)] px-3 pt-[calc(env(safe-area-inset-top)+1rem)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-[calc(100%+0.75rem)] before:bg-gradient-to-b before:from-bg before:via-bg/85 before:to-transparent sm:px-4">
       <div className="relative mx-auto flex max-w-[1600px] items-start justify-center">
         <PageChip />
         <div className="pointer-events-auto absolute right-0 top-0">
