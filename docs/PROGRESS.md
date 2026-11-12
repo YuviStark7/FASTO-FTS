@@ -53,4 +53,8 @@ Merged into `day-3/spine`, not yet in `main`:
 - Cell sheet with six tabs, every figure opening its ledger rows in the Sources tab; credit lines for every source.
 - Map of the 20 pilot cities by status.
 
-In progress: Bluesky mentions, competitors and products from Open Food Facts, feedback controls for the human review loop.
+Also merged: Bluesky mentions (no post URLs: they carry the author's DID), Open Food Facts products and brands as offers, rating controls on CSI readings and `/admin/feedback` (`feedback_summary()`, counts and comments, no authors). Review blockers fixed before merge: every sentiment figure graded and traced to a provenance panel; classifier spend logged for every billed call, three-failure stop, unknown models refused.
+
+PR 7 merged on 11 November. Migrations `20261112090000` to `20261112130000` applied to production and fingerprint-verified. Source licences and activation follow in PR 8.
+
+Blocked from 19:50 UTC on 11 November to the night: GitHub Actions failed every job at startup ("unexpected error", no incident on githubstatus.com); scheduled runs resumed at 01:15 UTC on 12 November. The production data run and the Day 3 gate check moved to 12 November.
