@@ -95,7 +95,27 @@ const connector: Connector<ObservationInput[]> = {
         ctx.log(`${city.slug}: relation ${parsed.relation.id} "${parsed.relation.name}" admin_level ${parsed.relation.adminLevel}, ${parsed.counts.size} shop values`);
       } catch (e) {
         failed.push(city.slug);
-        ctx.warn(`${city.slug}: FAILED, no rows written: ${e instanceof Error ? e.message : String(e)}`);
+        const msg = e instanceof Error ? e.message : String(e);
+        ctx.warn(`${city.slug}: FAILED, no rows written: ${msg}`);
+        // No boundary matched the table: list same-named boundaries so the table can be corrected
+        // from evidence. Nothing is counted from these candidates.
+        if (msg.includes("got 0")) {
+          try {
+            const q = `[out:json][timeout:60];rel["boundary"="administrative"]["name"~"^(${area.names.join("|")})$"];out tags;`;
+            const res = await ctx.get(endpoints[preferred], {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({ data: q }).toString(),
+              retries: 1,
+            });
+            const els = ((res.json() as { elements?: { id: number; tags?: Record<string, string> }[] }).elements ?? []).slice(0, 8);
+            ctx.warn(
+              `${city.slug}: candidates by name: ${els.map((x) => `relation ${x.id} admin_level=${x.tags?.admin_level} wikidata=${x.tags?.wikidata} name="${x.tags?.name}"`).join("; ") || "none"}`,
+            );
+          } catch {
+            // Diagnostics only.
+          }
+        }
       }
     }
     if (failed.length) ctx.log(`cities without data: ${failed.join(", ")}`);
