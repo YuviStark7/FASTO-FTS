@@ -44,7 +44,6 @@
   --shadow-2: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 10px 28px -10px rgb(0 0 0 / 0.7);
   --shadow-3: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 28px 72px -18px rgb(0 0 0 / 0.85), 0 4px 12px rgb(0 0 0 / 0.35);
   --scrim: rgb(4 5 8 / 0.62);
-  --glow: rgb(255 212 0 / 0.055);
 }
 
 [data-theme="light"] {
@@ -77,7 +76,6 @@
   --shadow-2: 0 1px 2px rgb(14 17 22 / 0.05), 0 10px 28px -12px rgb(11 61 145 / 0.2);
   --shadow-3: 0 2px 6px rgb(14 17 22 / 0.06), 0 28px 72px -22px rgb(11 61 145 / 0.32);
   --scrim: rgb(14 17 22 / 0.38);
-  --glow: rgb(11 61 145 / 0.05);
 }
 
 :root {
@@ -146,10 +144,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* One quiet light behind the brand chip: depth without chrome. */
-  background-image: radial-gradient(60rem 26rem at 50% -8rem, var(--glow), transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 @media (min-width: 640px) {
@@ -460,7 +454,7 @@ dd {
     display: inline-flex;
     min-height: 2.75rem;
     min-width: 4.75rem;
-    flex: 1;
+    flex: 1 0 auto;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;

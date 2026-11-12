@@ -67,7 +67,7 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
                 </ul>
               </div>
             )}
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="table min-w-[640px]">
                 <caption className="sr-only">{t("offers")}</caption>
                 <thead>

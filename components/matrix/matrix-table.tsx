@@ -25,7 +25,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
     <div className="relative hidden sm:block">
     {/* Fade on the right edge: the grid scrolls sideways inside its box. */}
     <div aria-hidden className="pointer-events-none absolute inset-y-px right-px z-40 w-12 rounded-r-[var(--radius-card)] bg-gradient-to-l from-surface to-transparent" />
-    <div className="card max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto">
+    <div className="card relative max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto">
       <table aria-label={t("gridLabel")} className="border-separate border-spacing-0 text-sm">
         <thead>
           <tr>

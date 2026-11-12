@@ -34,7 +34,8 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
           {t("empty")}
         </p>
       ) : null}
-      <div className="card overflow-x-auto">
+      {/* relative: screen-reader-only spans inside the table stay inside the scroll box and never widen the page. */}
+      <div className="card relative overflow-x-auto">
         <table className="table min-w-[1040px]" data-testid="ledger">
           <caption className="sr-only">{t("table")}</caption>
           <thead className="bg-surface-2/60">
@@ -52,7 +53,7 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
                 <th scope="row" className="min-w-40">
                   {locale === "en" ? l.indicatorName.en : l.indicatorName.it}
                 </th>
-                <td className="font-mono text-xs leading-5 break-all text-muted">{l.seriesKey}</td>
+                <td className="min-w-52 font-mono text-xs leading-5 break-all text-muted">{l.seriesKey}</td>
                 <td>{l.territory}</td>
                 <td className="whitespace-nowrap">{period(l.periodStart, l.periodEnd)}</td>
                 <td className="whitespace-nowrap">

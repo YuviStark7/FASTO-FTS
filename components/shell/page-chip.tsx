@@ -75,7 +75,11 @@ export function PageChip() {
           lastPointer.current = "";
           setOpen((o) => (viaMouse ? true : !o));
         }}
-        className="flex min-h-11 items-center gap-2.5 rounded-full px-4 text-[13px] font-bold tracking-[0.12em] uppercase transition-transform duration-(--dur-fast) active:scale-[0.97]"
+        className={cn(
+          "flex min-h-11 items-center gap-2.5 rounded-full px-4 text-[13px] font-bold tracking-[0.12em] uppercase transition-transform duration-(--dur-fast) active:scale-[0.97]",
+          // On phones the open chip must clear the profile badge.
+          open && "max-sm:px-3",
+        )}
       >
         {/* Slot: a logo image can replace this text later. */}
         <span data-slot="logo" className={cn("whitespace-nowrap", open && "max-sm:hidden")}>{ts("brand")}</span>
@@ -98,7 +102,7 @@ export function PageChip() {
                 <Link href={href} aria-current={isActive ? "page" : undefined} className="group flex min-h-11 items-center focus-visible:!outline-0">
                   <span
                     className={cn(
-                      "flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold tracking-[0.1em] uppercase ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",
+                      "flex h-9 items-center gap-1.5 rounded-full px-2 text-xs font-semibold tracking-[0.06em] uppercase sm:tracking-[0.1em] ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",
                       isActive ? "bg-brand-contrast text-brand" : "group-hover:bg-brand-contrast/12",
                     )}
                   >

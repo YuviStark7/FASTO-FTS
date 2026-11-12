@@ -79,7 +79,7 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
           </span>
         </p>
         {table ? (
-          <div className="overflow-x-auto">
+          <div className="relative overflow-x-auto">
             <table className="table num">
               <caption className="sr-only">{t("tableCaption")}</caption>
               <thead>
