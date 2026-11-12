@@ -155,3 +155,9 @@ body {
     transform: none;
   }
 }
+
+/* Scout floating frames: slow drift, each frame on its own phase (reduced motion is handled above). */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(var(--dx, 6px), var(--dy, -10px), 0); }
+}

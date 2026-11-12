@@ -2,11 +2,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Category, CellRow, Territory } from "@/lib/queries/scout";
+import { getScoutFigures, type ScoutFigure } from "@/app/[locale]/(app)/scout-actions";
 import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
-import { DemoBadge, GradeBadge, type Grade } from "./grade-badge";
+import { DemoBadge } from "./grade-badge";
+import { ScoutCombobox, type ComboItem } from "./scout-combobox";
+import { ScoutFrames } from "./scout-frames";
 import { STATUS_TEXT, statusIcon } from "./status";
+
+// The map screen still uses the round-token carousel.
+export { TokenCarousel } from "./token-carousel";
 
 type Props = {
   categories: Category[];
@@ -16,13 +22,20 @@ type Props = {
   initialTerritory?: string;
 };
 
+const STEP = 24; // 360 / 15 categories: the arc is a slice of a full wheel
+const VISIBLE = 4; // petals shown either side of the selected one (96 degrees)
+
+/** Shortest signed distance between two indices on a wheel of n. */
+const wrap = (d: number, n: number) => ((((d + n / 2) % n) + n) % n) - n / 2;
+
 /**
- * Scout (home): pick a category and a territory, get the verdict.
- * Phone: verdict in the centre, selectors in a tray under the thumb.
- * Desktop: selectors in a left panel, verdict on the right. SPEC sections 6 and 7.
+ * Scout (home), full-bleed. Two states of one screen:
+ * bloomed (choosing): the category flower and two editable tags; collapsed (reading): the verdict,
+ * two pills and floating frames with the cell's key figures. SPEC sections 6 and 7.
  */
 export function ScoutView({ categories, territories, cells, initialCategory, initialTerritory }: Props) {
   const t = useTranslations("scout");
+  const ts = useTranslations("status");
   const locale = useLocale();
   const name = useCallback((x: { name_it: string; name_en: string }) => (locale === "en" ? x.name_en : x.name_it), [locale]);
 
@@ -32,6 +45,20 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
   const [terSlug, setTerSlug] = useState(
     territories.some((x) => x.slug === initialTerritory) ? initialTerritory! : territories[0]?.slug,
   );
+  const catIndex = Math.max(0, categories.findIndex((c) => c.slug === catSlug));
+  const [rot, setRot] = useState(-catIndex * STEP); // accumulated wheel angle, so turns take the short way
+  const [bloomed, setBloomed] = useState(false);
+  const [editing, setEditing] = useState(0);
+  const [figures, setFigures] = useState<ScoutFigure[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const zone = useRef<HTMLDivElement>(null);
+  const petals = useRef(new Map<string, HTMLButtonElement>());
+  const catChip = useRef<HTMLButtonElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const inside = useRef(false);
+  const mouseSeen = useRef(false);
+  const focusPetal = useRef(false);
 
   const category = categories.find((c) => c.slug === catSlug)!;
   const territory = territories.find((x) => x.slug === terSlug)!;
@@ -48,289 +75,325 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
     window.history.replaceState(null, "", url);
   }, [catSlug, terSlug]);
 
+  // Key figures of the selected cell: debounced, previous frames stay until the new ones arrive.
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const id = setTimeout(async () => {
+      try {
+        const r = await getScoutFigures(catSlug, terSlug, locale);
+        if (!cancelled) setFigures(r);
+      } catch {
+        if (!cancelled) setFigures((prev) => prev ?? []);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [catSlug, terSlug, locale]);
+
+  const bloom = useCallback(() => {
+    clearTimeout(timer.current);
+    setBloomed(true);
+  }, []);
+  const collapse = useCallback(() => {
+    clearTimeout(timer.current);
+    setBloomed(false);
+  }, []);
+
+  // Tap or click outside, and Escape, collapse the flower.
+  useEffect(() => {
+    if (!bloomed) return;
+    const down = (e: PointerEvent) => {
+      if (zone.current && !zone.current.contains(e.target as Node)) collapse();
+    };
+    const key = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || editing) return;
+      const hadFocus = zone.current?.contains(document.activeElement);
+      collapse();
+      if (hadFocus) requestAnimationFrame(() => catChip.current?.focus());
+    };
+    document.addEventListener("pointerdown", down);
+    window.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("pointerdown", down);
+      window.removeEventListener("keydown", key);
+    };
+  }, [bloomed, editing, collapse]);
+
+  // After a keyboard bloom, focus goes to the selected petal.
+  useEffect(() => {
+    if (bloomed && focusPetal.current) {
+      focusPetal.current = false;
+      requestAnimationFrame(() => petals.current.get(catSlug)?.focus());
+    }
+  }, [bloomed, catSlug]);
+
+  // If the pointer is already outside when editing ends, collapse after the usual delay.
+  useEffect(() => {
+    if (bloomed && !editing && mouseSeen.current && !inside.current) {
+      timer.current = setTimeout(collapse, 300);
+      return () => clearTimeout(timer.current);
+    }
+  }, [bloomed, editing, collapse]);
+
+  const onEditing = useCallback((on: boolean) => {
+    setEditing((n) => Math.max(0, n + (on ? 1 : -1)));
+  }, []);
+
+  const selectCategory = useCallback(
+    (slug: string) => {
+      const next = categories.findIndex((c) => c.slug === slug);
+      if (next < 0 || slug === catSlug) return;
+      setRot((r) => r - wrap(next - catIndex, categories.length) * STEP);
+      setCatSlug(slug);
+    },
+    [categories, catIndex, catSlug],
+  );
+
+  const onPetalKey = (e: React.KeyboardEvent) => {
+    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    if (!delta) return;
+    e.preventDefault();
+    const next = categories[(catIndex + delta + categories.length) % categories.length];
+    selectCategory(next.slug);
+    petals.current.get(next.slug)?.focus();
+  };
+
+  const catItems = useMemo<ComboItem[]>(
+    () => categories.map((c) => ({ id: c.slug, label: name(c), search: [c.name_it, c.name_en] })),
+    [categories, name],
+  );
+  const terItems = useMemo<ComboItem[]>(
+    () => territories.map((x) => ({ id: x.slug, label: name(x), meta: x.country_code, search: [x.name_it, x.name_en] })),
+    [territories, name],
+  );
+
   if (!category || !territory) return null;
 
-  return (
-    <div className="flex min-h-[calc(100dvh-4.5rem)] flex-col lg:min-h-dvh lg:flex-row">
-      {/* Verdict */}
-      <section
-        aria-live="polite"
-        className="flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-10 pb-6 text-center lg:order-2 lg:px-12"
-      >
-        <Pair category={category} territory={territory} cell={cell} name={name} />
-        <Verdict
-          cell={cell}
-          category={category.slug}
-          territory={territory.slug}
-          title={`${name(category)} · ${name(territory)}`}
-          country={territory.country_code ?? ""}
-          key={`${catSlug}-${terSlug}`}
-        />
-      </section>
-
-      {/* Tray (phone) / left panel (desktop) */}
-      <section
-        aria-label={`${t("categories")}, ${t("territories")}`}
-        className={cn(
-          "sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 rounded-t-[var(--radius-tray)] bg-surface pt-5 pb-4 shadow-[0_-12px_40px_rgba(0,0,0,0.35)]",
-          "lg:static lg:order-1 lg:w-[380px] lg:shrink-0 lg:overflow-y-auto lg:rounded-none lg:border-r lg:border-border lg:pt-10 lg:shadow-none",
-        )}
-      >
-        <TokenCarousel
-          label={t("pickCategory")}
-          items={categories.map((c) => ({ id: c.slug, label: name(c), color: c.color, icon: c.icon }))}
-          value={catSlug}
-          onChange={setCatSlug}
-        />
-        <ChipRow
-          label={t("pickTerritory")}
-          items={territories.map((x) => ({ id: x.slug, label: name(x), meta: x.country_code }))}
-          value={terSlug}
-          onChange={setTerSlug}
-        />
-      </section>
-    </div>
-  );
-}
-
-function Pair({
-  category,
-  territory,
-  cell,
-  name,
-}: {
-  category: Category;
-  territory: Territory;
-  cell?: CellRow;
-  name: (x: { name_it: string; name_en: string }) => string;
-}) {
-  const t = useTranslations("scout");
-  const unknown = !cell || cell.status === "insufficient_data";
-  // Two cards side by side define the cell. A hatched card means unknown.
-  return (
-    <div className="flex items-center gap-3" aria-label={t("pair", { category: name(category), territory: name(territory) })}>
-      <div
-        className="flex h-24 w-20 flex-col items-center justify-center gap-2 rounded-[var(--radius-card)] text-bg shadow-lg transition-transform duration-300"
-        style={{ backgroundColor: category.color }}
-      >
-        <CategoryIcon name={category.icon} className="size-7" />
-      </div>
-      <div
-        className={cn(
-          "flex h-24 w-20 flex-col items-center justify-center rounded-[var(--radius-card)] border border-border px-1 text-xs font-medium shadow-lg",
-          unknown ? "hatched text-text" : "bg-surface-2",
-        )}
-      >
-        <span className="line-clamp-2">{name(territory)}</span>
-        <span className="text-[10px] text-muted">{territory.country_code}</span>
-      </div>
-    </div>
-  );
-}
-
-function Verdict({ cell, category, territory, title, country }: { cell?: CellRow; category: string; territory: string; title: string; country: string }) {
-  const t = useTranslations("scout");
-  const ts = useTranslations("status");
-  const ti = useTranslations("inputs");
   const status = cell?.status ?? "insufficient_data";
-  const mix = (cell?.grade_mix ?? { A: 0, B: 0, C: 0 }) as Record<Grade, number>;
-  const coverage = Number(cell?.coverage_pct ?? 0);
-  const missing = (cell?.missing_inputs ?? []).map((k) => (ti.has(k) ? ti(k) : k));
   const StatusIcon = statusIcon(status);
+  const country = territory.country_code ?? "";
+  const missing = (cell?.missing_inputs ?? []) as string[];
+  const cellHref = `/cell/${category.slug}/${territory.slug}`;
+  const mosHref = `/matrix?mode=mos&c=${category.slug}&t=${territory.slug}`;
+  const move = "transition-all duration-500 ease-[var(--ease-spring)] motion-reduce:transition-none";
 
   return (
-    <div className="flex max-w-md animate-[fade_300ms_ease-out] flex-col items-center gap-4">
-      <p className="flex items-center gap-2 text-sm font-medium text-muted">
-        {title}
-        {cell?.is_demo && <DemoBadge />}
-      </p>
-      {/* Status by icon, word and colour together, never colour alone. */}
-      <h1 className={cn("flex items-center gap-3 text-[40px] leading-tight font-light tracking-tight sm:text-[56px]", STATUS_TEXT[status])}>
-        <StatusIcon aria-hidden className="size-9 shrink-0 sm:size-11" />
-        <span className="text-text">{ts(status)}</span>
-      </h1>
-      {status !== "insufficient_data" && <p className="-mt-2 text-xs text-muted">{t("nationalScope", { country })}</p>}
-      <Link
-        href={`/cell/${category}/${territory}`}
-        className="inline-flex h-11 items-center rounded-full bg-brand px-6 font-medium text-brand-contrast"
-      >
-        {t("openCell")}
-      </Link>
-      <p className="num text-muted">
-        {cell?.mos != null ? (
-          <>
-            {t("mos")} <span className="text-text">{Math.round(Number(cell.mos))}</span>
-          </>
-        ) : (
-          t("mosUnavailable")
+    <section
+      aria-label={t("title")}
+      // Full-bleed under the transparent header: cancel the layout's top padding, fill the viewport.
+      className="relative isolate -mt-[var(--header-h,96px)] h-dvh min-h-[34rem] overflow-hidden"
+    >
+      <ScoutFrames figures={figures} loading={loading} visible={!bloomed} href={cellHref} />
+
+      {/* Verdict: upper centre while choosing, vertical centre while reading. */}
+      <div
+        aria-live="polite"
+        className={cn(
+          "pointer-events-none absolute left-1/2 z-10 w-full max-w-xl -translate-x-1/2 px-4 text-center",
+          move,
+          bloomed ? "top-[calc(var(--header-h,96px)+1rem)] translate-y-0" : "top-1/2 -translate-y-1/2",
         )}
-      </p>
-      {status === "insufficient_data" && (
-        <p className="text-sm text-muted">
-          {t("insufficientReason")}
-          {missing.length > 0 && <span className="mt-1 block">{t("missing", { inputs: missing.join(", ") })}</span>}
-        </p>
-      )}
-      <div className="mt-2 w-64 space-y-3 text-left text-xs text-muted">
-        <ThinBar label={t("coverage")} value={coverage} />
-        <GradeMix label={t("gradeMix")} mix={mix} />
-      </div>
-    </div>
-  );
-}
-
-function ThinBar({ label, value }: { label: string; value: number }) {
-  return (
-    <div>
-      <div className="mb-1 flex justify-between">
-        <span>{label}</span>
-        <span className="num">{Math.round(value)}%</span>
-      </div>
-      <div
-        role="progressbar"
-        aria-label={label}
-        aria-valuenow={Math.round(value)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        className="h-1 overflow-hidden rounded-full bg-surface-2"
       >
-        <div className="h-full rounded-full bg-brand transition-[width] duration-300" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function GradeMix({ label, mix }: { label: string; mix: Record<Grade, number> }) {
-  const total = mix.A + mix.B + mix.C;
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span>{label}</span>
-      {total ? (
-        <span className="num flex items-center gap-2 text-text">
-          {(["A", "B", "C"] as const).map((g) => (
-            <span key={g} className={cn("inline-flex items-center gap-1", !mix[g] && "opacity-40")}>
-              <GradeBadge grade={g} />
-              {mix[g]}
-            </span>
-          ))}
-        </span>
-      ) : (
-        <span className="hatched rounded px-2">-</span>
-      )}
-    </div>
-  );
-}
-
-type Token = { id: string; label: string; color: string; icon: string };
-
-/** Round coloured tokens; the selected one is enlarged and scrolled to the centre. Radio-group keyboard model. */
-export function TokenCarousel({ label, items, value, onChange }: { label: string; items: Token[]; value: string; onChange: (id: string) => void }) {
-  const refs = useRef(new Map<string, HTMLButtonElement>());
-  const selected = items.find((i) => i.id === value);
-
-  useEffect(() => {
-    refs.current.get(value)?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
-  }, [value]);
-
-  const onKey = (e: React.KeyboardEvent) => {
-    const i = items.findIndex((x) => x.id === value);
-    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-    if (!delta) return;
-    e.preventDefault();
-    const next = items[(i + delta + items.length) % items.length];
-    onChange(next.id);
-    refs.current.get(next.id)?.focus();
-  };
-
-  return (
-    <div className="mb-4">
-      <p className="mb-2 px-4 text-center text-sm font-medium lg:px-6 lg:text-left">{selected?.label}</p>
-      <div
-        role="radiogroup"
-        aria-label={label}
-        onKeyDown={onKey}
-        className="no-scrollbar flex snap-x snap-mandatory items-center gap-3 overflow-x-auto px-[calc(50%-28px)] py-3 lg:flex-wrap lg:overflow-visible lg:px-6"
-      >
-        {items.map((it) => {
-          const active = it.id === value;
-          return (
-            <button
-              key={it.id}
-              ref={(el) => {
-                if (el) refs.current.set(it.id, el);
-              }}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              aria-label={it.label}
-              tabIndex={active ? 0 : -1}
-              onClick={() => onChange(it.id)}
-              className={cn(
-                "grid shrink-0 snap-center place-items-center rounded-full text-bg transition-all duration-300 ease-[var(--ease-spring)]",
-                active ? "size-14 ring-2 ring-text ring-offset-2 ring-offset-surface" : "size-11 opacity-70 hover:opacity-100",
-              )}
-              style={{ backgroundColor: it.color }}
-            >
-              <CategoryIcon name={it.icon} className={active ? "size-6" : "size-5"} />
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function ChipRow({
-  label,
-  items,
-  value,
-  onChange,
-}: {
-  label: string;
-  items: { id: string; label: string; meta: string }[];
-  value: string;
-  onChange: (id: string) => void;
-}) {
-  const refs = useRef(new Map<string, HTMLButtonElement>());
-  useEffect(() => {
-    refs.current.get(value)?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
-  }, [value]);
-
-  const onKey = (e: React.KeyboardEvent) => {
-    const i = items.findIndex((x) => x.id === value);
-    const delta = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-    if (!delta) return;
-    e.preventDefault();
-    const next = items[(i + delta + items.length) % items.length];
-    onChange(next.id);
-    refs.current.get(next.id)?.focus();
-  };
-
-  return (
-    <div role="radiogroup" aria-label={label} onKeyDown={onKey} className="no-scrollbar flex gap-2 overflow-x-auto px-4 lg:flex-wrap lg:px-6">
-      {items.map((it) => {
-        const active = it.id === value;
-        return (
-          <button
-            key={it.id}
-            ref={(el) => {
-              if (el) refs.current.set(it.id, el);
-            }}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            tabIndex={active ? 0 : -1}
-            onClick={() => onChange(it.id)}
-            className={cn(
-              "flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm transition-colors",
-              active ? "bg-brand text-brand-contrast" : "bg-surface-2 text-text hover:bg-border",
-            )}
+        <div className="flex flex-col items-center gap-3">
+          <p className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.2em] text-muted uppercase sm:text-sm">
+            {t("cellName", { category: name(category), territory: name(territory) })}
+            {cell?.is_demo && <DemoBadge />}
+          </p>
+          {/* Status by icon, word and colour together, never colour alone. */}
+          <h1 className="flex flex-col items-center gap-2 text-[34px] leading-none font-light tracking-tight uppercase sm:text-5xl lg:text-6xl">
+            <StatusIcon aria-hidden className={cn("size-9 sm:size-12", STATUS_TEXT[status])} />
+            <span>{ts(status)}</span>
+          </h1>
+          <div
+            className={cn("flex flex-col items-center gap-3", move, bloomed ? "pointer-events-none max-h-0 overflow-hidden opacity-0" : "max-h-96 opacity-100")}
+            inert={bloomed}
           >
-            {it.label}
-            <span className={cn("text-[10px]", active ? "opacity-70" : "text-muted")}>{it.meta}</span>
+            <div className="pointer-events-auto mt-2 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href={cellHref}
+                className="inline-flex h-11 items-center rounded-full bg-text px-6 text-sm font-semibold tracking-wider text-bg uppercase"
+              >
+                {t("openCell")}
+              </Link>
+              <Link
+                href={mosHref}
+                className="inline-flex h-11 items-center rounded-full bg-text px-6 text-sm font-semibold tracking-wider text-bg uppercase"
+              >
+                {cell?.mos != null ? t("mosValue", { value: Math.round(Number(cell.mos)) }) : t("mosUnavailable")}
+              </Link>
+            </div>
+            {status !== "insufficient_data" ? (
+              <p className="max-w-xs text-xs text-muted">{t("nationalScope", { country })}</p>
+            ) : (
+              <p className="max-w-xs text-sm text-muted">
+                {t("insufficientReason")}
+                {missing.length > 0 && <MissingInputs keys={missing} />}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Flower zone: the pointer leaving it, a tap outside or Escape collapses it. */}
+      <div
+        ref={zone}
+        data-testid="scout-zone"
+        data-state={bloomed ? "bloomed" : "collapsed"}
+        onPointerEnter={(e) => {
+          if (e.pointerType !== "mouse") return; // touch collapses on a tap outside, never on "leave"
+          inside.current = true;
+          mouseSeen.current = true;
+          bloom();
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType !== "mouse") return;
+          inside.current = false;
+          if (!editing) {
+            clearTimeout(timer.current);
+            timer.current = setTimeout(collapse, 300);
+          }
+        }}
+        style={{ ["--b" as string]: "calc(var(--R) * 0.1 + var(--p) / 2 + 1.75rem)" }}
+        className={cn(
+          "absolute bottom-0 left-1/2 z-20 -translate-x-1/2 [--R:150px] [--p:50px] sm:[--R:230px] sm:[--p:70px]",
+          bloomed ? "h-[calc(var(--b)+var(--R)+var(--p)+1.5rem)] w-full" : "h-28 w-72",
+        )}
+      >
+        {/* Collapsed chips: category icon and location. Hover or tap blooms the flower again. */}
+        <div
+          className={cn(
+            "absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-3",
+            move,
+            bloomed ? "pointer-events-none scale-50 opacity-0" : "scale-100 opacity-100",
+          )}
+          inert={bloomed}
+        >
+          <button
+            ref={catChip}
+            type="button"
+            aria-label={`${t("bloom")}: ${name(category)}`}
+            data-testid="scout-chip-category"
+            onClick={(e) => {
+              focusPetal.current = e.detail === 0;
+              bloom();
+            }}
+            className="grid size-14 place-items-center rounded-2xl text-bg shadow-lg"
+            style={{ backgroundColor: category.color }}
+          >
+            <CategoryIcon name={category.icon} className="size-7" />
           </button>
-        );
-      })}
-    </div>
+          <button
+            type="button"
+            aria-label={`${t("bloom")}: ${name(territory)}`}
+            data-testid="scout-chip-territory"
+            onClick={(e) => {
+              focusPetal.current = e.detail === 0;
+              bloom();
+            }}
+            className="flex h-14 min-w-24 flex-col items-center justify-center rounded-2xl border border-border bg-surface-2 px-4 text-sm font-semibold tracking-wider uppercase shadow-lg"
+          >
+            {name(territory)}
+            <span className="text-[10px] font-normal text-muted">{territory.country_code}</span>
+          </button>
+        </div>
+
+        {/* The flower. */}
+        <div
+          className={cn("absolute bottom-[var(--b)] left-1/2 size-0 origin-center", move, bloomed ? "scale-100 opacity-100" : "pointer-events-none scale-[0.12] opacity-0")}
+          inert={!bloomed}
+          data-testid="scout-flower"
+        >
+          <div
+            role="radiogroup"
+            aria-label={t("pickCategory")}
+            onKeyDown={onPetalKey}
+            className="absolute size-0 transition-transform duration-500 ease-in-out motion-reduce:transition-none"
+            style={{ transform: `rotate(${rot}deg)` }}
+          >
+            {categories.map((c, i) => {
+              const off = wrap(i - catIndex, categories.length);
+              const active = i === catIndex;
+              const near = Math.abs(off) <= VISIBLE;
+              return (
+                <button
+                  key={c.slug}
+                  ref={(el) => {
+                    if (el) petals.current.set(c.slug, el);
+                  }}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  aria-label={name(c)}
+                  tabIndex={active ? 0 : -1}
+                  onClick={() => selectCategory(c.slug)}
+                  className={cn(
+                    "absolute top-0 left-0 grid place-items-center rounded-2xl transition-[transform,opacity,background-color] duration-500 ease-in-out motion-reduce:transition-none",
+                    active ? "text-bg shadow-xl" : "bg-surface-2 text-muted hover:bg-border hover:text-text",
+                    !near && "pointer-events-none",
+                  )}
+                  style={{
+                    width: "var(--p)",
+                    height: "var(--p)",
+                    marginLeft: "calc(var(--p) / -2)",
+                    marginTop: "calc(var(--p) / -2)",
+                    backgroundColor: active ? c.color : undefined,
+                    opacity: near ? 1 : 0,
+                    zIndex: active ? 2 : 1,
+                    transform: `rotate(${i * STEP}deg) translateY(calc(var(--R) * -1)) rotate(${-(i * STEP) - rot}deg) scale(${active ? 1.45 : near ? 1 : 0.3})`,
+                  }}
+                >
+                  <CategoryIcon name={c.icon} className="size-6 sm:size-8" />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Category name under the selected petal, editable. */}
+          <div className="absolute left-1/2 -translate-x-1/2" style={{ bottom: "calc(var(--R) - var(--p) * 0.725 - 3.25rem)" }}>
+            <ScoutCombobox
+              items={catItems}
+              value={catSlug}
+              label={t("editCategory")}
+              placeholder={t("typeCategory")}
+              emptyText={t("noMatches")}
+              onPick={selectCategory}
+              onEditing={onEditing}
+              testId="scout-category-tag"
+              triggerClassName="bg-surface/80 whitespace-nowrap hover:bg-surface-2"
+            />
+          </div>
+
+          {/* Location chip at the centre of the flower, editable. */}
+          <div className="absolute left-1/2 -translate-x-1/2" style={{ bottom: "-1.375rem" }}>
+            <ScoutCombobox
+              items={terItems}
+              value={terSlug}
+              label={t("editTerritory")}
+              placeholder={t("typeTerritory")}
+              emptyText={t("noMatches")}
+              onPick={setTerSlug}
+              onEditing={onEditing}
+              listSide="up"
+              testId="scout-territory-tag"
+              triggerClassName="border border-border bg-surface-2 whitespace-nowrap hover:bg-border"
+            >
+              {name(territory)} <span className="text-[10px] font-normal text-muted">{territory.country_code}</span>
+            </ScoutCombobox>
+          </div>
+        </div>
+      </div>
+    </section>
   );
+}
+
+function MissingInputs({ keys }: { keys: string[] }) {
+  const t = useTranslations("scout");
+  const ti = useTranslations("inputs");
+  const list = keys.map((k) => (ti.has(k) ? ti(k) : k));
+  return <span className="mt-1 block">{t("missing", { inputs: list.join(", ") })}</span>;
 }
