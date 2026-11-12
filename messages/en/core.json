@@ -54,7 +54,30 @@
     "mosUnavailable": "MOS not available",
     "openCell": "Open the sheet",
     "pair": "{category} in {territory}",
-    "nationalScope": "National trend ({country}): cities in the same country share it"
+    "nationalScope": "National trend ({country}): cities in the same country share it",
+    "cellName": "{category}, {territory}",
+    "mosValue": "MOS {value}",
+    "flowerLabel": "Category and city selector",
+    "editCategory": "Change category",
+    "editTerritory": "Change city",
+    "typeCategory": "Type a category",
+    "typeTerritory": "Type a city",
+    "noMatches": "No match",
+    "bloom": "Change category or city",
+    "framesLabel": "Key figures for this cell",
+    "framesLoading": "Loading key figures",
+    "openFrame": "{label}: {value}, open the sheet",
+    "range": "range {low} – {high}",
+    "frame": {
+      "realValueCagr": "Real annual growth",
+      "volumeCagr": "Volume growth",
+      "latestNominal": "Nominal spend (latest year)",
+      "localDemand": "Estimated local demand",
+      "perCapita": "Estimated spend per head",
+      "csi": "Sentiment (CSI)",
+      "pageviews": "Attention: page views",
+      "mediaAttention": "Media attention"
+    }
   },
   "inputs": {
     "trend": "trend",

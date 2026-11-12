@@ -11,3 +11,6 @@ export const cellKey = (categoryId: number, territoryId: number) => `${categoryI
 
 export const localName = (x: { name_it: string; name_en: string }, locale: string) =>
   locale === "en" ? x.name_en : x.name_it;
+
+/** A cell marked by a deep link (slugs from the URL). */
+export type Highlight = { category: string; territory: string };

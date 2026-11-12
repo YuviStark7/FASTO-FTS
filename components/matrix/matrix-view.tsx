@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import type { Category, CellRow, Territory } from "@/lib/queries/matrix";
 import { GapSummaryList, summariseGaps } from "./coverage";
@@ -8,6 +9,7 @@ import { MatrixLegend } from "./legend";
 import { MatrixTable } from "./matrix-table";
 import { MatrixList } from "./matrix-list";
 import { cellKey, type ViewModel } from "./model";
+import type { Highlight } from "./model";
 
 type Props = { categories: Category[]; territories: Territory[]; cells: CellRow[] };
 
@@ -19,7 +21,25 @@ const NOTE = "rounded-[var(--radius-card)] border border-border bg-surface px-4 
 export function MatrixView({ categories, territories, cells }: Props) {
   const t = useTranslations("matrix");
   const locale = useLocale();
-  const [filters, setFilters] = useState<Filters>(INITIAL);
+  // Deep link from Scout: ?mode=mos|status|coverage sets the colour mode, ?c=&t= marks one cell.
+  const params = useSearchParams();
+  const modeParam = params.get("mode");
+  const highlight: Highlight | null = params.get("c") && params.get("t") ? { category: params.get("c")!, territory: params.get("t")! } : null;
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...INITIAL,
+    mode: modeParam === "mos" || modeParam === "status" || modeParam === "coverage" ? modeParam : INITIAL.mode,
+  }));
+
+  useEffect(() => {
+    if (!highlight) return;
+    const id = requestAnimationFrame(() => {
+      const target = [...document.querySelectorAll<HTMLElement>('[aria-current="true"]')].find((el) => el.offsetParent !== null);
+      target?.scrollIntoView({ block: "center", inline: "center", behavior: "auto" });
+    });
+    return () => cancelAnimationFrame(id);
+    // Only on arrival: later filter changes must not pull the page around.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const model = useMemo<ViewModel>(() => {
     const byKey = new Map(cells.map((c) => [cellKey(c.category_id, c.territory_id), c]));
@@ -86,8 +106,8 @@ export function MatrixView({ categories, territories, cells }: Props) {
             </div>
           ) : (
             <>
-              <MatrixTable model={model} mode={filters.mode} locale={locale} />
-              <MatrixList model={model} mode={filters.mode} locale={locale} />
+              <MatrixTable model={model} mode={filters.mode} locale={locale} highlight={highlight} />
+              <MatrixList model={model} mode={filters.mode} locale={locale} highlight={highlight} />
               {filters.mode === "coverage" && <GapSummaryList model={model} summary={summariseGaps(model)} locale={locale} />}
             </>
           )}
