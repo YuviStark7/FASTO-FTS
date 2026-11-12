@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { MAX_CONSECUTIVE_FAILURES, scoreMentions } from "./score";
+import { CONCURRENCY, scoreMentions } from "./score";
 
 type Row = Record<string, unknown>;
 
@@ -20,8 +20,15 @@ function fakeDb(opts: { mentions: number; gate?: string; budget?: number; spentT
   }));
   const chain = (data: unknown) => {
     const c: Record<string, unknown> = {};
-    for (const m of ["select", "in", "is", "order", "limit", "eq", "gte"]) c[m] = () => c;
-    c.then = (res: (v: unknown) => unknown) => res({ data, error: null });
+    let after = -Infinity;
+    let max = Infinity;
+    for (const m of ["select", "in", "is", "order", "eq", "gte"]) c[m] = () => c;
+    c.gt = (_col: string, v: number) => ((after = v), c);
+    c.limit = (n: number) => ((max = n), c);
+    c.then = (res: (v: unknown) => unknown) => {
+      const rows = Array.isArray(data) ? (data as { id?: number }[]).filter((r) => r.id == null || r.id > after).slice(0, max) : data;
+      return res({ data: rows, error: null });
+    };
     return c;
   };
   const db = {
@@ -92,8 +99,9 @@ describe("scoreMentions", () => {
     const c = client(() => ({ stop_reason: "max_tokens", text: "{" }));
     const r = await scoreMentions(db, () => {}, 2000, c as never);
     expect(r.skipped).toBe("failures");
-    expect(c.calls).toBe(MAX_CONSECUTIVE_FAILURES);
-    expect(usage).toHaveLength(MAX_CONSECUTIVE_FAILURES);
+    // One round of parallel batches, every billed call logged, then the run stops.
+    expect(c.calls).toBe(CONCURRENCY);
+    expect(usage).toHaveLength(CONCURRENCY);
     expect(scores).toHaveLength(0);
   });
 
@@ -102,6 +110,15 @@ describe("scoreMentions", () => {
     const c = client(() => ({ stop_reason: "end_turn", text: JSON.stringify({ results: [{ id: 1 }] }) }));
     await scoreMentions(db, () => {}, 2000, c as never);
     expect(usage).toHaveLength(1);
+  });
+
+  it("pages past 1000 mentions with an id cursor", async () => {
+    const { db, scores } = fakeDb({ mentions: 2300 });
+    const c = client(good);
+    const r = await scoreMentions(db, () => {}, 50_000, c as never);
+    expect(r).toEqual({ scored: 2300, skipped: null });
+    expect(scores).toHaveLength(2300);
+    expect(new Set(scores.map((x) => x.mention_id)).size).toBe(2300);
   });
 
   it("does not call the model when the kill switch or global limit says no", async () => {
