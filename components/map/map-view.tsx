@@ -2,7 +2,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CircleDashed } from "lucide-react";
 import type { Marker } from "maplibre-gl";
 import { TokenCarousel } from "@/components/cell/scout-view";
@@ -13,6 +13,8 @@ import { cellKey, localName } from "@/components/matrix/model";
 import { radiusFor } from "@/lib/map-geo";
 import type { Category, CellRow, GeoEstimate, MapTerritory } from "@/lib/queries/map";
 import { cn } from "@/lib/utils";
+import { GradeBadge } from "@/components/cell/grade-badge";
+import { formatValue } from "@/components/sheet/format";
 import { CitySheet, type CityDetail } from "./city-sheet";
 
 type Props = { categories: Category[]; territories: MapTerritory[]; cells: CellRow[]; estimates: GeoEstimate[] };
@@ -38,7 +40,6 @@ type City = {
 export function MapView({ categories, territories, cells, estimates }: Props) {
   const t = useTranslations("map");
   const ts = useTranslations("status");
-  const f = useFormatter();
   const locale = useLocale();
 
   const [catSlug, setCatSlug] = useState(categories[0]?.slug ?? "");
@@ -72,8 +73,9 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
 
   const demandText = useCallback(
     (c: City) =>
-      c.estimate ? `${f.number(c.estimate.value, { maximumFractionDigits: 0 })} ${c.estimate.unit}` : t("noEstimate"),
-    [f, t],
+      // An estimate (grade B) is shown rounded: euro-level digits would claim a precision it does not have.
+      c.estimate ? `${formatValue(c.estimate.value, c.estimate.unit, locale)} (${c.estimate.grade})` : t("noEstimate"),
+    [locale, t],
   );
 
   // Create the map once. Anything that goes wrong before the style is ready switches to the list.
@@ -267,8 +269,16 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
                       </span>
                       <span className="flex-1" aria-hidden>
                         <span className="block font-medium">{c.name}</span>
-                        <span className="num block text-xs text-muted">
-                          {ts(c.status)} · {demandText(c)}
+                        <span className="num flex items-center gap-1.5 text-xs text-muted">
+                          {ts(c.status)} ·{" "}
+                          {c.estimate ? (
+                            <>
+                              {formatValue(c.estimate.value, c.estimate.unit, locale)}
+                              <GradeBadge grade={c.estimate.grade} />
+                            </>
+                          ) : (
+                            t("noEstimate")
+                          )}
                         </span>
                       </span>
                     </>

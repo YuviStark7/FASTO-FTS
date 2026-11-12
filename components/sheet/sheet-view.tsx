@@ -77,7 +77,7 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
               role="tablist"
               aria-label={t("tabsLabel")}
               onKeyDown={onKey}
-              className="no-scrollbar flex gap-1 overflow-x-auto px-3 lg:px-6"
+              className="no-scrollbar flex gap-1 overflow-x-auto px-3 [mask-image:linear-gradient(to_right,black_85%,transparent)] lg:px-6 lg:[mask-image:none]"
             >
               {TABS.map((k) => (
                 <button
@@ -168,7 +168,9 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
           {period ? t("verdict.scope", { country, period }) : t("verdict.scopeNoPeriod", { country })}
         </p>
         {unknown && <p className="text-sm">{t("verdict.insufficient")}</p>}
-        {cell.missingInputs.length > 0 && <p className="text-sm text-muted">{t("verdict.missing", { inputs: cell.missingInputs.join(", ") })}</p>}
+        {cell.missingInputs.length > 0 && <p className="text-sm text-muted">{t("verdict.missing", {
+              inputs: cell.missingInputs.map((k) => (t.has(`verdict.inputNames.${k}` as never) ? t(`verdict.inputNames.${k}` as never) : k)).join(", "),
+            })}</p>}
         <div>
           <div className="mb-1 flex justify-between text-xs text-muted">
             <span>{t("verdict.coverage")}</span>

@@ -148,6 +148,16 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
     return found ? { density: (count / pop.value) * 10000, inputs: shops.map((s) => idx.latest("pos_count", city.id, `shop=${s}`)).filter(Boolean) as Obs[] } : null;
   };
 
+  // Competition counts as present when at least one product is observed for the category in the
+  // city or its country (offers come from Open Food Facts at country level).
+  const offerKeys = new Set<string>();
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await db.from("offers").select("category_id, territory_id").range(from, from + 999);
+    if (error) throw new Error(`read offers: ${error.message}`);
+    for (const o of data ?? []) offerKeys.add(`${o.category_id}|${o.territory_id}`);
+    if (!data || data.length < 1000) break;
+  }
+
   let geoCount = 0;
   for (const cat of tax.categories.values()) {
     const shops = cat.codes.osm_shop ?? [];
@@ -228,7 +238,7 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
       if (!geoId) missing.push("geo");
       const csi = csiIds.get(`${cat.slug}|${country.slug}`);
       if (!csi?.published) missing.push("csi");
-      missing.push("competition"); // competition coverage arrives with offers
+      if (!offerKeys.has(`${cat.id}|${city.id}`) && !offerKeys.has(`${cat.id}|${country.id}`)) missing.push("competition");
       const present = 4 - missing.length;
       const gradeObs = [...trend.inputIds.map((id) => idx.byId.get(id)!), ...used].filter(Boolean);
       const gradeMix = { A: 0, B: 0, C: 0 } as Record<Grade, number>;
