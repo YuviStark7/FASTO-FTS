@@ -7,7 +7,7 @@ import { setTheme, signOut } from "@/app/[locale]/(app)/more/actions";
 import { cn } from "@/lib/utils";
 
 const ITEM =
-  "flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand";
+  "flex min-h-11 w-full items-center gap-3 rounded-[var(--radius-tile)] px-3 text-left text-sm transition-colors duration-(--dur-fast) hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:-outline-offset-2 active:bg-surface-3 [&>svg]:text-muted";
 
 export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff: boolean; theme: "dark" | "light" }) {
   const t = useTranslations("shell");
@@ -65,7 +65,7 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
         aria-controls={menuId}
         aria-label={t("profile")}
         onClick={() => setOpen((o) => !o)}
-        className="grid size-11 place-items-center rounded-full bg-surface-2 text-sm font-semibold uppercase text-text ring-1 ring-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        className="grid size-11 place-items-center rounded-full bg-surface-2 text-sm font-semibold text-text uppercase shadow-e2 ring-1 ring-border transition-[background-color,transform,box-shadow] duration-(--dur-base) hover:bg-surface-3 active:scale-[0.94] aria-expanded:bg-surface-3 aria-expanded:ring-border-strong"
       >
         {initial}
       </button>
@@ -74,11 +74,11 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
         role="menu"
         aria-label={t("profileMenu")}
         className={cn(
-          "absolute right-0 top-13 w-64 origin-top-right rounded-2xl border border-border bg-surface p-2 shadow-xl transition-[opacity,transform,visibility] duration-200 motion-reduce:transition-none",
-          open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0",
+          "absolute top-13 right-0 w-68 origin-top-right rounded-[var(--radius-card)] border border-border bg-surface p-1.5 shadow-e3 transition-[opacity,transform,visibility] duration-(--dur-base) ease-out motion-reduce:transition-none",
+          open ? "visible translate-y-0 scale-100 opacity-100" : "invisible -translate-y-1 scale-[0.96] opacity-0",
         )}
       >
-        <p className="truncate px-3 py-2 text-xs text-muted">{t("signedInAs", { email })}</p>
+        <p className="mb-1 truncate border-b border-border px-3 pt-2 pb-3 text-xs text-muted">{t("signedInAs", { email })}</p>
         <form action={setTheme.bind(null, nextTheme)}>
           <button role="menuitem" tabIndex={-1} className={ITEM}>
             {theme === "dark" ? <Sun aria-hidden className="size-4" /> : <Moon aria-hidden className="size-4" />}
@@ -96,8 +96,8 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
               locale={l}
               aria-current={locale === l ? "true" : undefined}
               className={cn(
-                "grid min-h-11 min-w-11 place-items-center rounded-full px-3 text-xs font-semibold uppercase focus-visible:outline-2 focus-visible:outline-brand",
-                locale === l ? "bg-brand text-brand-contrast" : "text-muted hover:text-text",
+                "grid min-h-11 min-w-11 place-items-center rounded-full px-3 text-xs font-semibold tracking-[0.08em] uppercase transition-colors duration-(--dur-base)",
+                locale === l ? "bg-brand text-brand-contrast" : "text-muted hover:bg-surface-2 hover:text-text",
               )}
             >
               {l}

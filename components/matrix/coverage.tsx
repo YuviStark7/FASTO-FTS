@@ -84,8 +84,8 @@ export function CoverageCell({ cell, compact = false }: { cell: CellRow; compact
 export function GapSummaryList({ model, summary, locale }: { model: ViewModel; summary: GapSummary; locale: string }) {
   const t = useTranslations("matrix");
   return (
-    <section aria-label={t("gapSummary")} className="space-y-3 rounded-[var(--radius-card)] border border-border bg-surface p-4 sm:hidden">
-      <h2 className="text-sm font-medium">{t("gapSummary")}</h2>
+    <section aria-label={t("gapSummary")} className="card space-y-3 p-4 sm:hidden">
+      <h2 className="t-label">{t("gapSummary")}</h2>
       <p className="num text-sm text-muted">{t("gapTotal", { count: summary.total })}</p>
       <ul data-testid="gap-summary-cities" className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
         {model.cols.map((col) => (

@@ -24,19 +24,19 @@ export default async function AdminFeedback({ params }: { params: Promise<{ loca
 
   return (
     <>
-      <h1 className="text-4xl font-light tracking-tight">{t("adminTitle")}</h1>
-      <p className="num text-lg" data-testid="control-cases">{t("controlCases", { count: items.length })}</p>
+      <h1 className="t-h1">{t("adminTitle")}</h1>
+      <p className="t-label num" data-testid="control-cases">{t("controlCases", { count: items.length })}</p>
       {items.length === 0 ? (
-        <div className="hatched space-y-2 rounded-[var(--radius-card)] p-6">
-          <h2 className="text-xl font-medium">{t("emptyTitle")}</h2>
-          <p className="text-muted">{t("emptyBody")}</p>
+        <div className="hatched space-y-2 rounded-[var(--radius-card)] border border-border-strong/60 p-6">
+          <h2 className="t-h2">{t("emptyTitle")}</h2>
+          <p>{t("emptyBody")}</p>
         </div>
       ) : (
         <ul className="space-y-3">
           {items.map((r) => (
-            <li key={r.csi_snapshot_id} className="space-y-3 rounded-[var(--radius-card)] bg-surface p-4" data-testid="feedback-case">
+            <li key={r.csi_snapshot_id} className="card space-y-4 p-4 sm:px-6 sm:py-5" data-testid="feedback-case">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h2 className="text-lg font-medium">
+                <h2 className="t-h2">
                   {name(cats.data, r.category_slug)}, {name(terrs.data, r.territory_slug)}
                 </h2>
                 <span className="num">{t("csiOf", { value: Math.round(r.csi), n: r.n_mentions })}</span>
@@ -45,18 +45,18 @@ export default async function AdminFeedback({ params }: { params: Promise<{ loca
                 <span className="text-sm text-muted">{t("computed", { date: format.dateTime(new Date(r.computed_at), { dateStyle: "medium" }) })}</span>
               </div>
               <ul className="flex flex-wrap gap-2 text-sm">
-                <li className="rounded-full bg-surface-2 px-3 py-1">{t("right")}: <span className="num">{r.n_right}</span></li>
-                <li className="rounded-full bg-surface-2 px-3 py-1">{t("partly_right")}: <span className="num">{r.n_partly_right}</span></li>
-                <li className="rounded-full bg-surface-2 px-3 py-1">{t("wrong")}: <span className="num">{r.n_wrong}</span></li>
+                <li className="rounded-full bg-surface-2 px-3.5 py-1.5">{t("right")}: <span className="num">{r.n_right}</span></li>
+                <li className="rounded-full bg-surface-2 px-3.5 py-1.5">{t("partly_right")}: <span className="num">{r.n_partly_right}</span></li>
+                <li className="rounded-full bg-surface-2 px-3.5 py-1.5">{t("wrong")}: <span className="num">{r.n_wrong}</span></li>
               </ul>
               <div>
-                <h3 className="text-sm font-medium text-muted">{t("commentsTitle")}</h3>
+                <h3 className="t-label mb-1.5">{t("commentsTitle")}</h3>
                 {r.comments.length === 0 ? (
                   <p className="text-sm text-muted">{t("noComments")}</p>
                 ) : (
-                  <ul className="mt-1 space-y-1">
+                  <ul className="mt-1 space-y-1.5">
                     {r.comments.map((c, i) => (
-                      <li key={i} className="border-l-2 border-border pl-3 text-sm">“{c}”</li>
+                      <li key={i} className="border-l-2 border-border-strong pl-3 text-sm leading-relaxed">“{c}”</li>
                     ))}
                   </ul>
                 )}

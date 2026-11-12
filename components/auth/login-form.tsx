@@ -36,7 +36,7 @@ export function LoginForm({ next, linkError }: { next: string; linkError: boolea
 
   if (state.kind === "sent") {
     return (
-      <p role="status" className="rounded-[var(--radius-card)] bg-surface-2 p-5 text-base">
+      <p role="status" className="card animate-[fade_var(--dur-slow)_var(--ease-out)] p-5 text-base leading-relaxed">
         {t("sent", { email: state.email })}
       </p>
     );
@@ -45,11 +45,11 @@ export function LoginForm({ next, linkError }: { next: string; linkError: boolea
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate={false}>
       {linkError && (
-        <p role="alert" className="rounded-xl bg-surface-2 p-3 text-sm text-threatened">
+        <p role="alert" className="note border-threatened/50 text-threatened">
           {t("linkError")}
         </p>
       )}
-      <label className="flex flex-col gap-2 text-sm text-muted">
+      <label className="t-label flex flex-col gap-2">
         {t("email")}
         <input
           type="email"
@@ -58,14 +58,14 @@ export function LoginForm({ next, linkError }: { next: string; linkError: boolea
           inputMode="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-12 rounded-xl border border-border bg-surface-2 px-4 text-base text-text placeholder:text-muted"
+          className="field h-12 px-4 text-base font-normal tracking-normal normal-case"
         />
       </label>
       {needsCaptcha && <Turnstile siteKey={env.turnstileSiteKey} onToken={onToken} label={t("captcha")} />}
       <button
         type="submit"
         disabled={state.kind === "sending" || (needsCaptcha && !captcha)}
-        className="h-12 rounded-full bg-brand font-medium text-brand-contrast transition-opacity disabled:opacity-50"
+        className="btn btn-primary h-12 text-[15px]"
       >
         {state.kind === "sending" ? t("sending") : t("submit")}
       </button>
@@ -74,7 +74,7 @@ export function LoginForm({ next, linkError }: { next: string; linkError: boolea
           {t("error")}
         </p>
       )}
-      <p className="text-xs text-muted">{t("privacy")}</p>
+      <p className="text-center text-xs text-muted">{t("privacy")}</p>
     </form>
   );
 }

@@ -26,12 +26,12 @@ export function TokenCarousel({ label, items, value, onChange }: { label: string
 
   return (
     <div className="mb-4">
-      <p className="mb-2 px-4 text-center text-sm font-medium lg:px-6 lg:text-left">{selected?.label}</p>
+      <p className="t-label mb-1 px-4 text-center text-text lg:px-1 lg:text-left">{selected?.label}</p>
       <div
         role="radiogroup"
         aria-label={label}
         onKeyDown={onKey}
-        className="no-scrollbar flex snap-x snap-mandatory items-center gap-3 overflow-x-auto px-[calc(50%-28px)] py-3 lg:flex-wrap lg:overflow-visible lg:px-6"
+        className="no-scrollbar flex snap-x snap-mandatory items-center gap-3 overflow-x-auto px-[calc(50%-28px)] py-3 lg:flex-wrap lg:overflow-visible lg:px-1"
       >
         {items.map((it) => {
           const active = it.id === value;
@@ -48,8 +48,8 @@ export function TokenCarousel({ label, items, value, onChange }: { label: string
               tabIndex={active ? 0 : -1}
               onClick={() => onChange(it.id)}
               className={cn(
-                "grid shrink-0 snap-center place-items-center rounded-full text-bg transition-all duration-300 ease-[var(--ease-spring)]",
-                active ? "size-14 ring-2 ring-text ring-offset-2 ring-offset-surface" : "size-11 opacity-70 hover:opacity-100",
+                "grid shrink-0 snap-center place-items-center rounded-full text-on-category transition-all duration-(--dur-slow) ease-spring active:scale-95",
+                active ? "size-14 shadow-e2 ring-2 ring-text ring-offset-[3px] ring-offset-bg" : "size-11 opacity-75 hover:-translate-y-0.5 hover:opacity-100",
               )}
               style={{ backgroundColor: it.color }}
             >

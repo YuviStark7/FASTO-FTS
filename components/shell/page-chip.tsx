@@ -60,7 +60,8 @@ export function PageChip() {
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
-      className="pointer-events-auto flex items-center rounded-full bg-brand text-brand-contrast shadow-lg"
+      data-open={open}
+      className="pointer-events-auto flex items-center rounded-full bg-brand text-brand-contrast shadow-e2 ring-1 ring-inset ring-white/15 transition-shadow duration-(--dur-slow) data-[open=true]:shadow-e3"
     >
       <button
         type="button"
@@ -74,35 +75,40 @@ export function PageChip() {
           lastPointer.current = "";
           setOpen((o) => (viaMouse ? true : !o));
         }}
-        className="flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold uppercase tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
+        className={cn(
+          "flex min-h-11 items-center gap-2.5 rounded-full px-4 text-[13px] font-bold tracking-[0.12em] uppercase transition-transform duration-(--dur-fast) active:scale-[0.97]",
+          // On phones the open chip must clear the profile badge.
+          open && "max-sm:px-3",
+        )}
       >
         {/* Slot: a logo image can replace this text later. */}
         <span data-slot="logo" className={cn("whitespace-nowrap", open && "max-sm:hidden")}>{ts("brand")}</span>
-        <span aria-hidden className={cn("h-4 w-px bg-brand-contrast/40", open && "max-sm:hidden")} />
-        <ActiveIcon aria-hidden className="size-5" />
+        <span aria-hidden className={cn("h-4 w-px bg-brand-contrast/30", open && "max-sm:hidden")} />
+        <ActiveIcon aria-hidden strokeWidth={2.25} className="size-[18px]" />
       </button>
       <div
         id={panelId}
         className={cn(
-          "grid transition-[grid-template-columns,opacity,visibility] duration-200 motion-reduce:transition-none",
+          "grid transition-[grid-template-columns,opacity,visibility] duration-(--dur-slow) ease-out motion-reduce:transition-none",
           open ? "visible grid-cols-[1fr] opacity-100" : "invisible grid-cols-[0fr] opacity-0",
         )}
       >
-        <ul className="flex min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap">
+        <ul className="flex min-w-0 items-center gap-0.5 overflow-hidden pr-1 whitespace-nowrap">
           {ITEMS.map(({ href, key, Icon }) => {
             const isActive = active?.key === key;
             return (
               <li key={key}>
-                <Link
-                  href={href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "flex min-h-11 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold sm:gap-2 sm:px-3 uppercase tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text",
-                    isActive ? "bg-brand-contrast text-brand" : "hover:bg-brand-contrast/15",
-                  )}
-                >
-                  <Icon aria-hidden className="size-4 max-sm:hidden" />
-                  {t(key)}
+                {/* 44 px hit area; the visible pill and its focus ring sit inside the chip. */}
+                <Link href={href} aria-current={isActive ? "page" : undefined} className="group flex min-h-11 items-center focus-visible:!outline-0">
+                  <span
+                    className={cn(
+                      "flex h-9 items-center gap-1.5 rounded-full px-2 text-xs font-semibold tracking-[0.06em] uppercase sm:tracking-[0.1em] ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",
+                      isActive ? "bg-brand-contrast text-brand" : "group-hover:bg-brand-contrast/12",
+                    )}
+                  >
+                    <Icon aria-hidden className="size-4 max-sm:hidden" />
+                    {t(key)}
+                  </span>
                 </Link>
               </li>
             );

@@ -33,38 +33,38 @@ export default async function AdminSources({ params }: { params: Promise<{ local
 
   return (
     <>
-      <h1 className="text-4xl font-light tracking-tight">{t("sources.title")}</h1>
+      <h1 className="t-h1">{t("sources.title")}</h1>
       {rows.length === 0 ? (
-        <p className="hatched rounded-[var(--radius-card)] p-6 text-muted">{t("sources.empty")}</p>
+        <p className="hatched rounded-[var(--radius-card)] border border-border-strong/60 p-6 font-medium">{t("sources.empty")}</p>
       ) : (
         <ul className="grid gap-3 lg:grid-cols-2">
           {rows.map(({ s, last, busy }) => (
-            <li key={s.id} className="space-y-4 rounded-[var(--radius-card)] bg-surface p-4">
+            <li key={s.id} className="card flex flex-col gap-5 p-4 sm:p-6">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-medium">{s.name}</h2>
-                <span className="inline-flex items-center gap-2 text-sm text-muted">
+                <h2 className="t-h2">{s.name}</h2>
+                <span className="t-label inline-flex shrink-0 items-center gap-2 pt-1">
                   {t("sources.grade")} <GradeBadge grade={s.default_grade} />
                 </span>
               </div>
-              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-border pt-4 text-sm">
                 <div>
-                  <dt className="text-muted">{t("sources.licence")}</dt>
+                  <dt className="t-label mb-0.5">{t("sources.licence")}</dt>
                   <dd>{s.licence ?? t("sources.noLicence")}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">{t("sources.terms")}</dt>
+                  <dt className="t-label mb-0.5">{t("sources.terms")}</dt>
                   <dd className="num">
                     {s.terms_verified_at ? format.dateTime(new Date(s.terms_verified_at), { dateStyle: "medium" }) : t("sources.termsMissing")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">{t("sources.active")}</dt>
+                  <dt className="t-label mb-0.5">{t("sources.active")}</dt>
                   <dd>
                     {role === "admin" ? <ActiveToggle sourceId={s.id} name={s.name} active={s.is_active} /> : s.is_active ? t("sources.yes") : t("sources.no")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">{t("sources.lastRun")}</dt>
+                  <dt className="t-label mb-0.5">{t("sources.lastRun")}</dt>
                   <dd className="space-y-0.5">
                     {last ? (
                       <>
@@ -81,9 +81,11 @@ export default async function AdminSources({ params }: { params: Promise<{ local
                 </div>
               </dl>
               {(CONNECTORS as readonly string[]).includes(s.slug) ? (
-                <RerunButton sourceId={s.id} name={s.name} busy={busy} />
+                <div className="mt-auto">
+                  <RerunButton sourceId={s.id} name={s.name} busy={busy} />
+                </div>
               ) : (
-                <p className="text-sm text-muted">{t("sources.noConnector")}</p>
+                <p className="mt-auto text-sm text-muted">{t("sources.noConnector")}</p>
               )}
             </li>
           ))}

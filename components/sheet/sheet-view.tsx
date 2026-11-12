@@ -69,15 +69,16 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
 
   return (
     <SheetContext.Provider value={ctx}>
-      <div className="lg:grid lg:min-h-dvh lg:grid-cols-[380px_1fr]">
+      <div className="lg:grid lg:grid-cols-[380px_1fr]">
         {renderVerdict(sheet)}
         <div className="min-w-0">
-          <div className="sticky top-0 z-20 border-b border-border bg-bg/95 backdrop-blur">
+          {/* Sticks under the fixed header, never behind the chip. */}
+          <div className="sticky top-[var(--header-h)] z-20 border-b border-border bg-bg/85 backdrop-blur-md">
             <div
               role="tablist"
               aria-label={t("tabsLabel")}
               onKeyDown={onKey}
-              className="no-scrollbar flex gap-1 overflow-x-auto px-3 [mask-image:linear-gradient(to_right,black_85%,transparent)] lg:px-6 lg:[mask-image:none]"
+              className="no-scrollbar flex gap-1 overflow-x-auto px-2 [mask-image:linear-gradient(to_right,black_85%,transparent)] lg:px-6 lg:[mask-image:none]"
             >
               {TABS.map((k) => (
                 <button
@@ -93,8 +94,9 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
                   tabIndex={tab === k ? 0 : -1}
                   onClick={() => go(k)}
                   className={cn(
-                    "min-h-11 shrink-0 border-b-2 px-4 text-sm font-medium whitespace-nowrap",
-                    tab === k ? "border-brand text-text" : "border-transparent text-muted hover:text-text",
+                    // The underline grows from the centre of the selected tab.
+                    "relative min-h-12 shrink-0 px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-(--dur-base) -outline-offset-4 after:absolute after:inset-x-3.5 after:bottom-0 after:h-0.5 after:origin-center after:rounded-full after:bg-brand after:transition-transform after:duration-(--dur-slow) after:ease-out",
+                    tab === k ? "text-text after:scale-x-100" : "text-muted after:scale-x-0 hover:text-text",
                   )}
                 >
                   {t(`tabs.${k}`)}
@@ -110,9 +112,9 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
             style={{ touchAction: "pan-y" }}
-            className="min-h-[60dvh] px-4 py-5 lg:px-6"
+            className="min-h-[60dvh] px-4 pt-5 pb-16 -outline-offset-2 lg:px-8 lg:pt-6"
           >
-            <div key={tab} className="animate-[fade_0.25s_ease-out]">
+            <div key={tab} className="mx-auto max-w-5xl animate-[fade_var(--dur-slow)_var(--ease-out)]">
               {tab === "market" && <MarketTab market={sheet.market} />}
               {tab === "territory" && <TerritoryTab data={sheet.territoryTab} />}
               {tab === "consumers" && <ConsumersTab consumers={sheet.consumers} attention={sheet.attention} />}
@@ -135,15 +137,15 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
     const period = market?.window.first && market.window.last ? `${market.window.first}–${market.window.last}` : null;
     const country = name(territory.country);
     return (
-      <header className="space-y-4 px-4 pt-5 pb-4 lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:border-r lg:border-border lg:px-6 lg:pt-8">
-        <Link href="/matrix" className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted hover:text-text">
-          <ArrowLeft aria-hidden className="size-4" />
+      <header className="space-y-5 px-4 pt-2 pb-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100dvh-var(--header-h))] lg:overflow-y-auto lg:border-r lg:border-border lg:px-8 lg:pt-4 lg:pb-10">
+        <Link href="/matrix" className="group -ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-sm text-muted transition-colors duration-(--dur-base) hover:text-text">
+          <ArrowLeft aria-hidden className="size-4 transition-transform duration-(--dur-base) group-hover:-translate-x-0.5" />
           {t("back")}
         </Link>
         <div className="flex items-center gap-3">
           <div
             aria-hidden
-            className="flex h-24 w-20 shrink-0 items-center justify-center rounded-[var(--radius-card)] text-bg shadow-lg"
+            className="flex h-24 w-20 shrink-0 items-center justify-center rounded-[var(--radius-card)] text-on-category shadow-e2 ring-1 ring-white/20 ring-inset"
             style={{ backgroundColor: category.color }}
           >
             <CategoryIcon name={category.icon} className="size-7" />
@@ -151,38 +153,38 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
           <div
             aria-hidden
             className={cn(
-              "flex h-24 w-20 shrink-0 flex-col items-center justify-center rounded-[var(--radius-card)] border border-border px-1 text-center text-xs font-medium shadow-lg",
-              unknown ? "hatched" : "bg-surface-2",
+              "flex h-24 w-20 shrink-0 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-card)] border px-1.5 text-center text-xs font-medium shadow-e2",
+              unknown ? "hatched border-border-strong/60" : "border-border bg-surface-2",
             )}
           >
             <span className="line-clamp-2">{name(territory)}</span>
-            <span className="text-[10px] text-muted">{territory.country_code}</span>
+            <span className={cn("text-[10px] font-medium tracking-[0.14em]", unknown ? "text-text" : "text-muted")}>{territory.country_code}</span>
           </div>
         </div>
-        <h1 className="text-2xl leading-tight font-light">{t("verdict.pair", { category: name(category), territory: name(territory) })}</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusLabel status={cell.status} className="text-base" />
+        <h1 className="text-[1.75rem] leading-[1.1] font-light tracking-[-0.025em] lg:text-[2rem]">{t("verdict.pair", { category: name(category), territory: name(territory) })}</h1>
+        <div className="-mt-1 flex flex-wrap items-center gap-2.5">
+          <StatusLabel status={cell.status} className="text-lg [&>svg]:size-5" />
           {cell.isDemo && <DemoBadge />}
         </div>
-        <p className="text-sm text-muted">
+        <p className="t-meta">
           {period ? t("verdict.scope", { country, period }) : t("verdict.scopeNoPeriod", { country })}
         </p>
         {unknown && <p className="text-sm">{t("verdict.insufficient")}</p>}
-        {cell.missingInputs.length > 0 && <p className="text-sm text-muted">{t("verdict.missing", {
+        {cell.missingInputs.length > 0 && <p className="t-meta -mt-3">{t("verdict.missing", {
               inputs: cell.missingInputs.map((k) => (t.has(`verdict.inputNames.${k}` as never) ? t(`verdict.inputNames.${k}` as never) : k)).join(", "),
             })}</p>}
         <div>
-          <div className="mb-1 flex justify-between text-xs text-muted">
-            <span>{t("verdict.coverage")}</span>
-            <span className="num">{Math.round(cell.coveragePct)}%</span>
+          <div className="mb-2 flex items-baseline justify-between">
+            <span className="t-label">{t("verdict.coverage")}</span>
+            <span className="num text-sm">{Math.round(cell.coveragePct)}%</span>
           </div>
-          <div role="progressbar" aria-label={t("verdict.coverage")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(cell.coveragePct)} className="h-1.5 overflow-hidden rounded-full bg-surface-2">
-            <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, Math.max(0, cell.coveragePct))}%` }} />
+          <div role="progressbar" aria-label={t("verdict.coverage")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(cell.coveragePct)} className="h-1 overflow-hidden rounded-full bg-surface-3">
+            <div className="h-full origin-left animate-[grow_700ms_var(--ease-out)] rounded-full bg-brand" style={{ width: `${Math.min(100, Math.max(0, cell.coveragePct))}%` }} />
           </div>
         </div>
         {total > 0 && (
           <div>
-            <div className="mb-1 text-xs text-muted">{t("verdict.gradeMix")}</div>
+            <div className="t-label mb-2">{t("verdict.gradeMix")}</div>
             <ul className="num flex flex-wrap gap-3 text-sm">
               {mix.map(([g, v]) => (
                 <li key={g} className="flex items-center gap-1.5">
@@ -194,13 +196,13 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
           </div>
         )}
         {territory.scopeNote && (
-          <p className="rounded-lg border border-border p-3 text-sm">
+          <p className="note">
             <span className="text-muted">{t("verdict.territoryNote")}: </span>
             {territory.scopeNote}
           </p>
         )}
         {category.scopeNote && (
-          <p className="rounded-lg border border-border p-3 text-sm">
+          <p className="note">
             <span className="text-muted">{t("verdict.categoryNote")}: </span>
             {category.scopeNote}
           </p>

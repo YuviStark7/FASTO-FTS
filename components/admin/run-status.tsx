@@ -7,7 +7,7 @@ export type RunStatus = Database["public"]["Enums"]["run_status"];
 
 const META: Record<RunStatus, { Icon: typeof Clock; text: string; spin?: boolean }> = {
   queued: { Icon: Clock, text: "text-muted" },
-  running: { Icon: Loader, text: "text-brand", spin: true },
+  running: { Icon: Loader, text: "text-text", spin: true },
   succeeded: { Icon: CheckCircle2, text: "text-expanding" },
   partial: { Icon: CircleAlert, text: "text-consolidated" },
   failed: { Icon: XCircle, text: "text-threatened" },

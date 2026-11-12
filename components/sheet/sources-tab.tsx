@@ -18,29 +18,30 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-medium">{t("title")}</h2>
-        <p className="text-sm text-muted">{t("lead")}</p>
+        <h2 className="t-h2">{t("title")}</h2>
+        <p className="mt-1 max-w-[75ch] text-sm leading-relaxed text-muted">{t("lead")}</p>
       </div>
       {filter && (
-        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface-2 p-3 text-sm">
+        <div className="note flex animate-[fade_var(--dur-base)_var(--ease-out)] flex-wrap items-center justify-between gap-3 border-border-strong bg-surface-2 py-2 pr-2">
           <span className="num">{t("filtered", { count: rows.length })}</span>
-          <button type="button" onClick={onClear} className="h-11 rounded-full border border-border px-4">
+          <button type="button" onClick={onClear} className="btn btn-ghost">
             {t("clear")}
           </button>
         </div>
       )}
       {rows.length === 0 ? (
-        <p role="status" className="hatched rounded-[var(--radius-card)] border border-border p-4 text-sm">
+        <p role="status" className="hatched rounded-[var(--radius-card)] border border-border-strong/60 p-5 text-sm font-medium">
           {t("empty")}
         </p>
       ) : null}
-      <div className="overflow-x-auto rounded-[var(--radius-card)] border border-border">
-        <table className="w-full min-w-[960px] text-left text-sm" data-testid="ledger">
+      {/* relative: screen-reader-only spans inside the table stay inside the scroll box and never widen the page. */}
+      <div className="card relative overflow-x-auto">
+        <table className="table min-w-[1040px]" data-testid="ledger">
           <caption className="sr-only">{t("table")}</caption>
-          <thead className="bg-surface-2 text-muted">
+          <thead className="bg-surface-2/60">
             <tr>
               {["Indicator", "Series", "Territory", "Period", "Value", "Grade", "Flag", "Source", "Licence", "Ref", "Run", "Method"].map((k) => (
-                <th key={k} scope="col" className="px-3 py-2 font-medium whitespace-nowrap">
+                <th key={k} scope="col">
                   {t(`col${k}` as never)}
                 </th>
               ))}
@@ -48,50 +49,50 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
           </thead>
           <tbody className="num">
             {rows.map((l) => (
-              <tr key={l.id} className="border-t border-border align-top">
-                <th scope="row" className="px-3 py-2 font-normal">
+              <tr key={l.id}>
+                <th scope="row" className="min-w-40">
                   {locale === "en" ? l.indicatorName.en : l.indicatorName.it}
                 </th>
-                <td className="px-3 py-2 break-all">{l.seriesKey}</td>
-                <td className="px-3 py-2">{l.territory}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{period(l.periodStart, l.periodEnd)}</td>
-                <td className="px-3 py-2 whitespace-nowrap">
+                <td className="min-w-52 font-mono text-xs leading-5 break-all text-muted">{l.seriesKey}</td>
+                <td>{l.territory}</td>
+                <td className="whitespace-nowrap">{period(l.periodStart, l.periodEnd)}</td>
+                <td className="whitespace-nowrap">
                   {formatValue(l.value, l.unit, locale)} <span className="text-muted">{unit(l.unit)}</span>
                 </td>
-                <td className="px-3 py-2">
+                <td>
                   <GradeBadge grade={l.grade} />
                 </td>
-                <td className="px-3 py-2">{l.flag ? <FlagLetters flags={[l.flag]} /> : "-"}</td>
-                <td className="px-3 py-2">
-                  <a href={l.source.url} target="_blank" rel="noreferrer" className="text-brand-alt underline">
+                <td>{l.flag ? <FlagLetters flags={[l.flag]} /> : "-"}</td>
+                <td className="whitespace-nowrap">
+                  <a href={l.source.url} target="_blank" rel="noreferrer" className="link">
                     {l.source.name}
                   </a>
                 </td>
-                <td className="px-3 py-2">{l.source.licence ?? "-"}</td>
-                <td className="px-3 py-2 break-all">{l.sourceRef ?? "-"}</td>
-                <td className="px-3 py-2 whitespace-nowrap">
+                <td className="text-muted">{l.source.licence ?? "-"}</td>
+                <td className="font-mono text-xs leading-5 break-all text-muted">{l.sourceRef ?? "-"}</td>
+                <td className="whitespace-nowrap">
                   {l.runId != null ? t("run", { id: l.runId, date: l.runFinishedAt ? formatDate(l.runFinishedAt, locale) : t("noRun") }) : t("noRun")}
                 </td>
-                <td className="px-3 py-2">{l.methodVersion}</td>
+                <td className="font-mono text-xs leading-5 whitespace-nowrap">{l.methodVersion}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <Panel title={t("attributions")}>
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1.5 text-sm leading-relaxed">
           <li>{t("attrEurostat")}</li>
           <li>{t("attrIstat")}</li>
           <li>
             {t("attrOsm")}{" "}
-            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className="text-brand-alt underline">
+            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className="link">
               {t("attrOsmLink")}
             </a>
           </li>
           <li>{t("attrOff")}</li>
           <li>
             {t("attrGdelt")}{" "}
-            <a href="https://www.gdeltproject.org/" target="_blank" rel="noreferrer" className="text-brand-alt underline">
+            <a href="https://www.gdeltproject.org/" target="_blank" rel="noreferrer" className="link">
               gdeltproject.org
             </a>
           </li>
@@ -99,7 +100,7 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
           <li>{t("attrBluesky")}</li>
         </ul>
         {/* Eurostat and ISTAT ask that modified data be marked as such, with a non-responsibility note. */}
-        <p className="mt-3 text-xs text-muted">{t("attrEurostatMod")}</p>
+        <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted">{t("attrEurostatMod")}</p>
       </Panel>
     </div>
   );

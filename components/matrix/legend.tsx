@@ -9,7 +9,7 @@ export function MatrixLegend({ mode, mosMissing }: { mode: ColourMode; mosMissin
   const t = useTranslations("matrix");
   const s = useTranslations("status");
   return (
-    <ul aria-label={t("legend")} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+    <ul aria-label={t("legend")} className="flex flex-wrap gap-x-5 gap-y-2.5 text-[13px]">
       {mode === "coverage" ? (
         <>
           <li className="flex items-center gap-2">

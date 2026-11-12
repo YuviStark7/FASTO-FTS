@@ -163,9 +163,9 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
 
   if (territories.length === 0 || !category) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="mb-4 text-3xl font-light tracking-tight">{t("title")}</h1>
-        <p role="status" className="rounded-[var(--radius-card)] border border-border bg-surface p-6 text-muted">
+      <div className="page max-w-3xl space-y-5">
+        <h1 className="t-h1">{t("title")}</h1>
+        <p role="status" className="card p-6 text-muted">
           {t("empty")}
         </p>
       </div>
@@ -176,10 +176,10 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
   const fallback = mode === "fallback";
 
   return (
-    <div className="mx-auto max-w-[1800px] space-y-4 px-4 py-6 lg:px-8 lg:py-8">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-light tracking-tight lg:text-4xl">{t("title")}</h1>
-        <p className="text-muted">{t("lead")}</p>
+    <div className="page max-w-[1800px] space-y-5">
+      <header className="page-header">
+        <h1 className="t-h1">{t("title")}</h1>
+        <p className="t-lead">{t("lead")}</p>
       </header>
 
       <div className="-mx-4 lg:mx-0">
@@ -195,21 +195,21 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
       </div>
 
       {fallback && (
-        <p role="status" className="rounded-[var(--radius-card)] border border-border bg-surface px-4 py-3 text-sm">
+        <p role="status" className="note">
           {t("tilesFailed")}
         </p>
       )}
       {noCoords > 0 && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" className="t-meta">
           {t("noCoordinates", { count: noCoords })}
         </p>
       )}
 
       <MatrixLegend mode="status" mosMissing={false} />
-      <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
+      <ul className="-mt-2 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted">
         <li>{t("legendSize")}</li>
         <li className="flex items-center gap-2">
-          <span aria-hidden className="hatched grid size-5 place-items-center rounded-full border border-dashed border-border">
+          <span aria-hidden className="hatched grid size-5 place-items-center rounded-full border border-dashed border-border-strong text-text">
             <CircleDashed className="size-3" />
           </span>
           {t("legendNoEstimate")}
@@ -220,11 +220,11 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
         <div
           role="region"
           aria-label={t("canvasLabel")}
-          className="relative h-[58dvh] min-h-80 overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface lg:h-[calc(100dvh-18rem)]"
+          className="card relative h-[58dvh] min-h-80 overflow-hidden lg:h-[calc(100dvh-19rem)]"
         >
           <div ref={containerRef} className="absolute inset-0" />
           {mode === "loading" && (
-            <p role="status" className="absolute inset-0 grid place-items-center text-muted motion-safe:animate-pulse">
+            <p role="status" className="skeleton absolute inset-0 grid place-items-center rounded-none text-muted">
               …
             </p>
           )}
@@ -238,8 +238,8 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
         })}
 
       <section aria-label={t("listLabel")} className={cn(!fallback && "sr-only")}>
-        {fallback && <h2 className="mb-2 text-lg">{t("listTitle")}</h2>}
-        <ul data-testid="map-city-list" className={cn(fallback && "grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4")}>
+        {fallback && <h2 className="t-label mb-3">{t("listTitle")}</h2>}
+        <ul data-testid="map-city-list" className={cn(fallback && "grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4")}>
           {cities.map((c) => {
             const Icon = statusIcon(c.status);
             const on = selected === c.territory.slug;
@@ -255,21 +255,21 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
                   onBlur={() => setHot(null)}
                   className={cn(
                     fallback &&
-                      "flex min-h-14 w-full items-center gap-3 rounded-[var(--radius-card)] border border-border bg-surface px-3 text-left",
-                    fallback && on && "ring-2 ring-text",
+                      "card card-link flex min-h-16 w-full items-center gap-3 px-3.5 py-2 text-left",
+                    fallback && on && "border-text",
                   )}
                 >
                   {fallback && (
                     <>
                       <span
                         aria-hidden
-                        className={cn("grid size-9 shrink-0 place-items-center rounded-full border", STATUS_CLASS[c.status], c.estimate === null && "border-dashed")}
+                        className={cn("grid size-10 shrink-0 place-items-center rounded-full border", STATUS_CLASS[c.status], c.estimate === null && "border-dashed")}
                       >
                         <Icon className="size-5" />
                       </span>
                       <span className="flex-1" aria-hidden>
                         <span className="block font-medium">{c.name}</span>
-                        <span className="num flex items-center gap-1.5 text-xs text-muted">
+                        <span className="num mt-0.5 flex items-center gap-1.5 text-xs text-muted">
                           {ts(c.status)} ·{" "}
                           {c.estimate ? (
                             <>
@@ -323,7 +323,7 @@ function CircleMarker({
         onMouseEnter={() => onHot(slug)}
         onMouseLeave={() => onHot(null)}
         title={`${city.name}: ${ts(city.status)}, ${demand}`}
-        className="grid place-items-center rounded-full bg-surface"
+        className="grid place-items-center rounded-full bg-surface shadow-e2 transition-[scale] duration-(--dur-base) ease-spring hover:scale-110"
         style={{ width: city.radius * 2, height: city.radius * 2 }}
       >
         <span
@@ -339,8 +339,8 @@ function CircleMarker({
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute top-full z-10 mt-1 max-w-48 rounded-md bg-surface px-1.5 py-0.5 text-xs whitespace-nowrap text-text shadow",
-          active ? "block" : "hidden",
+          "num pointer-events-none absolute top-full z-10 mt-1.5 rounded-[var(--radius-chip)] border border-border bg-surface px-2 py-1 text-xs whitespace-nowrap text-text shadow-e2",
+          active ? "block animate-[pop_var(--dur-fast)_var(--ease-out)]" : "hidden",
         )}
       >
         {city.name}: {ts(city.status)}, {demand}

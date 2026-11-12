@@ -23,12 +23,12 @@ export function RerunButton({ sourceId, name, busy }: { sourceId: number; name: 
             setMsg(r.ok ? t(r.mode) : t("error"));
           })
         }
-        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand px-5 text-sm font-medium text-brand-contrast disabled:opacity-50"
+        className="btn btn-primary"
       >
         <RotateCw aria-hidden className={`size-4 ${pending ? "animate-spin" : ""}`} />
         {pending ? t("sending") : t("button")}
       </button>
-      <p role="status" className="text-sm text-muted">
+      <p role="status" className="t-meta min-h-5">
         {msg ?? (busy ? t("busy") : "")}
       </p>
     </div>

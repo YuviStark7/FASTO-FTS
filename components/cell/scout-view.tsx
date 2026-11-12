@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Category, CellRow, Territory } from "@/lib/queries/scout";
 import { getScoutFigures, type ScoutFigure } from "@/app/[locale]/(app)/scout-actions";
@@ -9,7 +10,7 @@ import { CategoryIcon } from "./category-icon";
 import { DemoBadge } from "./grade-badge";
 import { ScoutCombobox, type ComboItem } from "./scout-combobox";
 import { ScoutFrames } from "./scout-frames";
-import { STATUS_TEXT, statusIcon } from "./status";
+import { STATUS_TEXT, statusIcon, type CellStatus } from "./status";
 
 // The map screen still uses the round-token carousel.
 export { TokenCarousel } from "./token-carousel";
@@ -21,6 +22,15 @@ type Props = {
   initialCategory?: string;
   initialTerritory?: string;
 };
+
+/** Soft light behind the verdict, in the status colour. Decoration only: the icon and the word carry the status. */
+const AURA: Record<CellStatus, string> = {
+  expanding: "bg-expanding",
+  consolidated: "bg-consolidated",
+  threatened: "bg-threatened",
+  insufficient_data: "bg-transparent",
+};
+const PILL = "btn btn-inverse btn-caps h-11 px-6";
 
 const STEP = 24; // 360 / 15 categories: the arc is a slice of a full wheel
 const VISIBLE = 4; // petals shown either side of the selected one (96 degrees)
@@ -197,7 +207,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
   const missing = (cell?.missing_inputs ?? []) as string[];
   const cellHref = `/cell/${category.slug}/${territory.slug}`;
   const mosHref = `/matrix?mode=mos&c=${category.slug}&t=${territory.slug}`;
-  const move = "transition-all duration-500 ease-[var(--ease-spring)] motion-reduce:transition-none";
+  const move = "transition-all duration-(--dur-flower) ease-spring motion-reduce:transition-none";
 
   return (
     <section
@@ -205,49 +215,67 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
       // Full-bleed under the transparent header: cancel the layout's top padding, fill the viewport.
       className="relative isolate -mt-[var(--header-h,96px)] h-dvh min-h-[34rem] overflow-hidden"
     >
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute top-1/2 left-1/2 -z-10 size-[min(70rem,150vw)] -translate-x-1/2 -translate-y-1/2 rounded-full transition-[background-color,opacity,scale] duration-1000 ease-out [mask-image:radial-gradient(closest-side,black,transparent)] motion-reduce:transition-none",
+          AURA[status],
+          bloomed ? "scale-75 opacity-[0.05]" : "scale-100 opacity-[0.09]",
+        )}
+      />
       <ScoutFrames figures={figures} loading={loading} visible={!bloomed} href={cellHref} />
 
       {/* Verdict: upper centre while choosing, vertical centre while reading. */}
       <div
         aria-live="polite"
         className={cn(
-          "pointer-events-none absolute left-1/2 z-10 w-full max-w-xl -translate-x-1/2 px-4 text-center",
+          "pointer-events-none absolute left-1/2 z-10 w-full max-w-2xl -translate-x-1/2 px-4 text-center",
           move,
           bloomed ? "top-[calc(var(--header-h,96px)+1rem)] translate-y-0" : "top-1/2 -translate-y-1/2",
         )}
       >
-        <div className="flex flex-col items-center gap-3">
-          <p className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.2em] text-muted uppercase sm:text-sm">
-            {t("cellName", { category: name(category), territory: name(territory) })}
-            {cell?.is_demo && <DemoBadge />}
-          </p>
-          {/* Status by icon, word and colour together, never colour alone. */}
-          <h1 className="flex flex-col items-center gap-2 text-[34px] leading-none font-light tracking-tight uppercase sm:text-5xl lg:text-6xl">
-            <StatusIcon aria-hidden className={cn("size-9 sm:size-12", STATUS_TEXT[status])} />
-            <span>{ts(status)}</span>
-          </h1>
+        <div className="flex flex-col items-center gap-4">
+          {/* Keyed on the cell: label and status cross-fade when the selection changes. */}
           <div
-            className={cn("flex flex-col items-center gap-3", move, bloomed ? "pointer-events-none max-h-0 overflow-hidden opacity-0" : "max-h-96 opacity-100")}
+            key={`${catSlug}:${terSlug}`}
+            className={cn(
+              "flex origin-top animate-[verdict_420ms_cubic-bezier(0.16,1,0.3,1)] flex-col items-center gap-3 transition-transform duration-(--dur-flower) ease-out motion-reduce:transition-none",
+              bloomed && "sm:scale-[0.82]",
+            )}
+          >
+            <p className="flex items-center justify-center gap-2 text-xs font-medium tracking-[0.24em] text-muted uppercase sm:text-[13px]">
+              {t("cellName", { category: name(category), territory: name(territory) })}
+              {cell?.is_demo && <DemoBadge />}
+            </p>
+            {/* Status by icon, word and colour together, never colour alone. */}
+            <h1 className="t-display flex flex-col items-center gap-3">
+              <StatusIcon aria-hidden strokeWidth={1.5} className={cn("size-9 sm:size-12", STATUS_TEXT[status])} />
+              <span>{ts(status)}</span>
+            </h1>
+          </div>
+          <div
+            className={cn("flex flex-col items-center gap-4", move, bloomed ? "pointer-events-none max-h-0 translate-y-2 overflow-hidden opacity-0" : "max-h-96 opacity-100")}
             inert={bloomed}
           >
-            <div className="pointer-events-auto mt-2 flex flex-wrap items-center justify-center gap-3">
+            <div className="pointer-events-auto mt-3 flex flex-wrap items-center justify-center gap-3 p-1">
               <Link
                 href={cellHref}
-                className="inline-flex h-11 items-center rounded-full bg-text px-6 text-sm font-semibold tracking-wider text-bg uppercase"
+                className={cn(PILL, "group")}
               >
                 {t("openCell")}
+                <ArrowRight aria-hidden className="-mr-1 size-4 transition-transform duration-(--dur-base) group-hover:translate-x-0.5" />
               </Link>
               <Link
                 href={mosHref}
-                className="inline-flex h-11 items-center rounded-full bg-text px-6 text-sm font-semibold tracking-wider text-bg uppercase"
+                className={cn(PILL, "num")}
               >
                 {cell?.mos != null ? t("mosValue", { value: Math.round(Number(cell.mos)) }) : t("mosUnavailable")}
               </Link>
             </div>
             {status !== "insufficient_data" ? (
-              <p className="max-w-xs text-xs text-muted">{t("nationalScope", { country })}</p>
+              <p className="max-w-xs text-xs leading-relaxed text-muted">{t("nationalScope", { country })}</p>
             ) : (
-              <p className="max-w-xs text-sm text-muted">
+              <p className="max-w-sm text-sm leading-relaxed text-muted">
                 {t("insufficientReason")}
                 {missing.length > 0 && <MissingInputs keys={missing} />}
               </p>
@@ -299,7 +327,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               focusPetal.current = e.detail === 0;
               bloom();
             }}
-            className="grid size-14 place-items-center rounded-2xl text-bg shadow-lg"
+            className="grid size-14 place-items-center rounded-[18px] text-on-category shadow-e2 ring-1 ring-inset ring-white/20 transition-[transform,box-shadow] duration-(--dur-base) hover:-translate-y-0.5 hover:shadow-e3 active:scale-[0.96]"
             style={{ backgroundColor: category.color }}
           >
             <CategoryIcon name={category.icon} className="size-7" />
@@ -312,10 +340,10 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               focusPetal.current = e.detail === 0;
               bloom();
             }}
-            className="flex h-14 min-w-24 flex-col items-center justify-center rounded-2xl border border-border bg-surface-2 px-4 text-sm font-semibold tracking-wider uppercase shadow-lg"
+            className="flex h-14 min-w-24 flex-col items-center justify-center rounded-[18px] border border-border bg-surface-2 px-5 text-sm font-semibold tracking-[0.1em] uppercase shadow-e2 transition-[transform,box-shadow,background-color,border-color] duration-(--dur-base) hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface-3 hover:shadow-e3 active:scale-[0.96]"
           >
             {name(territory)}
-            <span className="text-[10px] font-normal text-muted">{territory.country_code}</span>
+            <span className="text-[10px] leading-3 font-medium tracking-[0.14em] text-muted">{territory.country_code}</span>
           </button>
         </div>
 
@@ -329,7 +357,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
             role="radiogroup"
             aria-label={t("pickCategory")}
             onKeyDown={onPetalKey}
-            className="absolute size-0 transition-transform duration-500 ease-in-out motion-reduce:transition-none"
+            className="absolute size-0 transition-transform duration-(--dur-flower) ease-in-out motion-reduce:transition-none"
             style={{ transform: `rotate(${rot}deg)` }}
           >
             {categories.map((c, i) => {
@@ -349,8 +377,10 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
                   tabIndex={active ? 0 : -1}
                   onClick={() => selectCategory(c.slug)}
                   className={cn(
-                    "absolute top-0 left-0 grid place-items-center rounded-2xl transition-[transform,opacity,background-color] duration-500 ease-in-out motion-reduce:transition-none",
-                    active ? "text-bg shadow-xl" : "bg-surface-2 text-muted hover:bg-border hover:text-text",
+                    "absolute top-0 left-0 grid place-items-center rounded-[18px] transition-[transform,opacity,background-color,color,box-shadow] duration-(--dur-flower) ease-in-out motion-reduce:transition-none",
+                    active
+                      ? "text-on-category shadow-e3 ring-1 ring-inset ring-white/20"
+                      : "bg-surface-2 text-muted shadow-e1 ring-1 ring-inset ring-border hover:bg-surface-3 hover:text-text",
                     !near && "pointer-events-none",
                   )}
                   style={{
@@ -361,7 +391,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
                     backgroundColor: active ? c.color : undefined,
                     opacity: near ? 1 : 0,
                     zIndex: active ? 2 : 1,
-                    transform: `rotate(${i * STEP}deg) translateY(calc(var(--R) * -1)) rotate(${-(i * STEP) - rot}deg) scale(${active ? 1.45 : near ? 1 : 0.3})`,
+                    transform: `rotate(${i * STEP}deg) translateY(calc(var(--R) * -1)) rotate(${-(i * STEP) - rot}deg) scale(${active ? 1.45 : near ? 1 - Math.abs(off) * 0.04 : 0.3})`,
                   }}
                 >
                   <CategoryIcon name={c.icon} className="size-6 sm:size-8" />
@@ -381,7 +411,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               onPick={selectCategory}
               onEditing={onEditing}
               testId="scout-category-tag"
-              triggerClassName="bg-surface/80 whitespace-nowrap hover:bg-surface-2"
+              triggerClassName="bg-surface/80 whitespace-nowrap backdrop-blur-sm hover:bg-surface-2"
             />
           </div>
 
@@ -397,9 +427,9 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               onEditing={onEditing}
               listSide="up"
               testId="scout-territory-tag"
-              triggerClassName="border border-border bg-surface-2 whitespace-nowrap hover:bg-border"
+              triggerClassName="border border-border bg-surface-2 whitespace-nowrap shadow-e1 hover:border-border-strong hover:bg-surface-3"
             >
-              {name(territory)} <span className="text-[10px] font-normal text-muted">{territory.country_code}</span>
+              {name(territory)} <span className="text-[10px] font-medium tracking-[0.14em] text-muted">{territory.country_code}</span>
             </ScoutCombobox>
           </div>
         </div>
