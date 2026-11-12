@@ -24,14 +24,14 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
   return (
     <div className="relative hidden sm:block">
     {/* Fade on the right edge: the grid scrolls sideways inside its box. */}
-    <div aria-hidden className="pointer-events-none absolute inset-y-px right-px z-40 w-10 rounded-r-[var(--radius-card)] bg-gradient-to-l from-bg/90 to-transparent" />
-    <div className="max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto rounded-[var(--radius-card)] border border-border bg-surface">
+    <div aria-hidden className="pointer-events-none absolute inset-y-px right-px z-40 w-12 rounded-r-[var(--radius-card)] bg-gradient-to-l from-surface to-transparent" />
+    <div className="card max-h-[calc(100dvh-20rem)] min-h-72 overflow-auto">
       <table aria-label={t("gridLabel")} className="border-separate border-spacing-0 text-sm">
         <thead>
           <tr>
             <th
               scope="col"
-              className="sticky top-0 left-0 z-30 min-w-52 border-r border-b border-border bg-surface px-3 py-2 text-left font-medium text-muted"
+              className="t-label sticky top-0 left-0 z-30 min-w-56 border-r border-b border-border bg-surface px-4 py-3 text-left"
             >
               {t("category")}
             </th>
@@ -39,14 +39,14 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
               <th
                 key={col.id}
                 scope="col"
-                className={cn("sticky top-0 z-20 min-w-24 border-b border-border bg-surface px-2 py-2 text-center font-medium", startsCountry(i) && "border-l-2")}
+                className={cn("sticky top-0 z-20 min-w-24 border-b border-border bg-surface px-2 py-2.5 text-center text-[13px] font-medium", startsCountry(i) && "border-l-2")}
               >
                 <span className="block truncate">{localName(col, locale)}</span>
-                <span className="num block text-xs font-normal text-muted">{col.country_code}</span>
+                <span className="block text-[10px] leading-4 font-medium tracking-[0.14em] text-muted">{col.country_code}</span>
               </th>
             ))}
             {summary && (
-              <th scope="col" className="sticky top-0 z-20 min-w-24 border-b border-l border-border bg-surface px-2 py-2 text-center font-medium">
+              <th scope="col" className="t-label sticky top-0 z-20 min-w-24 border-b border-l border-border bg-surface px-2 py-2.5 text-center">
                 {t("missingInputs")}
               </th>
             )}
@@ -54,16 +54,16 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
         </thead>
         <tbody>
           {model.rows.map(({ category }) => (
-            <tr key={category.id}>
+            <tr key={category.id} className="group/row">
               <th
                 scope="row"
-                className="sticky left-0 z-10 border-r border-b border-border bg-surface px-3 py-1.5 text-left font-medium"
+                className="sticky left-0 z-10 border-r border-b border-border bg-surface px-4 py-1.5 text-left font-medium transition-colors duration-(--dur-fast) group-hover/row:bg-surface-2"
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2.5">
                   <span
                     aria-hidden
-                    className="grid size-7 shrink-0 place-items-center rounded-lg"
-                    style={{ backgroundColor: category.color, color: "#0a0c10" }}
+                    className="grid size-7 shrink-0 place-items-center rounded-[var(--radius-chip)] text-on-category"
+                    style={{ backgroundColor: category.color }}
                   >
                     <CategoryIcon name={category.icon} className="size-4" />
                   </span>
@@ -74,7 +74,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                 const cell = model.byKey.get(cellKey(category.id, col.id));
                 if (!cell || !model.matches(cell)) {
                   return (
-                    <td key={col.id} className={cn("border-b border-border p-1 text-center text-muted/50", startsCountry(i) && "border-l-2")} title={t("filteredOut")}>
+                    <td key={col.id} className={cn("border-b border-border p-1 text-center text-muted/50 transition-colors duration-(--dur-fast) group-hover/row:bg-surface-2/60", startsCountry(i) && "border-l-2")} title={t("filteredOut")}>
                       <span aria-hidden>·</span>
                     </td>
                   );
@@ -83,7 +83,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                 const label = sc("pair", { category: localName(category, locale), territory: localName(col, locale) });
                 const status = s(cell.status);
                 return (
-                  <td key={col.id} className={cn("border-b border-border p-1", startsCountry(i) && "border-l-2")}>
+                  <td key={col.id} className={cn("border-b border-border p-1 transition-colors duration-(--dur-fast) group-hover/row:bg-surface-2/60", startsCountry(i) && "border-l-2")}>
                     <Link
                       href={`/cell/${category.slug}/${col.slug}`}
                       aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
@@ -91,7 +91,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                       aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
                         data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
                       className={cn(
-                        "grid h-11 min-w-20 place-items-center rounded-lg border",
+                        "relative grid h-11 min-w-20 place-items-center rounded-[10px] border transition-[scale,border-color,box-shadow] duration-(--dur-fast) hover:z-[5] hover:scale-[1.06] hover:border-current hover:shadow-e2 focus-visible:z-[5] active:scale-100",
                         cellClass(cell.status, cell.mos, mode),
                         highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",
                       )}
@@ -102,7 +102,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                 );
               })}
               {summary && (
-                <td data-testid="gap-category-count" className="num border-b border-l border-border px-2 text-center">
+                <td data-testid="gap-category-count" className="num border-b border-l border-border px-2 text-center transition-colors duration-(--dur-fast) group-hover/row:bg-surface-2/60">
                   {summary.perCategory.get(category.id) ?? 0}
                 </td>
               )}
@@ -112,7 +112,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
         {summary && (
           <tfoot>
             <tr data-testid="gap-city-row">
-              <th scope="row" className="sticky left-0 z-10 border-r border-border bg-surface px-3 py-2 text-left font-medium">
+              <th scope="row" className="t-label sticky left-0 z-10 border-r border-border bg-surface px-4 py-3 text-left">
                 {t("missingInputs")}
               </th>
               {model.cols.map((col) => (

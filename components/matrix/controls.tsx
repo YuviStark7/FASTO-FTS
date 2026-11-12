@@ -1,12 +1,12 @@
 "use client";
 import { useTranslations } from "next-intl";
 import type { CellStatus } from "@/components/cell/status";
-import { cn } from "@/lib/utils";
 import { STATUS_ORDER, type ColourMode } from "./cell-style";
 
 export type Filters = { mode: ColourMode; country: string; status: "" | CellStatus; sort: "category" | "coverage" };
 
-const SELECT = "h-11 w-full rounded-xl border border-border bg-surface px-3 text-text sm:w-auto sm:min-w-40";
+const SELECT = "field sm:w-auto sm:min-w-44";
+const LABEL = "t-label mb-1.5 block";
 
 export function MatrixControls({
   filters,
@@ -25,20 +25,17 @@ export function MatrixControls({
   const dirty = filters.country !== "" || filters.status !== "" || filters.sort !== "category";
 
   return (
-    <section aria-label={t("filters")} className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
+    <section aria-label={t("filters")} className="grid grid-cols-2 gap-x-3 gap-y-4 sm:flex sm:flex-wrap sm:items-end sm:gap-x-4">
       <div role="group" aria-label={t("colourBy")} className="col-span-2 sm:col-span-1">
-        <span className="mb-1 block text-xs text-muted">{t("colourBy")}</span>
-        <div className="inline-flex rounded-full border border-border bg-surface p-1">
+        <span className={LABEL}>{t("colourBy")}</span>
+        <div className="seg">
           {(["status", "mos", "coverage"] as const).map((m) => (
             <button
               key={m}
               type="button"
               aria-pressed={filters.mode === m}
               onClick={() => set({ mode: m })}
-              className={cn(
-                "h-9 min-w-20 rounded-full px-4 text-sm font-medium",
-                filters.mode === m ? "bg-brand text-brand-contrast" : "text-muted",
-              )}
+              className="seg-item"
             >
               {t(m === "status" ? "modeStatus" : m === "mos" ? "modeMos" : "modeCoverage")}
             </button>
@@ -47,7 +44,7 @@ export function MatrixControls({
       </div>
 
       <label className="block">
-        <span className="mb-1 block text-xs text-muted">{t("country")}</span>
+        <span className={LABEL}>{t("country")}</span>
         <select className={SELECT} value={filters.country} onChange={(e) => set({ country: e.target.value })}>
           <option value="">{t("allCountries")}</option>
           {countries.map((c) => (
@@ -59,7 +56,7 @@ export function MatrixControls({
       </label>
 
       <label className="block">
-        <span className="mb-1 block text-xs text-muted">{t("statusFilter")}</span>
+        <span className={LABEL}>{t("statusFilter")}</span>
         <select
           className={SELECT}
           value={filters.status}
@@ -75,7 +72,7 @@ export function MatrixControls({
       </label>
 
       <label className="col-span-2 block sm:col-span-1">
-        <span className="mb-1 block text-xs text-muted">{t("sortBy")}</span>
+        <span className={LABEL}>{t("sortBy")}</span>
         <select
           className={SELECT}
           value={filters.sort}
@@ -90,7 +87,7 @@ export function MatrixControls({
         <button
           type="button"
           onClick={onReset}
-          className="col-span-2 h-11 rounded-full px-4 text-sm text-brand-alt underline sm:col-span-1"
+          className="btn col-span-2 animate-[fade-in_var(--dur-base)_ease-out] px-4 text-brand-alt hover:bg-surface-2 sm:col-span-1"
         >
           {t("reset")}
         </button>

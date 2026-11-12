@@ -21,23 +21,23 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
   const summary = coverage ? summariseGaps(model) : null;
 
   return (
-    <ul data-testid="matrix-list" className="space-y-2 sm:hidden">
+    <ul data-testid="matrix-list" className="space-y-2.5 sm:hidden">
       {model.rows.map(({ category, withData, total }) => {
         const expanded = open === category.id;
         const panelId = `strip-${category.id}`;
         return (
-          <li key={category.id} className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface">
+          <li key={category.id} className={cn("card overflow-hidden transition-colors duration-(--dur-base)", expanded && "border-border-strong")}>
             <button
               type="button"
               aria-expanded={expanded}
               aria-controls={panelId}
               onClick={() => setOpen(expanded ? null : category.id)}
-              className="flex min-h-14 w-full items-center gap-3 px-3 text-left"
+              className="flex min-h-16 w-full items-center gap-3 px-3.5 py-2 text-left transition-colors duration-(--dur-fast) -outline-offset-2 active:bg-surface-2"
             >
               <span
                 aria-hidden
-                className="grid size-9 shrink-0 place-items-center rounded-xl"
-                style={{ backgroundColor: category.color, color: "#0a0c10" }}
+                className="grid size-10 shrink-0 place-items-center rounded-[12px] text-on-category"
+                style={{ backgroundColor: category.color }}
               >
                 <CategoryIcon name={category.icon} className="size-5" />
               </span>
@@ -48,10 +48,10 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                   <span className="num block text-xs text-muted">{t("missingCount", { count: summary.perCategory.get(category.id) ?? 0 })}</span>
                 )}
               </span>
-              <ChevronDown aria-hidden className={cn("size-5 text-muted transition-transform", expanded && "rotate-180")} />
+              <ChevronDown aria-hidden className={cn("size-5 text-muted transition-transform duration-(--dur-slow)", expanded && "rotate-180 text-text")} />
             </button>
             {expanded && (
-              <ul id={panelId} className="no-scrollbar flex gap-1 overflow-x-auto border-t border-border px-2 py-3">
+              <ul id={panelId} className="no-scrollbar flex animate-[fade_var(--dur-slow)_var(--ease-out)] gap-1 overflow-x-auto border-t border-border px-2 py-3">
                 {model.cols.map((col) => {
                   const cell = model.byKey.get(cellKey(category.id, col.id));
                   if (!cell || !model.matches(cell)) return null;
@@ -67,7 +67,7 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                         aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
                         data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
                         className={cn(
-                          "flex flex-col items-center gap-1 rounded-xl py-1",
+                          "flex flex-col items-center gap-1.5 rounded-[12px] py-1 transition-transform duration-(--dur-fast) -outline-offset-2 active:scale-[0.95]",
                           highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",
                         )}
                       >
@@ -80,7 +80,7 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                         >
                           {coverage ? <CoverageCell cell={cell} compact /> : <Icon aria-hidden className="size-5" />}
                         </span>
-                        <span aria-hidden className="w-full truncate text-center text-xs">
+                        <span aria-hidden className="w-full truncate px-0.5 text-center text-[11px] text-muted">
                           {localName(col, locale)}
                         </span>
                       </Link>
@@ -106,7 +106,7 @@ function StatusCounts({ model, categoryId, label }: { model: ViewModel; category
     if (c) counts.set(c.status, (counts.get(c.status) ?? 0) + 1);
   }
   return (
-    <span className="num mt-0.5 flex items-center gap-3 text-xs text-muted">
+    <span className="num mt-1 flex items-center gap-3 text-xs text-muted">
       <span className="sr-only">{label}</span>
       {ORDER.filter((k) => counts.get(k)).map((k) => {
         const Icon = statusIcon(k);
