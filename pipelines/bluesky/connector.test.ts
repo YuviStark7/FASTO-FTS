@@ -118,6 +118,26 @@ describe("bluesky connector", () => {
     expect(times[1] - times[0]).toBeGreaterThanOrEqual(MIN_INTERVAL_MS);
   });
 
+  it("shares the total across queries so every query of every category gets a turn", async () => {
+    const cheese = QUERIES.filter((q) => q.category === "cheese");
+    const asked = new Set<string>();
+    let requests = 0;
+    const { ctx } = makeCtx(
+      async (u) => {
+        requests++;
+        asked.add(new URL(u).searchParams.get("q") ?? "");
+        return toResult(u, 200, "application/json", new TextEncoder().encode(JSON.stringify({ posts: page.posts, cursor: "more" })));
+      },
+      { lang: "", query: "", max_total: String(cheese.length * 3) },
+    );
+    const p = connector.run(ctx);
+    await vi.runAllTimersAsync();
+    await p;
+    expect(asked.size).toBe(new Set(cheese.map((q) => q.q)).size);
+    // 3 posts per query fit in the first page: no query pages on with the cursor and eats the budget.
+    expect(requests).toBe(cheese.length);
+  });
+
   it("stops at the global cap and warns", async () => {
     const { ctx, warns } = makeCtx(
       async (u) => toResult(u, 200, "application/json", new TextEncoder().encode(JSON.stringify({ posts: page.posts }))),

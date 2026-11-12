@@ -42,7 +42,6 @@ const connector: Connector<{ mentions: MentionInput[] }> = {
   async run(ctx) {
     const now = new Date();
     const since = new Date(now.getTime() - Number(ctx.params.days ?? WINDOW_DAYS) * 86_400_000);
-    const perQuery = Number(ctx.params.max_per_query ?? MAX_PER_QUERY);
     const total = Number(ctx.params.max_total ?? MAX_TOTAL);
     const queries: QuerySpec[] = QUERIES.filter(
       (s) =>
@@ -51,6 +50,11 @@ const connector: Connector<{ mentions: MentionInput[] }> = {
         (!ctx.params.lang || s.lang === ctx.params.lang) &&
         (!ctx.params.query || s.q === ctx.params.query),
     );
+
+    // Share the total evenly across queries: with a flat 500 per query the first categories used
+    // the whole budget (12 Nov run: only 5 of 15 categories got mentions).
+    const perQuery = Number(ctx.params.max_per_query ?? Math.min(MAX_PER_QUERY, Math.max(1, Math.floor(total / Math.max(1, queries.length)))));
+    ctx.log(`${queries.length} queries, up to ${perQuery} posts each, ${total} in total`);
 
     let base = PUBLIC_BASE;
     let headers: Record<string, string> = {};
