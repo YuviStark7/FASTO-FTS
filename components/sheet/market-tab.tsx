@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { CellSheet } from "@/lib/queries/cell";
 import { LineChartBox } from "@/components/charts/line-chart";
@@ -35,12 +36,13 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted">{t("national")}</p>
+      <p className="t-meta">{t("national")}</p>
       <Panel>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Labelled label={t("realCagr")}>
-            <FigureValue figure={market.realValueCagr} size="lg" />
-          </Labelled>
+        {/* One lead figure, three supporting ones. */}
+        <Labelled label={t("realCagr")}>
+          <FigureValue figure={market.realValueCagr} size="lg" />
+        </Labelled>
+        <div className="mt-4 grid gap-x-6 gap-y-4 border-t border-border pt-4 sm:grid-cols-3">
           <Labelled label={t("volumeCagr")}>
             <FigureValue figure={market.volumeCagr} />
           </Labelled>
@@ -51,7 +53,7 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
             <FigureValue figure={market.latestNominal} />
           </Labelled>
         </div>
-        <p className="mt-4 text-sm">
+        <p className="mt-5 rounded-[var(--radius-tile)] bg-surface-2 px-4 py-3 text-sm leading-relaxed">
           <span className="text-muted">{t("rule")}: </span>
           {t(market.status === "expanding" ? "ruleExpanding" : market.status === "threatened" ? "ruleThreatened" : "ruleConsolidated", {
             real: formatValue(market.realValueCagr.value ?? 0, "ratio_per_year", locale),
@@ -63,8 +65,8 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
       </Panel>
 
       <Panel title={t("chartTitle")}>
-        <p className="mb-3 flex items-start gap-2 text-sm">
-          {grade && <GradeBadge grade={grade} />}
+        <p className="mb-5 flex max-w-[75ch] items-start gap-2.5 text-sm leading-relaxed">
+          {grade && <span className="mt-0.5"><GradeBadge grade={grade} /></span>}
           <span>
             {t("chartSummary", {
               first: first.year,
@@ -78,23 +80,23 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
         </p>
         {table ? (
           <div className="overflow-x-auto">
-            <table className="num w-full text-sm">
+            <table className="table num">
               <caption className="sr-only">{t("tableCaption")}</caption>
-              <thead className="text-left text-muted">
+              <thead>
                 <tr>
-                  <th scope="col" className="py-1 pr-3">{t("year")}</th>
-                  <th scope="col" className="py-1 pr-3">{t("nominal")}</th>
-                  <th scope="col" className="py-1 pr-3">{t("volume")}</th>
-                  <th scope="col" className="py-1">{t("priceIndex")}</th>
+                  <th scope="col">{t("year")}</th>
+                  <th scope="col">{t("nominal")}</th>
+                  <th scope="col">{t("volume")}</th>
+                  <th scope="col">{t("priceIndex")}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((r) => (
-                  <tr key={r.year} className="border-t border-border">
-                    <th scope="row" className="py-1 pr-3 text-left font-normal">{r.year}</th>
-                    <td className="py-1 pr-3">{eur(r.nominal)}</td>
-                    <td className="py-1 pr-3">{eur(r.volume)}</td>
-                    <td className="py-1">{formatValue(r.priceIndex, "index", locale)}</td>
+                  <tr key={r.year}>
+                    <th scope="row">{r.year}</th>
+                    <td>{eur(r.nominal)}</td>
+                    <td>{eur(r.volume)}</td>
+                    <td>{formatValue(r.priceIndex, "index", locale)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -106,12 +108,12 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
             xKey="year"
             format={eur}
             series={[
-              { key: "nominal", label: t("nominal"), color: "var(--brand-alt)" },
-              { key: "volume", label: t("volume"), color: "var(--text)", dash: "6 4" },
+              { key: "nominal", label: t("nominal"), color: "var(--chart-1)" },
+              { key: "volume", label: t("volume"), color: "var(--chart-2)", dash: "6 4" },
             ]}
           />
         )}
-        <button type="button" aria-pressed={table} onClick={() => setTable(!table)} className="mt-3 h-11 rounded-full border border-border px-5 text-sm">
+        <button type="button" aria-pressed={table} onClick={() => setTable(!table)} className="btn btn-ghost mt-4">
           {table ? t("showChart") : t("showTable")}
         </button>
       </Panel>
@@ -123,7 +125,7 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
             xKey="year"
             height={140}
             format={(v) => formatValue(v, "index", locale)}
-            series={[{ key: "priceIndex", label: t("priceIndex"), color: "var(--consolidated)" }]}
+            series={[{ key: "priceIndex", label: t("priceIndex"), color: "var(--chart-3)" }]}
           />
         </Panel>
       )}
@@ -134,9 +136,12 @@ export function MarketTab({ market }: { market: CellSheet["market"] }) {
 /** The stored rule text is the method's audit trail (English, as written by trend-v1). */
 function Technical({ label, text }: { label: string; text: string }) {
   return (
-    <details className="mt-2 text-xs text-muted">
-      <summary className="cursor-pointer">{label}</summary>
-      <p className="mt-1 font-mono">{text}</p>
+    <details className="group mt-2 text-xs text-muted">
+      <summary className="-ml-1 inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-full px-1 transition-colors duration-(--dur-fast) hover:text-text">
+        <ChevronRight aria-hidden className="size-3.5 transition-transform duration-(--dur-base) group-open:rotate-90" />
+        {label}
+      </summary>
+      <p className="rounded-[var(--radius-tile)] bg-surface-2 px-3 py-2 font-mono text-[11px] leading-relaxed break-words text-text">{text}</p>
     </details>
   );
 }

@@ -37,11 +37,11 @@ export function TerritoryTab({ data }: { data: CellSheet["territoryTab"] }) {
           aria-label={t("interval", { low: text(d, low), high: text(d, high) })}
           className="mt-4"
         >
-          <div className="relative h-3 rounded-full bg-surface-2">
-            <div className="absolute inset-y-0 rounded-full border-2 border-dotted border-text/60" style={{ left: 0, right: 0 }} />
-            <div className="absolute -top-1 h-5 w-1 rounded bg-brand" style={{ left: `calc(${pos}% - 2px)` }} />
+          <div className="relative h-2.5 rounded-full bg-surface-3">
+            <div className="absolute inset-0 rounded-full border-[1.5px] border-dotted border-text/55" />
+            <div className="absolute -top-[5px] h-5 w-1 rounded-full bg-brand shadow-e1 ring-2 ring-surface" style={{ left: `calc(${pos}% - 2px)` }} />
           </div>
-          <div className="num mt-1 flex justify-between text-xs text-muted">
+          <div className="num mt-2.5 flex justify-between text-xs text-muted">
             <span>
               {t("low")}: {text(d, low)}
             </span>
@@ -50,8 +50,8 @@ export function TerritoryTab({ data }: { data: CellSheet["territoryTab"] }) {
             </span>
           </div>
         </div>
-        {d.note && <p className="mt-3 text-sm text-muted">{d.note}</p>}
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {d.note && <p className="mt-4 max-w-[75ch] text-sm leading-relaxed text-muted">{d.note}</p>}
+        <div className="mt-5 grid gap-x-6 gap-y-4 border-t border-border pt-4 sm:grid-cols-2">
           <Labelled label={t("perCapita")}>
             <FigureValue figure={data.perCapita} />
           </Labelled>
@@ -72,17 +72,17 @@ export function TerritoryTab({ data }: { data: CellSheet["territoryTab"] }) {
       </Panel>
 
       <Panel title={t("factors")}>
-        <ul className="space-y-3">
+        <ul className="divide-y divide-border">
           {data.factors.map((f) => (
-            <li key={f.key} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <li key={f.key} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 first:pt-0 last:pb-0">
               <span className="font-medium">{t(`factorNames.${f.key}`)}</span>
               <span className="num text-sm">{t("factorValue", { value: num(f.value), low: num(f.low), high: num(f.high) })}</span>
               {f.missing && (
-                <span title={t("missingHint")} className="hatched rounded-md border border-border px-1.5 py-0.5 text-xs font-medium">
+                <span title={t("missingHint")} className="hatched rounded-[var(--radius-chip)] border border-border-strong/60 px-2 py-0.5 text-xs font-medium">
                   {t("missing")}
                 </span>
               )}
-              <span className="w-full text-sm text-muted">
+              <span className="w-full text-sm leading-relaxed text-muted">
                 {t("basis")}: {f.basis}
               </span>
             </li>
@@ -98,7 +98,7 @@ export function TerritoryTab({ data }: { data: CellSheet["territoryTab"] }) {
         </ul>
       </Panel>
 
-      <p className="rounded-[var(--radius-card)] border border-border p-4 text-sm">{t("production")}</p>
+      <p className="note text-muted">{t("production")}</p>
     </div>
   );
 }

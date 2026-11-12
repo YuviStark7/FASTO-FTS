@@ -30,7 +30,7 @@ export function FlagLetters({ flags }: { flags?: string[] }) {
   return (
     <span className="inline-flex gap-0.5">
       {known.map((key) => (
-        <abbr key={key} title={t(key)} className="rounded border border-border px-1 text-[10px] leading-4 font-semibold no-underline">
+        <abbr key={key} title={t(key)} className="rounded-[5px] border border-border-strong px-1 text-[10px] leading-4 font-semibold no-underline">
           {key}
           <span className="sr-only"> ({t(key)})</span>
         </abbr>
@@ -74,7 +74,7 @@ export function FigureValue({
   if (figure.value == null || figure.grade == null) {
     return (
       <span
-        className={cn("hatched inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm", className)}
+        className={cn("hatched inline-flex min-h-11 items-center gap-2 rounded-[10px] border border-border-strong/60 px-3 text-sm font-medium", className)}
         title={t("insufficientHint")}
       >
         {t("insufficient")}
@@ -92,27 +92,29 @@ export function FigureValue({
         type="button"
         onClick={() => dialog.current?.showModal()}
         aria-label={t("open", { value: shown })}
-        className={cn("inline-flex min-h-11 items-center gap-2 rounded-lg px-1 text-left hover:bg-surface-2", className)}
+        // The negative margin keeps the number flush with its label; the padding is the hover plate.
+        className={cn("-mx-2 inline-flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-left transition-[background-color,transform] duration-(--dur-fast) hover:bg-surface-2 active:scale-[0.98]", className)}
       >
-        <span className={cn("num font-light", size === "lg" ? "text-4xl" : "text-xl")}>{shown}</span>
+        <span className={cn("t-figure", size === "lg" ? "text-[2.5rem] sm:text-5xl" : "text-[1.375rem]")}>{shown}</span>
         <GradeBadge grade={figure.grade} />
         <FlagLetters flags={figure.flags} />
       </button>
       <dialog
         ref={dialog}
         aria-labelledby={titleId}
-        className="m-auto mb-0 w-full max-w-lg rounded-t-[var(--radius-tray)] border border-border bg-surface p-5 text-text backdrop:bg-black/60 sm:mb-auto sm:rounded-[var(--radius-card)]"
+        className="sheet m-auto mb-0 w-full max-w-lg rounded-t-[var(--radius-tray)] border border-border bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-text sm:mb-auto sm:rounded-[var(--radius-tray)] sm:p-7"
       >
+        <div aria-hidden className="mx-auto mb-4 h-1 w-10 rounded-full bg-border-strong sm:hidden" />
         <div className="flex items-start justify-between gap-3">
-          <p id={titleId} className="num flex items-center gap-2 text-3xl font-light">
+          <p id={titleId} className="t-figure flex items-center gap-2.5 text-[2rem]">
             {shown}
             <GradeBadge grade={figure.grade} />
           </p>
-          <button type="button" onClick={() => dialog.current?.close()} aria-label={t("close")} className="grid size-11 place-items-center rounded-full hover:bg-surface-2">
+          <button type="button" onClick={() => dialog.current?.close()} aria-label={t("close")} className="-mt-1 -mr-2 grid size-11 shrink-0 place-items-center rounded-full text-muted transition-colors duration-(--dur-fast) hover:bg-surface-2 hover:text-text">
             <X aria-hidden className="size-5" />
           </button>
         </div>
-        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-border pt-5 text-sm">
           <dt className="text-muted">{t("grade")}</dt>
           <dd>
             {figure.grade}: {tg(figure.grade)}
@@ -120,7 +122,7 @@ export function FigureValue({
           <dt className="text-muted">{t("period")}</dt>
           <dd className="num">{figure.period || "-"}</dd>
           <dt className="text-muted">{t("method")}</dt>
-          <dd className="num">{figure.methodVersion}</dd>
+          <dd className="font-mono text-[13px]">{figure.methodVersion}</dd>
           <dt className="text-muted">{t("observations")}</dt>
           <dd className="num">{ids.length}</dd>
           <dt className="text-muted">{t("unit")}</dt>
@@ -148,7 +150,7 @@ export function FigureValue({
             </>
           )}
         </dl>
-        <div className="mt-5">
+        <div className="mt-6">
           {ids.length > 0 && sheet ? (
             <button
               type="button"
@@ -156,7 +158,7 @@ export function FigureValue({
                 dialog.current?.close();
                 sheet.showSources(ids);
               }}
-              className="h-11 rounded-full bg-brand px-6 font-medium text-brand-contrast"
+              className="btn btn-primary max-sm:w-full"
             >
               {t("viewSources")}
             </button>
@@ -169,7 +171,7 @@ export function FigureValue({
                 el?.scrollIntoView({ behavior: "smooth", block: "start" });
                 el?.focus({ preventScroll: true });
               }}
-              className="h-11 rounded-full bg-brand px-6 font-medium text-brand-contrast"
+              className="btn btn-primary max-sm:w-full"
             >
               {t("viewProvenance")}
             </button>

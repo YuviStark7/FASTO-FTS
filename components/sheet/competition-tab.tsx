@@ -30,13 +30,13 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
   return (
     <div className="space-y-4">
       <Panel title={t("assortment")}>
-        <p className="mb-3 text-sm text-muted">{t("assortmentNote")}</p>
+        <p className="mb-3 max-w-[75ch] text-sm leading-relaxed text-muted">{t("assortmentNote")}</p>
         {competition.assortment.length === 0 ? (
           <p className="text-sm">{t("assortmentEmpty")}</p>
         ) : (
-          <ul className="grid gap-2 sm:grid-cols-2">
+          <ul className="grid gap-x-8 sm:grid-cols-2">
             {competition.assortment.map((a) => (
-              <li key={a.tag} className="flex items-center justify-between gap-3">
+              <li key={a.tag} className="flex items-center justify-between gap-3 border-b border-border py-1">
                 <span className="text-sm break-all">{a.tag}</span>
                 <FigureValue figure={a.figure} />
               </li>
@@ -47,13 +47,13 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
 
       <Panel title={t("offers")}>
         {competition.offers.length === 0 ? (
-          <p className="hatched rounded-lg border border-border p-3 text-sm">{t("offersEmpty")}</p>
+          <p className="hatched rounded-[var(--radius-tile)] border border-border-strong/60 px-4 py-3 text-sm font-medium">{t("offersEmpty")}</p>
         ) : (
           <div className="space-y-5">
-            {priced.length === 0 && <p className="hatched rounded-lg border border-border p-3 text-sm">{t("noPrices")}</p>}
+            {priced.length === 0 && <p className="hatched rounded-[var(--radius-tile)] border border-border-strong/60 px-4 py-3 text-sm font-medium">{t("noPrices")}</p>}
             {ladder.size > 0 && (
               <div>
-                <h4 className="mb-1 text-sm font-medium">{t("ladder")}</h4>
+                <h4 className="t-label mb-2">{t("ladder")}</h4>
                 <ul className="num space-y-1 text-sm">
                   {[...ladder.entries()].map(([pack, os]) => {
                     const ps = os.map((o) => o.price!);
@@ -68,32 +68,32 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
               </div>
             )}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="table min-w-[640px]">
                 <caption className="sr-only">{t("offers")}</caption>
-                <thead className="text-muted">
+                <thead>
                   <tr>
-                    <th scope="col" className="py-1 pr-3">{t("product")}</th>
-                    <th scope="col" className="py-1 pr-3">{t("competitor")}</th>
-                    <th scope="col" className="py-1 pr-3">{t("pack")}</th>
-                    <th scope="col" className="py-1 pr-3">{t("price")}</th>
-                    <th scope="col" className="py-1 pr-3">{t("channel")}</th>
-                    <th scope="col" className="py-1">{t("observed")}</th>
+                    <th scope="col">{t("product")}</th>
+                    <th scope="col">{t("competitor")}</th>
+                    <th scope="col">{t("pack")}</th>
+                    <th scope="col">{t("price")}</th>
+                    <th scope="col">{t("channel")}</th>
+                    <th scope="col">{t("observed")}</th>
                   </tr>
                 </thead>
                 <tbody className="num">
                   {competition.offers.map((o, i) => (
-                    <tr key={i} className="border-t border-border align-top">
-                      <td className="py-1 pr-3">
+                    <tr key={i}>
+                      <td>
                         {o.url ? (
-                          <a href={o.url} target="_blank" rel="noreferrer" className="text-brand-alt underline">
+                          <a href={o.url} target="_blank" rel="noreferrer" className="link">
                             {o.productName}
                           </a>
                         ) : (
                           o.productName
                         )}
                       </td>
-                      <td className="py-1 pr-3">{o.competitor ?? "-"}</td>
-                      <td className="py-1 pr-3 whitespace-nowrap">
+                      <td>{o.competitor ?? "-"}</td>
+                      <td className="whitespace-nowrap">
                         {o.packSize != null ? (
                           <span className="inline-flex items-center gap-1.5">
                             {o.packSize} {o.packUnit ?? ""} <GradeBadge grade={o.grade} />
@@ -102,7 +102,7 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
                           "-"
                         )}
                       </td>
-                      <td className="py-1 pr-3 whitespace-nowrap">
+                      <td className="whitespace-nowrap">
                         {o.price != null ? (
                           <span className="inline-flex items-center gap-1.5">
                             {money(o.price)} <GradeBadge grade={o.grade} />
@@ -111,8 +111,8 @@ export function CompetitionTab({ competition }: { competition: CellSheet["compet
                           t("noPrice")
                         )}
                       </td>
-                      <td className="py-1 pr-3">{o.channel ?? "-"}</td>
-                      <td className="py-1">{formatDate(o.observedOn, locale)}</td>
+                      <td>{o.channel ?? "-"}</td>
+                      <td className="whitespace-nowrap">{formatDate(o.observedOn, locale)}</td>
                     </tr>
                   ))}
                 </tbody>
