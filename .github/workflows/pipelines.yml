@@ -19,11 +19,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  run:
+  # Decides what runs. Only known modes and connector slugs get through.
+  plan:
     runs-on: ubuntu-latest
-    # A full run takes 2-3 hours: OFF (~35 min, 6.5 s spacing), GDELT (120 queries, 12 s spacing, retries),
-    # Bluesky, then scoring 5 batches at a time. GitHub's limit is 360.
-    timeout-minutes: 240
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      sources: ${{ steps.plan.outputs.sources }}
+      score: ${{ steps.plan.outputs.score }}
+      compute: ${{ steps.plan.outputs.compute }}
+    steps:
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          # Keep in step with pipelines/connectors.ts (checked by pipelines/workflow.test.ts).
+          ALL='["eurostat","istat","openfoodfacts","osm","gdelt","wikimedia","bluesky"]'
+          if [ "$EVENT" = "workflow_dispatch" ]; then mode="$INPUT_MODE";
+          elif [ "$SCHEDULE" = "17 3 * * 1" ]; then mode="all";
+          else mode="queued"; fi
+          sources='[]'; score=false; compute=false
+          case "$mode" in
+            all) sources="$ALL"; score=true; compute=true ;;
+            eurostat|istat|osm|openfoodfacts|gdelt|wikimedia) sources="[\"$mode\"]"; compute=true ;;
+            bluesky) sources='["bluesky"]'; score=true; compute=true ;;
+            score) score=true; compute=true ;;
+            compute) compute=true ;;
+            queued|eval) ;;
+            *) echo "::error::unknown mode '$mode'"; exit 1 ;;
+          esac
+          { echo "mode=$mode"; echo "sources=$sources"; echo "score=$score"; echo "compute=$compute"; } >> "$GITHUB_OUTPUT"
+
+  # One job per source, in parallel: a slow or failing source never holds up the others,
+  # and a single source can be re-run from the Actions page.
+  connector:
+    needs: plan
+    if: needs.plan.outputs.sources != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        source: ${{ fromJSON(needs.plan.outputs.sources) }}
+    name: source ${{ matrix.source }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -32,49 +72,69 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Decide mode
-        id: mode
-        env:
-          EVENT: ${{ github.event_name }}
-          SCHEDULE: ${{ github.event.schedule }}
-          INPUT_MODE: ${{ inputs.mode }}
-        run: |
-          if [ "$EVENT" = "workflow_dispatch" ]; then mode="$INPUT_MODE";
-          elif [ "$SCHEDULE" = "17 3 * * 1" ]; then mode="all";
-          else mode="queued"; fi
-          # Only known modes and connector slugs reach the shell command below.
-          case "$mode" in
-            all|queued|compute|score|eval|eurostat|istat|osm|openfoodfacts|gdelt|wikimedia|bluesky) ;;
-            *) echo "::error::unknown mode '$mode'"; exit 1 ;;
-          esac
-          echo "mode=$mode" >> "$GITHUB_OUTPUT"
-      # Two steps so the Anthropic and Bluesky secrets only reach the modes that use them.
-      # The service key is given to these steps only, never to dependency installation.
-      - name: Run (statistics and signals)
-        if: steps.mode.outputs.mode != 'all' && steps.mode.outputs.mode != 'queued' && steps.mode.outputs.mode != 'score' && steps.mode.outputs.mode != 'eval' && steps.mode.outputs.mode != 'bluesky'
+      # The service key reaches this step only, never dependency installation. Bluesky
+      # credentials reach the Bluesky job only.
+      - name: Run ${{ matrix.source }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          MODE: ${{ steps.mode.outputs.mode }}
-        run: |
-          case "$MODE" in
-            compute) pnpm pipeline compute ;;
-            *)       pnpm pipeline "$MODE" && pnpm pipeline compute ;;
-          esac
-      - name: Run (mentions and scoring)
-        if: steps.mode.outputs.mode == 'all' || steps.mode.outputs.mode == 'queued' || steps.mode.outputs.mode == 'score' || steps.mode.outputs.mode == 'eval' || steps.mode.outputs.mode == 'bluesky'
+          BSKY_IDENTIFIER: ${{ matrix.source == 'bluesky' && secrets.BSKY_IDENTIFIER || '' }}
+          BSKY_APP_PASSWORD: ${{ matrix.source == 'bluesky' && secrets.BSKY_APP_PASSWORD || '' }}
+          SOURCE: ${{ matrix.source }}
+        run: pnpm pipeline "$SOURCE"
+
+  # After every source job (whatever its result): score new mentions, then recompute snapshots and cells.
+  finish:
+    needs: [plan, connector]
+    if: always() && needs.plan.result == 'success' && needs.plan.outputs.compute == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Score mentions
+        if: needs.plan.outputs.score == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: pnpm pipeline score
+      - name: Compute snapshots and cells
+        if: always()
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: pnpm pipeline compute
+
+  # Admin reruns (queued) and the classifier eval run as one job each.
+  other:
+    needs: plan
+    if: needs.plan.outputs.mode == 'queued' || needs.plan.outputs.mode == 'eval'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run ${{ needs.plan.outputs.mode }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
           BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
-          MODE: ${{ steps.mode.outputs.mode }}
+          MODE: ${{ needs.plan.outputs.mode }}
         run: |
           case "$MODE" in
-            queued)  pnpm pipeline --queued ;;
-            score)   pnpm pipeline score && pnpm pipeline compute ;;
-            eval)    pnpm eval:mention-score ;;
-            all)     pnpm pipeline all ;;
-            bluesky) pnpm pipeline bluesky && pnpm pipeline score && pnpm pipeline compute ;;
+            queued) pnpm pipeline --queued ;;
+            eval)   pnpm eval:mention-score ;;
           esac
