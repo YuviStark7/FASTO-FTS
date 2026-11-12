@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
 import { RunStatusLabel, type RunStatus } from "@/components/admin/run-status";
@@ -39,13 +40,13 @@ export default async function AdminRuns({ params }: { params: Promise<{ locale: 
 
   return (
     <>
-      <h1 className="text-4xl font-light tracking-tight">{t("runs.title")}</h1>
+      <h1 className="t-h1">{t("runs.title")}</h1>
       {live && <AutoRefresh />}
       {runs.length === 0 ? (
-        <div className="hatched space-y-3 rounded-[var(--radius-card)] p-6">
-          <h2 className="text-xl font-medium">{t("runs.emptyTitle")}</h2>
-          <p className="text-muted">{t("runs.emptyBody")}</p>
-          <Link href="/admin/sources" className="inline-flex min-h-11 items-center rounded-full bg-brand px-5 text-sm font-medium text-brand-contrast">
+        <div className="hatched space-y-3 rounded-[var(--radius-card)] border border-border-strong/60 p-6">
+          <h2 className="t-h2">{t("runs.emptyTitle")}</h2>
+          <p>{t("runs.emptyBody")}</p>
+          <Link href="/admin/sources" className="btn btn-primary">
             {t("runs.emptyAction")}
           </Link>
         </div>
@@ -54,37 +55,40 @@ export default async function AdminRuns({ params }: { params: Promise<{ locale: 
           {runs.map((r) => {
             const lines = errorLines(r.errors);
             return (
-              <li key={r.id} className="space-y-3 rounded-[var(--radius-card)] bg-surface p-4" data-testid="run">
+              <li key={r.id} className="card space-y-4 p-4 sm:px-6 sm:py-5" data-testid="run">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-lg font-medium">{r.sources?.name}</h2>
+                  <h2 className="t-h2">{r.sources?.name}</h2>
                   <RunStatusLabel status={r.status as RunStatus} />
                 </div>
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3 lg:grid-cols-6">
+                <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-border pt-4 text-sm sm:grid-cols-3 lg:grid-cols-5">
                   <div>
-                    <dt className="text-muted">{t("runs.requestedAt")}</dt>
+                    <dt className="t-label mb-0.5">{t("runs.requestedAt")}</dt>
                     <dd className="num">{format.dateTime(new Date(r.requested_at), { dateStyle: "short", timeStyle: "short" })}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted">{t("runs.duration")}</dt>
+                    <dt className="t-label mb-0.5">{t("runs.duration")}</dt>
                     <dd className="num">{duration(r.started_at, r.finished_at)}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted">{t("runs.fetched")}</dt>
+                    <dt className="t-label mb-0.5">{t("runs.fetched")}</dt>
                     <dd className="num">{n(r.rows_fetched)}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted">{t("runs.written")}</dt>
+                    <dt className="t-label mb-0.5">{t("runs.written")}</dt>
                     <dd className="num">{n(r.rows_inserted)}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted">{t("runs.rejected")}</dt>
+                    <dt className="t-label mb-0.5">{t("runs.rejected")}</dt>
                     <dd className="num">{n(r.rows_rejected)}</dd>
                   </div>
                 </dl>
                 {lines.length > 0 ? (
-                  <details className="text-sm">
-                    <summary className="flex min-h-11 cursor-pointer items-center">{t("runs.errors", { n: lines.length })}</summary>
-                    <ul className="space-y-1 pb-2">
+                  <details className="group text-sm">
+                    <summary className="-ml-1 inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-full px-1 text-threatened">
+                      <ChevronRight aria-hidden className="size-4 transition-transform duration-(--dur-base) group-open:rotate-90" />
+                      {t("runs.errors", { n: lines.length })}
+                    </summary>
+                    <ul className="space-y-1.5 rounded-[var(--radius-tile)] bg-surface-2 px-4 py-3 leading-relaxed">
                       {lines.map((l, i) => (
                         <li key={i} className="break-words">
                           {l.reason}

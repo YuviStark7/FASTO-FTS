@@ -18,20 +18,20 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   const { role } = await getStaffRole();
 
   const seg = (active: boolean) =>
-    cn("flex min-h-11 flex-1 items-center justify-center rounded-full text-sm", active ? "bg-brand text-brand-contrast" : "text-muted");
+    cn("seg-item w-full", active && "bg-brand text-brand-contrast shadow-e1 hover:text-brand-contrast");
 
   return (
-    <div className="mx-auto max-w-md space-y-6 px-4 py-10">
-      <h1 className="text-4xl font-light tracking-tight">{t("title")}</h1>
+    <div className="page max-w-md space-y-4">
+      <h1 className="t-h1 pb-2">{t("title")}</h1>
 
-      <section className="space-y-2 rounded-[var(--radius-card)] bg-surface p-5">
-        <h2 className="text-sm text-muted">{t("account")}</h2>
+      <section className="card space-y-2 p-5">
+        <h2 className="t-label">{t("account")}</h2>
         <p className="truncate">{email}</p>
       </section>
 
-      <section className="space-y-3 rounded-[var(--radius-card)] bg-surface p-5">
-        <h2 className="text-sm text-muted">{t("theme")}</h2>
-        <div className="flex gap-1 rounded-full bg-surface-2 p-1">
+      <section className="card space-y-3 p-5">
+        <h2 className="t-label">{t("theme")}</h2>
+        <div className="seg flex bg-surface-2">
           <form action={setTheme.bind(null, "dark")} className="flex flex-1">
             <button className={seg(theme === "dark")} aria-pressed={theme === "dark"}>{t("dark")}</button>
           </form>
@@ -41,9 +41,9 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      <section className="space-y-3 rounded-[var(--radius-card)] bg-surface p-5">
-        <h2 className="text-sm text-muted">{t("language")}</h2>
-        <div className="flex gap-1 rounded-full bg-surface-2 p-1">
+      <section className="card space-y-3 p-5">
+        <h2 className="t-label">{t("language")}</h2>
+        <div className="seg flex bg-surface-2">
           <Link href="/more" locale="it" className={seg(locale === "it")} aria-current={locale === "it" ? "true" : undefined}>
             Italiano
           </Link>
@@ -53,23 +53,23 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      <Link href="/map" className="flex min-h-12 items-center justify-between rounded-[var(--radius-card)] bg-surface p-5">
+      <Link href="/map" className="card card-link group flex min-h-12 items-center justify-between p-5">
         <span className="flex items-center gap-3">
           <MapIcon aria-hidden className="size-5 text-muted" />
           {tm("link")}
         </span>
-        <ChevronRight aria-hidden className="size-4 text-muted" />
+        <ChevronRight aria-hidden className="size-4 text-muted transition-transform duration-(--dur-base) group-hover:translate-x-0.5 group-hover:text-text" />
       </Link>
 
       {role && (
-        <Link href="/admin" className="flex min-h-12 items-center justify-between rounded-[var(--radius-card)] bg-surface p-5">
+        <Link href="/admin" className="card card-link group flex min-h-12 items-center justify-between p-5">
           {ta("link")}
-          <ChevronRight aria-hidden className="size-4 text-muted" />
+          <ChevronRight aria-hidden className="size-4 text-muted transition-transform duration-(--dur-base) group-hover:translate-x-0.5 group-hover:text-text" />
         </Link>
       )}
 
       <form action={signOut}>
-        <button className="h-12 w-full rounded-full bg-surface-2 text-text">{t("signOut")}</button>
+        <button className="btn btn-quiet mt-2 h-12 w-full">{t("signOut")}</button>
       </form>
     </div>
   );

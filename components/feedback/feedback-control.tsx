@@ -1,4 +1,5 @@
 "use client";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useState, useTransition } from "react";
 import { getMyFeedback, saveFeedback, type FeedbackTarget, type Rating } from "@/app/[locale]/(app)/feedback-actions";
@@ -47,7 +48,7 @@ export function FeedbackControl({ targetType, targetId }: { targetType: Feedback
 
   const question = targetType === "csi_snapshot" ? t("csiQuestion") : t("briefQuestion");
   return (
-    <div className="mt-5 border-t border-border pt-4" data-testid="feedback-control">
+    <div className="mt-6 border-t border-border pt-5" data-testid="feedback-control">
       <p id={`${id}-q`} className="text-sm font-medium">{question}</p>
       {state === "loading" && <p className="mt-2 text-sm text-muted" role="status">{t("loading")}</p>}
       {state === "viewer" && <p className="mt-2 text-sm text-muted">{t("viewer")}</p>}
@@ -61,35 +62,33 @@ export function FeedbackControl({ targetType, targetId }: { targetType: Feedback
                 aria-pressed={rating === r}
                 disabled={pending}
                 onClick={() => submit(r)}
-                className={`min-h-11 rounded-full border px-4 text-sm disabled:opacity-60 ${
-                  rating === r ? "border-brand bg-brand font-medium text-bg" : "border-border bg-surface-2"
-                }`}
+                className={`btn px-4 ${rating === r ? "btn-primary" : "btn-quiet"}`}
               >
-                {rating === r && <span aria-hidden>✓ </span>}
+                {rating === r && <Check aria-hidden strokeWidth={2.5} className="-ml-0.5 size-4" />}
                 {t(r)}
               </button>
             ))}
           </div>
           <div className="mt-3">
-            <label htmlFor={`${id}-c`} className="text-xs text-muted">{t("commentLabel")}</label>
+            <label htmlFor={`${id}-c`} className="t-label">{t("commentLabel")}</label>
             <textarea
               id={`${id}-c`}
               value={comment}
               maxLength={2000}
               rows={3}
               onChange={(e) => setComment(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-surface-2 p-2 text-sm"
+              className="field mt-1.5 bg-surface-2 text-sm"
             />
             <button
               type="button"
               disabled={pending || rating == null}
               onClick={() => rating && submit(rating)}
-              className="mt-2 min-h-11 rounded-full bg-surface-2 px-4 text-sm disabled:opacity-50"
+              className="btn btn-ghost mt-2"
             >
               {t("send")}
             </button>
           </div>
-          <p role="status" className="mt-2 text-sm">
+          <p role="status" className="mt-2 min-h-5 text-sm text-muted">
             {status === "saved" && t("saved")}
             {status === "error" && t("error")}
           </p>

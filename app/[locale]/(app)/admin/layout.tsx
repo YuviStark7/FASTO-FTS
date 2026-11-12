@@ -7,5 +7,5 @@ export default async function AdminLayout({ children, params }: { children: Reac
   setRequestLocale(locale);
   const { role } = await getStaffRole();
   if (!role) return <NotAllowed />;
-  return <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 lg:px-8">{children}</div>;
+  return <div className="page max-w-6xl space-y-6">{children}</div>;
 }

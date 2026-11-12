@@ -21,10 +21,10 @@ export function ActiveToggle({ sourceId, name, active }: { sourceId: number; nam
             setFailed(!r.ok);
           })
         }
-        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-2 px-4 text-sm disabled:opacity-50"
+        className="group -ml-1 inline-flex min-h-11 items-center gap-2.5 rounded-full px-1 text-sm transition-opacity duration-(--dur-base) disabled:opacity-50"
       >
-        <span aria-hidden className={`h-5 w-9 rounded-full p-0.5 ${active ? "bg-brand" : "bg-border"}`}>
-          <span className={`block size-4 rounded-full bg-bg transition-transform ${active ? "translate-x-4" : ""}`} />
+        <span aria-hidden className={`h-6 w-11 rounded-full p-0.5 transition-colors duration-(--dur-base) ${active ? "bg-brand" : "bg-border-strong"}`}>
+          <span className={`block size-5 rounded-full bg-surface shadow-e1 transition-transform duration-(--dur-base) ease-spring group-active:scale-90 ${active ? "translate-x-5" : ""}`} />
         </span>
         {active ? t("sources.yes") : t("sources.no")}
       </button>
