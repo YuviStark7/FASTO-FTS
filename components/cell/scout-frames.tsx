@@ -34,23 +34,32 @@ const PHONE_POS = [
   "",
 ];
 
-const shell = "absolute rounded-2xl border border-border px-3 py-2 text-left sm:rounded-[var(--radius-card)] sm:px-4 sm:py-3";
+const shell = "block rounded-[18px] border px-3 py-2.5 text-left sm:rounded-[var(--radius-card)] sm:px-4 sm:py-3.5";
 
+/**
+ * The li holds the slot and the slow drift; the inner box floats in (staggered) and carries the surface.
+ * Frames recede through a translucent surface, not through faded text: labels and values keep AA contrast.
+ */
 function Wrap({ slot, i, children, shown, hatched }: { slot: Slot; i: number; children: React.ReactNode; shown: boolean; hatched?: boolean }) {
   return (
     <li
-      className={cn(
-        "transition-opacity duration-500 motion-reduce:transition-none",
-        slot.cls,
-        PHONE_POS[i],
-        !slot.phone && "max-sm:hidden",
-        shell,
-        hatched ? "hatched" : "bg-surface",
-        shown ? "pointer-events-auto opacity-45 focus-within:opacity-100 hover:opacity-100 max-sm:opacity-85" : "pointer-events-none opacity-0",
-      )}
+      className={cn("absolute", slot.cls, PHONE_POS[i], !slot.phone && "max-sm:hidden", shown ? "pointer-events-auto" : "pointer-events-none")}
       style={{ ["--dx" as string]: `${slot.dx}px`, ["--dy" as string]: `${slot.dy}px`, animation: `drift ${slot.dur}s ease-in-out ${slot.delay}s infinite` }}
     >
-      {children}
+      <div
+        className={cn(
+          shell,
+          "transition-[opacity,translate,scale,background-color,border-color,box-shadow] duration-(--dur-slow) ease-out motion-reduce:transition-none",
+          hatched
+            ? "hatched border-border-strong/60"
+            : "border-border/70 bg-surface/55 backdrop-blur-[2px] focus-within:border-border-strong focus-within:bg-surface focus-within:shadow-e2 hover:border-border-strong hover:bg-surface hover:shadow-e2 max-sm:bg-surface/80",
+          shown ? "translate-y-0 scale-100 opacity-100" : "translate-y-3 scale-[0.96] opacity-0",
+        )}
+        // Float in one after the other; leave together.
+        style={{ transitionDelay: shown ? `${60 + i * 45}ms` : "0ms" }}
+      >
+        {children}
+      </div>
     </li>
   );
 }
@@ -82,7 +91,10 @@ export function ScoutFrames({
       {!figures &&
         SLOTS.map((s, i) => (
           <Wrap key={i} slot={s} i={i} shown={visible}>
-            <div role="status" aria-label={t("framesLoading")} className="h-16 animate-pulse rounded-lg bg-surface-2 opacity-60" />
+            <div role="status" aria-label={t("framesLoading")} className="space-y-2.5 py-0.5">
+              <div className="skeleton h-3 w-3/5" />
+              <div className="skeleton h-6 w-4/5" />
+            </div>
           </Wrap>
         ))}
       {figures &&
@@ -100,20 +112,20 @@ export function ScoutFrames({
                 href={href}
                 tabIndex={visible ? 0 : -1}
                 aria-label={t("openFrame", { label, value })}
-                className={cn("block rounded-[inherit] outline-offset-4", loading && "opacity-60")}
+                className={cn("-m-1 block rounded-[14px] p-1 transition-opacity duration-(--dur-base)", loading && "opacity-60")}
               >
-                <span className="block text-[10px] font-medium tracking-wider text-muted uppercase sm:text-xs">{label}</span>
+                <span className={cn("t-label block text-[10px] sm:text-[11px]", missing && "text-text")}>{label}</span>
                 {missing ? (
-                  <span className="mt-1 block text-sm" title={tf("insufficientHint")}>
+                  <span className="mt-1.5 block text-sm font-medium" title={tf("insufficientHint")}>
                     {tf("insufficient")}
                   </span>
                 ) : (
-                  <span className="mt-1 flex items-center gap-2">
-                    <span className="num text-lg font-light sm:text-2xl">{value}</span>
+                  <span className="mt-1.5 flex items-center gap-2">
+                    <span className="t-figure text-lg sm:text-[26px]">{value}</span>
                     <GradeBadge grade={f.figure.grade!} />
                   </span>
                 )}
-                {range && <span className="num mt-0.5 block text-[10px] text-muted sm:text-xs">{range}</span>}
+                {range && <span className="num mt-1 block text-[10px] text-muted sm:text-xs">{range}</span>}
               </Link>
             </Wrap>
           );

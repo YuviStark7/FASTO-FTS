@@ -76,7 +76,7 @@ export function ScoutCombobox({ items, value, label, placeholder, emptyText, onP
         aria-label={`${label}: ${current?.label ?? ""}`}
         data-testid={testId}
         onClick={() => setEditing(true)}
-        className={cn("min-h-11 cursor-text rounded-full px-4 text-sm font-semibold tracking-wider uppercase", triggerClassName)}
+        className={cn("min-h-11 cursor-text rounded-full px-5 text-sm font-semibold tracking-[0.1em] uppercase transition-[background-color,border-color,transform] duration-(--dur-base) active:scale-[0.97]", triggerClassName)}
       >
         {children ?? current?.label}
       </button>
@@ -118,14 +118,14 @@ export function ScoutCombobox({ items, value, label, placeholder, emptyText, onP
             setActive((a) => (a + (e.key === "ArrowDown" ? 1 : -1) + matches.length) % matches.length);
           }
         }}
-        className="h-11 w-48 rounded-full border border-text/40 bg-surface px-4 text-center text-sm font-semibold tracking-wider uppercase placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-muted"
+        className="h-11 w-52 animate-[fade-in_var(--dur-base)_ease-out] rounded-full border border-border-strong bg-surface px-4 text-center text-sm font-semibold tracking-[0.1em] uppercase shadow-e2 placeholder:font-normal placeholder:tracking-normal placeholder:text-muted placeholder:normal-case"
       />
       <ul
         id={listId}
         role="listbox"
         aria-label={label}
         className={cn(
-          "absolute left-1/2 z-50 max-h-56 w-56 -translate-x-1/2 overflow-y-auto rounded-2xl border border-border bg-surface p-1 text-left shadow-xl",
+          "absolute left-1/2 z-50 max-h-56 w-60 -translate-x-1/2 overflow-y-auto rounded-[var(--radius-card)] border border-border bg-surface p-1.5 text-left shadow-e3",
           listSide === "up" ? "bottom-full mb-2" : "top-full mt-2",
         )}
       >
@@ -142,10 +142,10 @@ export function ScoutCombobox({ items, value, label, placeholder, emptyText, onP
               pick(m.id);
             }}
             onMouseEnter={() => setActive(i)}
-            className={cn("flex min-h-10 cursor-pointer items-center justify-between gap-2 rounded-xl px-3 text-sm", i === active && "bg-surface-2")}
+            className={cn("flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-tile)] px-3 text-sm transition-colors duration-(--dur-fast)", i === active && "bg-surface-2")}
           >
             <span>{m.label}</span>
-            {m.meta && <span className="text-[10px] text-muted">{m.meta}</span>}
+            {m.meta && <span className="text-[10px] font-medium tracking-[0.14em] text-muted">{m.meta}</span>}
           </li>
         ))}
       </ul>
