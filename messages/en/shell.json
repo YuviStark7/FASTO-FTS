@@ -1,0 +1,9 @@
+{
+  "shell": {
+    "brand": "FASTO FTS",
+    "chipLabel": "Choose the page. Current page: {page}",
+    "profile": "Profile and settings",
+    "profileMenu": "Profile menu",
+    "signedInAs": "Signed in as {email}"
+  }
+}
