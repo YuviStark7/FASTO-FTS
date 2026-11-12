@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -7,7 +7,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import "../globals.css";
 
-const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"], weight: "variable" });
+// One sans family with a wide weight range (SPEC section 7); the mono cut is for method ids, series keys and refs.
+const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"], weight: "variable", display: "swap" });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], weight: "variable", display: "swap" });
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -42,7 +44,7 @@ export default async function LocaleLayout({
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
 
   return (
-    <html lang={locale} data-theme={theme} className={geist.variable}>
+    <html lang={locale} data-theme={theme} className={`${geist.variable} ${geistMono.variable}`}>
       <body className="min-h-dvh">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

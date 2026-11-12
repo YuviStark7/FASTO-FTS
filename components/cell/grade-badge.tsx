@@ -16,8 +16,6 @@ export function GradeBadge({ grade }: { grade: Grade }) {
 export function DemoBadge() {
   const t = useTranslations("common");
   return (
-    <span className="rounded-md bg-threatened px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-bg">
-      {t("demo")}
-    </span>
+    <span className="demo">{t("demo")}</span>
   );
 }
