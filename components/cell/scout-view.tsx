@@ -140,6 +140,23 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
     }
   }, [bloomed, editing, collapse]);
 
+  // Backstop for pointerleave: when the element under the pointer is replaced (picking from a
+  // typeahead re-renders the tag), browsers can skip the leave event. While bloomed, any mouse
+  // movement outside the zone schedules the collapse.
+  useEffect(() => {
+    if (!bloomed) return;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || !zone.current) return;
+      const isInside = zone.current.contains(e.target as Node);
+      if (isInside === inside.current) return;
+      inside.current = isInside;
+      clearTimeout(timer.current);
+      if (!isInside && !editing) timer.current = setTimeout(collapse, 300);
+    };
+    document.addEventListener("pointermove", onMove);
+    return () => document.removeEventListener("pointermove", onMove);
+  }, [bloomed, editing, collapse]);
+
   const onEditing = useCallback((on: boolean) => {
     setEditing((n) => Math.max(0, n + (on ? 1 : -1)));
   }, []);
