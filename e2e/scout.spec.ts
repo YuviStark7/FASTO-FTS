@@ -43,7 +43,7 @@ test("MOS pill opens the matrix in MOS mode with the cell highlighted", async ({
   await page.getByRole("link", { name: /^MOS( \d+| non disponibile)$/ }).click();
   await expect(page).toHaveURL(/\/matrix\?mode=mos&c=honey&t=bologna/);
   await expect(page.getByRole("button", { name: "MOS", exact: true })).toHaveAttribute("aria-pressed", "true");
-  const current = page.locator('[aria-current="true"]:visible');
+  const current = page.locator("[data-matrix-target]:visible");
   await expect(current).toHaveCount(1);
   await expect(current).toHaveAttribute("aria-label", /Miele a Bologna/);
   await expect(current).toBeInViewport();

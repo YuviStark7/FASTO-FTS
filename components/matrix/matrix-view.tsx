@@ -32,11 +32,17 @@ export function MatrixView({ categories, territories, cells }: Props) {
 
   useEffect(() => {
     if (!highlight) return;
-    const id = requestAnimationFrame(() => {
-      const target = [...document.querySelectorAll<HTMLElement>('[aria-current="true"]')].find((el) => el.offsetParent !== null);
+    const scroll = () => {
+      const target = [...document.querySelectorAll<HTMLElement>("[data-matrix-target]")].find((el) => el.offsetParent !== null);
       target?.scrollIntoView({ block: "center", inline: "center", behavior: "auto" });
-    });
-    return () => cancelAnimationFrame(id);
+    };
+    // Once now, and again after the client navigation has applied its own scroll-to-top.
+    const id = requestAnimationFrame(scroll);
+    const late = setTimeout(scroll, 250);
+    return () => {
+      cancelAnimationFrame(id);
+      clearTimeout(late);
+    };
     // Only on arrival: later filter changes must not pull the page around.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

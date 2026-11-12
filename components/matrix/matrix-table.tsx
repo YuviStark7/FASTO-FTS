@@ -89,6 +89,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                       aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
                       title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
                       aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
+                        data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
                       className={cn(
                         "grid h-11 min-w-20 place-items-center rounded-lg border",
                         cellClass(cell.status, cell.mos, mode),

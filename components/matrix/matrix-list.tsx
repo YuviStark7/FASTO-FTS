@@ -65,6 +65,7 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                         aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
                         title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
                         aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
+                        data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
                         className={cn(
                           "flex flex-col items-center gap-1 rounded-xl py-1",
                           highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",

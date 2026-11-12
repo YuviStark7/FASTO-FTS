@@ -185,9 +185,8 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
   return (
     <section
       aria-label={t("title")}
-      // --bottom-bar is the space the old bottom navigation takes on phones; it is 0 once that bar is gone.
-      style={{ ["--bottom-bar" as string]: "calc(4.5rem + env(safe-area-inset-bottom))" }}
-      className="relative isolate h-[calc(100dvh-var(--bottom-bar))] min-h-[34rem] overflow-hidden lg:h-dvh"
+      // Full-bleed under the transparent header: cancel the layout's top padding, fill the viewport.
+      className="relative isolate -mt-[var(--header-h,96px)] h-dvh min-h-[34rem] overflow-hidden"
     >
       <ScoutFrames figures={figures} loading={loading} visible={!bloomed} href={cellHref} />
 
