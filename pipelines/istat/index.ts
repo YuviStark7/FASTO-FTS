@@ -17,10 +17,20 @@ const connector: Connector<ObservationInput[]> = {
     for (const c of COMUNI) {
       const key = keyFor(c.code);
       const url = `${BASE}/data/${c.flow}/${key}?startPeriod=${startPeriod}`;
-      const res = await ctx.get(url, {
-        // The service answers HTTP 500 "languageTag1" to Node's default "Accept-Language: *".
-        headers: { Accept: "application/vnd.sdmx.data+json;version=1.0.0-wd", "Accept-Language": "en" },
-      });
+      let res;
+      try {
+        res = await ctx.get(url, {
+          // The service answers HTTP 500 "languageTag1" to Node's default "Accept-Language: *".
+          headers: { Accept: "application/vnd.sdmx.data+json;version=1.0.0-wd", "Accept-Language": "en" },
+          // A slow answer is retried rather than waited on: one hung request once cost the whole run.
+          timeoutMs: 45_000,
+          retries: 4,
+        });
+      } catch (e) {
+        // One comune failing is a warning (run partial), not a failed run.
+        ctx.warn(`${c.slug}: no rows, request failed (${(e instanceof Error ? e.message : String(e)).slice(0, 120)})`);
+        continue;
+      }
       await ctx.storeRaw({ name: `${c.flow}_${key}.json`, bytes: res.bytes, contentType: "application/json", url });
       const parsed = parsePopulation(res.json());
       if (parsed.refArea.id !== c.code || parsed.refArea.name !== c.label) {
@@ -43,6 +53,7 @@ const connector: Connector<ObservationInput[]> = {
         });
       }
     }
+    if (!out.length) throw new Error("no comune produced data");
     return out;
   },
 };

@@ -81,24 +81,26 @@ describe("query and shop list", () => {
   });
 });
 
-function fakeCtx(respond: (body: string) => Uint8Array | Error) {
+function fakeCtx(respond: (body: string, url: string) => Uint8Array | Error, params: Record<string, string> = {}) {
   const logs: string[] = [];
+  const calls: string[] = [];
   const ctx = {
     taxonomy: {
       categories: new Map([["x", { codes: { osm_shop: ["bakery", "cheese"] } }]]),
       pilotCities: [{ slug: "roma" }, { slug: "milano" }],
     },
     get: async (url: string, init?: { body?: string }) => {
-      const r = respond(decodeURIComponent(init?.body ?? ""));
+      calls.push(url);
+      const r = respond(decodeURIComponent(init?.body ?? ""), url);
       if (r instanceof Error) throw r;
       return toResult(url, 200, "application/json", r);
     },
     storeRaw: async () => {},
     log: (m: string) => logs.push(m),
     warn: (m: string) => logs.push(m),
-    params: { baseline_shops: "deli" },
+    params: { baseline_shops: "deli", endpoints: "https://a.test/api,https://b.test/api", ...params },
   } as unknown as ConnectorContext;
-  return { ctx, logs };
+  return { ctx, logs, calls };
 }
 
 describe("connector", () => {
@@ -123,8 +125,19 @@ describe("connector", () => {
     ]);
     expect(rows[0]).toMatchObject({ category: null, indicator: "pos_count" });
     expect(rows[0].periodStart).toBe(rows[0].periodEnd);
-    expect(rows[0].sourceRef).toBe("overpass:area=relation=5,wikidata=Q220,admin_level=8;shop=bakery");
+    expect(rows[0].sourceRef).toBe("overpass:a.test:area=relation=5,wikidata=Q220,admin_level=8;shop=bakery");
     expect(logs.some((l) => l.includes("milano: FAILED"))).toBe(true);
+  }, 15000);
+
+  it("falls back to the next Overpass endpoint and keeps using the one that answered", async () => {
+    const { ctx, calls } = fakeCtx((body, url) =>
+      url.startsWith("https://a.test") ? new Error("HTTP 406") : body.includes("Q220") ? answer("Q220", "Roma") : answer("Q490", "Milano"),
+    );
+    const rows = await connector.run(ctx);
+    expect(rows.some((r) => r.territory === "roma")).toBe(true);
+    expect(rows[0].sourceRef).toContain("overpass:b.test:");
+    // Roma: a fails, b answers. Milano: starts with b directly.
+    expect(calls).toEqual(["https://a.test/api", "https://b.test/api", "https://b.test/api"]);
   }, 15000);
 
   it("throws when every city fails", async () => {

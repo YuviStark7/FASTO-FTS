@@ -74,7 +74,8 @@ export type RawFile = { name: string; bytes: Uint8Array; contentType: string; ur
 export type ConnectorContext = {
   taxonomy: import("./taxonomy").Taxonomy;
   /** HTTP GET with the project User-Agent, retries and timeout. */
-  get: (url: string, init?: { headers?: Record<string, string>; method?: string; body?: string }) => Promise<HttpResult>;
+  /** timeoutMs per attempt (default 120 s) and retries on network errors, 429 and 5xx (default 3). */
+  get: (url: string, init?: { headers?: Record<string, string>; method?: string; body?: string; timeoutMs?: number; retries?: number }) => Promise<HttpResult>;
   /** Keep the raw response (hashed, stored in the raw-files bucket, logged in raw_files). */
   storeRaw: (file: RawFile) => Promise<void>;
   log: (message: string) => void;
