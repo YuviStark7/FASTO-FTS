@@ -4,7 +4,9 @@ import type { MentionInput, OfferInput } from "./types";
 
 /** Defensive second pass: no handle, e-mail or profile link survives, whatever the connector did. */
 export function scrubExcerpt(text: string): string {
-  return text
+  const out = text
+    // Control characters (NUL included) are refused by Postgres text and mean nothing to a reader.
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
     .replace(/https?:\/\/\S+/gi, "[link]")
     .replace(/\bwww\.\S+\.\S+/gi, "[link]")
     .replace(/\bdid:[a-z0-9]+:[A-Za-z0-9._:%-]+/g, "[id]")
@@ -14,6 +16,8 @@ export function scrubExcerpt(text: string): string {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 500);
+  // The cut can split an emoji (surrogate pair); a lone surrogate is invalid in JSON and in Postgres.
+  return out.toWellFormed().replace(/\uFFFD$/, "").trimEnd();
 }
 
 export function contentHash(excerpt: string): string {

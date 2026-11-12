@@ -21,8 +21,9 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    # A full run is about an hour: GDELT (120 queries, 5 s spacing), Bluesky (188 queries), OFF (161 queries, 6.5 s spacing), then scoring.
-    timeout-minutes: 120
+    # A full run takes 2-3 hours: OFF (~35 min, 6.5 s spacing), GDELT (120 queries, 12 s spacing, retries),
+    # Bluesky, then scoring 5 batches at a time. GitHub's limit is 360.
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

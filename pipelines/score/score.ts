@@ -10,10 +10,15 @@ import { priceFor, PROMPT_VERSION, scoreBatch, type BatchResult, type MentionFor
 /** Consecutive failed batches before the run stops (failed mentions stay queued for the next run). */
 export const MAX_CONSECUTIVE_FAILURES = 3;
 
+/** Batches sent at once. Each round checks the gates first, so the budget can overshoot by at most one round. */
+export const CONCURRENCY = 5;
+const BATCH = 20;
+const PAGE = 1000; // PostgREST returns at most 1000 rows per request
+
 export async function scoreMentions(
   db: SupabaseClient,
   log: (m: string) => void = console.log,
-  limit = 2000,
+  limit = 50_000,
   client: Pick<Anthropic, "messages"> | null = null,
 ) {
   if (!client && !process.env.ANTHROPIC_API_KEY) {
@@ -26,80 +31,93 @@ export async function scoreMentions(
   if (!model) throw new Error("app_config ai.model.classifier is not set");
   priceFor(model); // unknown model: stop before any spend
 
-  const { data: pending, error } = await db
-    .from("mentions")
-    .select("id, language, excerpt, categories(slug), mention_scores(mention_id)")
-    .is("mention_scores", null)
-    .order("id")
-    .limit(limit);
-  if (error) throw new Error(error.message);
-  const queue: MentionForScoring[] = (pending ?? []).map((m) => ({
-    id: m.id,
-    language: m.language,
-    excerpt: m.excerpt,
-    category: (m.categories as unknown as { slug: string }).slug,
-  }));
-  log(`score: ${queue.length} mentions to score with ${model}`);
-
   const api = client ?? new Anthropic();
   let scored = 0;
+  let seen = 0;
   let failures = 0;
-  for (let i = 0; i < queue.length; i += 20) {
-    const gate = await allowed(db, budget);
-    if (gate !== "ok") {
-      log(`score: stopped (${gate}); ${queue.length - i} mentions left for the next run`);
-      return { scored, skipped: gate };
-    }
-    const batch = queue.slice(i, i + 20);
-    let result: BatchResult;
-    try {
-      result = await scoreBatch(api as Anthropic, model, batch);
-    } catch (e) {
-      // The request itself failed (network, API error): nothing was billed.
-      result = { scores: [], inputTokens: 0, outputTokens: 0, costUsd: 0, error: e instanceof Error ? e.message : String(e) };
-    }
-    // Spend first: a billed call is logged even when its output is unusable.
-    if (result.inputTokens || result.outputTokens) {
-      const { error: ue } = await db.from("usage").insert({
-        module: "04",
-        kind: "classification",
-        model,
-        input_tokens: result.inputTokens,
-        output_tokens: result.outputTokens,
-        cost_usd: result.costUsd,
-      });
-      if (ue) throw new Error(`write usage: ${ue.message}`);
-    }
-    if (result.error) {
-      failures++;
-      log(`score: batch starting at mention ${batch[0].id} failed: ${result.error}`);
+  let after = 0; // id cursor: a mention that failed stays unscored and is not fetched again in this run
+
+  while (seen < limit) {
+    const { data: pending, error } = await db
+      .from("mentions")
+      .select("id, language, excerpt, categories(slug), mention_scores(mention_id)")
+      .is("mention_scores", null)
+      .gt("id", after)
+      .order("id")
+      .limit(Math.min(PAGE, limit - seen));
+    if (error) throw new Error(error.message);
+    if (!pending?.length) break;
+    after = pending[pending.length - 1].id;
+    seen += pending.length;
+    const queue: MentionForScoring[] = pending.map((m) => ({
+      id: m.id,
+      language: m.language,
+      excerpt: m.excerpt,
+      category: (m.categories as unknown as { slug: string }).slug,
+    }));
+    log(`score: ${queue.length} mentions in this page (${scored} scored so far) with ${model}`);
+
+    for (let i = 0; i < queue.length; i += BATCH * CONCURRENCY) {
+      const gate = await allowed(db, budget);
+      if (gate !== "ok") {
+        log(`score: stopped (${gate}); remaining mentions wait for the next run`);
+        return { scored, skipped: gate };
+      }
+      const batches: MentionForScoring[][] = [];
+      for (let j = i; j < Math.min(i + BATCH * CONCURRENCY, queue.length); j += BATCH) batches.push(queue.slice(j, j + BATCH));
+      const results = await Promise.all(
+        batches.map((batch) =>
+          scoreBatch(api as Anthropic, model, batch).catch(
+            // The request itself failed (network, API error): nothing was billed.
+            (e): BatchResult => ({ scores: [], inputTokens: 0, outputTokens: 0, costUsd: 0, error: e instanceof Error ? e.message : String(e) }),
+          ),
+        ),
+      );
+      for (const [k, result] of results.entries()) {
+        // Spend first: a billed call is logged even when its output is unusable.
+        if (result.inputTokens || result.outputTokens) {
+          const { error: ue } = await db.from("usage").insert({
+            module: "04",
+            kind: "classification",
+            model,
+            input_tokens: result.inputTokens,
+            output_tokens: result.outputTokens,
+            cost_usd: result.costUsd,
+          });
+          if (ue) throw new Error(`write usage: ${ue.message}`);
+        }
+        if (result.error) {
+          failures++;
+          log(`score: batch starting at mention ${batches[k][0].id} failed: ${result.error}`);
+          continue;
+        }
+        failures = 0;
+        if (result.scores.length) {
+          const { error: e } = await db.from("mention_scores").upsert(
+            result.scores.map((s) => ({
+              mention_id: s.id,
+              relevant: s.relevant,
+              liking: s.liking,
+              desirability: s.desirability,
+              trust: s.trust,
+              perceived_value: s.perceived_value,
+              purchase_intent: s.purchase_intent,
+              levers: s.levers,
+              barriers: s.barriers,
+              model,
+              prompt_version: PROMPT_VERSION,
+            })),
+            { onConflict: "mention_id" },
+          );
+          if (e) throw new Error(`write scores: ${e.message}`);
+        }
+        scored += result.scores.length;
+      }
       if (failures >= MAX_CONSECUTIVE_FAILURES) {
         log(`score: stopped after ${failures} failed batches in a row`);
         return { scored, skipped: "failures" as const };
       }
-      continue;
     }
-    failures = 0;
-    if (result.scores.length) {
-      const { error: e } = await db.from("mention_scores").upsert(
-        result.scores.map((s) => ({
-          mention_id: s.id,
-          relevant: s.relevant,
-          liking: s.liking,
-          desirability: s.desirability,
-          trust: s.trust,
-          perceived_value: s.perceived_value,
-          purchase_intent: s.purchase_intent,
-          levers: s.levers,
-          barriers: s.barriers,
-          model,
-          prompt_version: PROMPT_VERSION,
-        })),
-        { onConflict: "mention_id" },
-      );
-      if (e) throw new Error(`write scores: ${e.message}`);
-    }
-    scored += result.scores.length;
   }
   log(`score: ${scored} mentions scored`);
   return { scored, skipped: null };

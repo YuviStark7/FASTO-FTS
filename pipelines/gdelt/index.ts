@@ -11,7 +11,8 @@ import type { Connector, ConnectorContext, ObservationInput } from "../shared/ty
 import { monthlyCounts, monthsBetween, type Timeline } from "./map";
 import { buildQueryUrl, KEYWORDS, SCOPES, window12 } from "./queries";
 
-const SPACING_MS = 6_000;
+// GDELT asks for 5 s; shared GitHub runner addresses get throttled well before that, so 12 s.
+const SPACING_MS = 12_000;
 const COOLDOWN_MS = 60_000;
 const MAX_CONSECUTIVE_FAILURES = 4;
 
@@ -43,7 +44,15 @@ export async function run(ctx: ConnectorContext): Promise<ObservationInput[]> {
       const label = `${category} ${scope.lang}:${scope.territory}`;
       n++;
       try {
-        const res = await ctx.get(url);
+        let res;
+        try {
+          res = await ctx.get(url);
+        } catch (first) {
+          // One retry of the same query after the cooldown: throttling is usually short.
+          ctx.log(`${label}: ${(first instanceof Error ? first.message : String(first)).slice(0, 80)}; retrying after cooldown`);
+          if (cooldown) await sleep(cooldown);
+          res = await ctx.get(url);
+        }
         let doc: Timeline;
         try {
           doc = res.json<Timeline>();

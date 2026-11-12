@@ -140,7 +140,7 @@ describe("gdelt connector", () => {
     expect(rows).toEqual([]);
     expect(warnings.some((w) => w.includes("request failed"))).toBe(true);
     expect(warnings.some((w) => w.includes("stopped after 4 consecutive failures"))).toBe(true);
-    expect(urls).toHaveLength(4);
+    expect(urls).toHaveLength(8); // each of the 4 queries tried twice (one retry after the cooldown)
   });
 
   it("treats a plain-text rate-limit body as a failure, not as zero", async () => {
