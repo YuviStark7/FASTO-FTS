@@ -25,7 +25,7 @@ export type MosResult = {
   /** Share of the total weight carried by present components, 0-100, one decimal. */
   coveragePct: number;
   isPartial: boolean;
-  /** Weakest grade among the present components, never better than B. Null when MOS is null. */
+  /** Weakest grade among the present weighted components, never better than B. Null when MOS is null. */
   grade: Grade | null;
   missing: ComponentKey[];
   /** Weighted points each present component adds to MOS, after renormalisation. */
@@ -84,11 +84,13 @@ export function scoreMos(c: CellComponents, weights: Weights = DEFAULT_WEIGHTS, 
     contributions[k] = round1(part);
     sum += part;
   }
+  // Partial and grade follow the components that carry weight: a missing component with zero
+  // weight changes nothing, and a zero-weight component does not lower the grade.
   return {
     mos: round1(sum),
     coveragePct,
-    isPartial: missing.length > 0,
-    grade: derivedGrade(present.map((k) => c[k]!.grade)),
+    isPartial: missing.some((k) => weights[k] > 0),
+    grade: derivedGrade(present.filter((k) => weights[k] > 0).map((k) => c[k]!.grade)),
     missing,
     contributions,
   };

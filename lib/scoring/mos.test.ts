@@ -60,6 +60,14 @@ describe("scoreMos", () => {
     expect(scoreMos(full, w).mos).toBe(60);
   });
 
+  it("is not partial when only zero-weight components are missing, and grades on weighted ones", () => {
+    const w = { growth: 0.5, size: 0.5, csi: 0, pressure: 0, fit: 0 };
+    const r = scoreMos({ growth: full.growth, size: full.size, pressure: full.pressure }, w);
+    expect(r.isPartial).toBe(false);
+    expect(r.coveragePct).toBe(100);
+    expect(r.grade).toBe("B");
+  });
+
   it("contributions add up to the score", () => {
     const r = scoreMos(full);
     const sum = Object.values(r.contributions).reduce((a, b) => a + b!, 0);
