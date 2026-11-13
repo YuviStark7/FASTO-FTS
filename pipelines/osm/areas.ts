@@ -33,7 +33,7 @@ export const AREAS: Record<string, CityArea> = {
   firenze: { wikidata: "Q2044", adminLevel: 8, names: ["Firenze"], note: "Comune di Firenze" },
   bari: { wikidata: "Q3519", adminLevel: 8, names: ["Bari"], note: "Comune di Bari (relation 41038, seen 12 Nov 2026)" },
   venezia: { wikidata: "Q641", adminLevel: 8, names: ["Venezia"], note: "Comune di Venezia (mainland and lagoon)" },
-  verona: { wikidata: "Q1237", adminLevel: 8, names: ["Verona"], note: "Comune di Verona" },
+  verona: { wikidata: "Q2028", adminLevel: 8, names: ["Verona"], note: "Comune di Verona (relation 44830, seen 13 Nov 2026)" },
   cagliari: { wikidata: "Q1897", adminLevel: 8, names: ["Cagliari", "Casteddu/Cagliari"], note: "Comune di Cagliari (not the greater city)" },
   paris: { wikidata: "Q90", adminLevel: 8, names: ["Paris"], note: "Commune de Paris (= departement 75)" },
   berlin: { wikidata: "Q64", adminLevel: 4, names: ["Berlin"], note: "City-state; matches NUTS3 DE300" },
