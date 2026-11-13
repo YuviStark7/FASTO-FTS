@@ -58,3 +58,8 @@ Also merged: Bluesky mentions (no post URLs: they carry the author's DID), Open 
 PR 7 merged on 11 November. Migrations `20261112090000` to `20261112130000` applied to production and fingerprint-verified. Source licences and activation follow in PR 8.
 
 Blocked from 19:50 UTC on 11 November to the night: GitHub Actions failed every job at startup ("unexpected error", no incident on githubstatus.com); scheduled runs resumed at 01:15 UTC on 12 November. The production data run and the Day 3 gate check moved to 12 November.
+
+12 November, evening runs (production):
+- Bluesky run 15 (after PR 14): 20,155 posts collected before the 20,000 cap; the vinegar-condiments queries never ran. All mentions are now scored: 26,591 of 26,593, 16,388 relevant. Classifier spend was $2.35 on 12 November, under the $3 daily budget.
+- Published CSI (latest non-demo snapshot per category and country): 62 of 75 pairs. Below the 50-mention minimum: coffee fr (31), honey es (10) and it (25), organic es (36) and it (2), premium-soft-drinks fr (4). No snapshot: chocolate es and nl, and every vinegar-condiments country.
+- OSM diagnostic run 14: Bari candidates show the comune is relation 41038, wikidata Q3519, admin_level 8; `areas.ts` held Q8553. Fixed in `day-4/osm-bari`. Verona had no candidate list because every Overpass mirror failed that night (504s, timeouts, overpass-api.de 406), as did Milano, Torino, Genova, Bologna, Firenze, Venezia and Barcelona. OSM now takes `--param cities=a,b` so a queued run can retry only those cities.

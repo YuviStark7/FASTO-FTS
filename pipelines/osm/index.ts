@@ -46,7 +46,12 @@ const connector: Connector<ObservationInput[]> = {
     const endpoints = ctx.params.endpoints ? ctx.params.endpoints.split(",") : ENDPOINTS;
     let preferred = 0; // index of the last endpoint that answered
 
-    for (const city of ctx.taxonomy.pilotCities) {
+    // --param cities=bari,verona re-runs only the named cities (e.g. after a boundary fix).
+    const only = ctx.params.cities ? new Set(ctx.params.cities.split(",").map((s) => s.trim()).filter(Boolean)) : null;
+    const cities = ctx.taxonomy.pilotCities.filter((c) => !only || only.has(c.slug));
+    if (only && cities.length !== only.size) ctx.warn(`unknown city in cities=${ctx.params.cities}`);
+
+    for (const city of cities) {
       const area = AREAS[city.slug];
       if (!area) {
         ctx.warn(`no area defined for ${city.slug}; skipped`);
