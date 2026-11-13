@@ -24,8 +24,11 @@ export function normaliseNumber(token: string): string {
   return t.slice(0, lastSep).replace(/[.,]/g, "") + "." + t.slice(lastSep + 1);
 }
 
+// Method version ids ("geo-v1", "mos-v1") name a method, not a figure.
+const METHOD_ID = /\b[a-z][a-z0-9_]*(?:-[a-z0-9_]+)*-v\d+\b/gi;
+
 export function numbersIn(text: string): string[] {
-  return (text.match(NUMBER) ?? []).map(normaliseNumber);
+  return (text.replace(METHOD_ID, " ").match(NUMBER) ?? []).map(normaliseNumber);
 }
 
 export function checkDraft(draft: BriefDraft, facts: Fact[]): CheckResult {

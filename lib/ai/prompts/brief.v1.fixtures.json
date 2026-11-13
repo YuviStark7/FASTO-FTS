@@ -272,10 +272,11 @@
           "limits"
         ],
         "must_mention_any": [
+          "disponibil",
           "insufficient",
-          "non disponibil",
-          "non pubblicat",
-          "assent"
+          "pubblicat",
+          "manca",
+          "mancan"
         ]
       },
       "pack": {

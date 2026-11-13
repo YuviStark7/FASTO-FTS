@@ -26,6 +26,9 @@ describe("normaliseNumber", () => {
   it("finds every number in a sentence", () => {
     expect(numbersIn("Tra il 2019 e il 2024 la spesa vale 187,8 Mln € (+2,1%).")).toEqual(["2019", "2024", "187.8", "2.1"]);
   });
+  it("ignores method version ids but not figures next to them", () => {
+    expect(numbersIn("Stima del modello geo-v1 (grado B) e mos-v1: 62.")).toEqual(["62"]);
+  });
 });
 
 describe("checkDraft", () => {
