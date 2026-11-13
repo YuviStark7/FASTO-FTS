@@ -24,7 +24,7 @@ export async function getMapData() {
       .order("sort_order"),
     supabase
       .from("cells")
-      .select("category_id, territory_id, status, mos, mos_is_partial, coverage_pct, grade_mix, missing_inputs, is_demo"),
+      .select("category_id, territory_id, status, mos, mos_grade, mos_is_partial, coverage_pct, grade_mix, missing_inputs, is_demo"),
     supabase
       .from("geo_estimates")
       .select("category_id, territory_id, period_year, value, low, high, unit, grade, is_demo")

@@ -7,7 +7,7 @@ export type Category = Pick<Tables["categories"]["Row"], "id" | "slug" | "name_i
 export type Territory = Pick<Tables["territories"]["Row"], "id" | "slug" | "name_it" | "name_en" | "country_code">;
 export type CellRow = Pick<
   Tables["cells"]["Row"],
-  "category_id" | "territory_id" | "status" | "mos" | "mos_is_partial" | "coverage_pct" | "grade_mix" | "missing_inputs" | "is_demo"
+  "category_id" | "territory_id" | "status" | "mos" | "mos_grade" | "mos_is_partial" | "coverage_pct" | "grade_mix" | "missing_inputs" | "is_demo"
 >;
 
 export async function getScoutData() {
@@ -21,7 +21,7 @@ export async function getScoutData() {
       .order("sort_order"),
     supabase
       .from("cells")
-      .select("category_id, territory_id, status, mos, mos_is_partial, coverage_pct, grade_mix, missing_inputs, is_demo"),
+      .select("category_id, territory_id, status, mos, mos_grade, mos_is_partial, coverage_pct, grade_mix, missing_inputs, is_demo"),
   ]);
   const error = categories.error ?? territories.error ?? cells.error;
   if (error) throw new Error(error.message);

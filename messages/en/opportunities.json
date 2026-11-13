@@ -1,0 +1,82 @@
+{
+  "opportunities": {
+    "title": "Opportunities",
+    "lead": "Cells ranked by MOS, the market opportunity score. Every score carries its grade and says how much of the weight is covered by data.",
+    "methodNote": "Method {method}. Each component is a percentile among the cells that have it: a cell can rank high in a weak field. Pressure enters reversed, so less pressure is worth more points.",
+    "filters": "Filters",
+    "category": "Category",
+    "allCategories": "All categories",
+    "country": "Country",
+    "allCountries": "All countries",
+    "reset": "Clear filters",
+    "summary": "{ranked, plural, one {# cell ranked} other {# cells ranked}}, {insufficient} without a score",
+    "listLabel": "Ranking by MOS",
+    "noMatch": "No cell matches the filters.",
+    "noRanked": "None of the cells shown has a MOS.",
+    "showMore": "Show {count} more",
+    "empty": {
+      "title": "MOS is not computed yet",
+      "body": "No cell has a score yet. The ranking appears after the first computation: until then we show no numbers.",
+      "matrix": "Go to the matrix"
+    },
+    "col": {
+      "rank": "No.",
+      "cell": "Cell",
+      "mos": "MOS",
+      "bar": "Breakdown"
+    },
+    "rank": "Rank {rank}",
+    "partial": "Partial",
+    "complete": "Complete",
+    "coverage": "coverage {pct}",
+    "components": {
+      "growth": "Growth",
+      "size": "Size",
+      "csi": "CSI",
+      "pressure": "Pressure",
+      "fit": "Fit"
+    },
+    "componentPoints": "{name}: {value} points",
+    "na": "n/a",
+    "naLong": "not available",
+    "barLabel": "Points per component: {parts}",
+    "whatIf": {
+      "badge": "What-if",
+      "note": "Scores recomputed here, in the browser, with your weights on the same percentiles. They are not saved and do not change the data."
+    },
+    "weights": {
+      "title": "Weights",
+      "lead": "Move the weights to see how the ranking changes. Only the proportions matter: they always sum to 100%.",
+      "open": "Open weights",
+      "close": "Close weights",
+      "stateDefault": "default (SPEC)",
+      "stateCustom": "what-if",
+      "slider": "Weight of {name}",
+      "resetDefault": "Default (SPEC)",
+      "allZero": "Give at least one component a weight: with every weight at zero there is no ranking.",
+      "fitNote": "Fit needs a product passport. No cell has it today, so its weight only lowers coverage.",
+      "sets": "Weight set",
+      "setDefault": "Default (SPEC)",
+      "setCustom": "Custom (not saved)",
+      "saveTitle": "Save as weight set",
+      "name": "Name of the set",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Set saved: {name}",
+      "viewer": "Your role can try weights, but not save them.",
+      "error": {
+        "name": "Give the set a name, 80 characters at most.",
+        "weights": "These weights are not valid.",
+        "forbidden": "Your role cannot save weight sets.",
+        "failed": "We could not save. Try again shortly."
+      }
+    },
+    "insufficient": {
+      "title": "Insufficient data",
+      "lead": "These cells have no MOS. They are not ranked and they do not count as zero.",
+      "missing": "Missing: {inputs}",
+      "weights": "No score with these weights: all the weight is on components without data.",
+      "showAll": "Show all ({count})"
+    }
+  }
+}
