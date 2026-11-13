@@ -18,6 +18,7 @@ import { estimateLocalDemand, median, type GeoParams } from "../../lib/scoring/g
 import { loadTaxonomy, type Taxonomy } from "../shared/taxonomy";
 import { computeCsi, representativenessNote, type CsiParams, type ScoredMention } from "../../lib/scoring/csi";
 import { BARRIER_LABELS, LEVER_LABELS } from "../../lib/ai/levers";
+import { percentileRanks, rankByMos, scoreMos, type CellComponents } from "../../lib/scoring/mos";
 
 type Obs = {
   id: number;
@@ -48,7 +49,7 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
   log(`compute: ${obs.length} observations loaded`);
 
   const countries = [...new Set(tax.pilotCities.map((c) => tax.countryOf(c.slug).slug))];
-  const trendIds = new Map<string, { id: number; status: string; grade: Grade | null; inputIds: number[]; lastYear: number | null; nominalLast: number | null }>();
+  const trendIds = new Map<string, { id: number; status: string; grade: Grade | null; realCagr: number | null; inputIds: number[]; lastYear: number | null; nominalLast: number | null }>();
 
   // ---------------------------------------------------------------- trend per category x country
   for (const cat of tax.categories.values()) {
@@ -120,6 +121,7 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
         id: data.id,
         status: result.status,
         grade: result.grade,
+        realCagr: result.status === "insufficient_data" ? null : result.realCagr,
         inputIds,
         lastYear: last?.year ?? null,
         nominalLast: last ? last.nominal : null,
@@ -151,12 +153,31 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
   // Competition counts as present when at least one product is observed for the category in the
   // city or its country (offers come from Open Food Facts at country level).
   const offerKeys = new Set<string>();
+  // Distinct competitors with an offer, per category x country (MOS pressure).
+  const competitorsByCountry = new Map<string, Set<number>>();
+  const countryOfId = new Map<number, number>();
+  for (const c of tax.pilotCities) countryOfId.set(c.id, tax.countryOf(c.slug).id);
+  for (const slug of countries) countryOfId.set(tax.territories.get(slug)!.id, tax.territories.get(slug)!.id);
   for (let from = 0; ; from += 1000) {
-    const { data, error } = await db.from("offers").select("category_id, territory_id").range(from, from + 999);
+    const { data, error } = await db
+      .from("offers")
+      .select("id, category_id, territory_id, competitor_id")
+      .eq("is_demo", false)
+      .order("id")
+      .range(from, from + 999);
     if (error) throw new Error(`read offers: ${error.message}`);
-    for (const o of data ?? []) offerKeys.add(`${o.category_id}|${o.territory_id}`);
+    for (const o of data ?? []) {
+      offerKeys.add(`${o.category_id}|${o.territory_id}`);
+      const countryId = o.territory_id != null ? countryOfId.get(o.territory_id) : undefined;
+      if (countryId != null && o.competitor_id != null) {
+        const k = `${o.category_id}|${countryId}`;
+        if (!competitorsByCountry.has(k)) competitorsByCountry.set(k, new Set());
+        competitorsByCountry.get(k)!.add(o.competitor_id);
+      }
+    }
     if (!data || data.length < 1000) break;
   }
+  const mosInputs: { catId: number; cityId: number; key: string; trend: { id: number; grade: Grade | null; realCagr: number | null }; geo: { id: number; value: number } | null; csi: CsiRef | undefined; competitors: number | null }[] = [];
 
   let geoCount = 0;
   for (const cat of tax.categories.values()) {
@@ -231,6 +252,15 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
         geoId = data.id;
         geoCount++;
       }
+      mosInputs.push({
+        catId: cat.id,
+        cityId: city.id,
+        key: `${cat.slug}|${city.slug}`,
+        trend: { id: trend.id, grade: trend.grade, realCagr: trend.realCagr },
+        geo: geoId && est ? { id: geoId, value: est.value } : null,
+        csi: csiIds.get(`${cat.slug}|${country.slug}`),
+        competitors: competitorsByCountry.get(`${cat.id}|${country.id}`)?.size ?? null,
+      });
 
       // ---------------------------------------------------------------- cell
       const missing: string[] = [];
@@ -262,6 +292,98 @@ export async function computeAll(db: SupabaseClient, log: (m: string) => void = 
     }
   }
   log(`compute: ${geoCount} geo estimates, ${tax.categories.size * tax.pilotCities.length} cells updated`);
+
+  await computeMos(db, mosInputs, log);
+}
+
+type CsiRef = { id: number; published: boolean; csi: number | null; barrierRate: number | null };
+
+/**
+ * MOS per cell, `mos-v1`: each component is a percentile rank among the cells that have it
+ * (lib/scoring/mos.ts). Fit needs a product passport, so system snapshots never have it.
+ */
+export async function computeMos(
+  db: SupabaseClient,
+  inputs: { catId: number; cityId: number; key: string; trend: { id: number; grade: Grade | null; realCagr: number | null }; geo: { id: number; value: number } | null; csi: CsiRef | undefined; competitors: number | null }[],
+  log: (m: string) => void,
+) {
+  const { data: ws, error: we } = await db.from("weight_sets").select("id, weights").is("org_id", null).eq("is_default", true).single();
+  if (we) throw new Error(`default weight set: ${we.message}`);
+
+  const raw = {
+    growth: new Map<string, number>(),
+    size: new Map<string, number>(),
+    csi: new Map<string, number>(),
+    competitors: new Map<string, number>(),
+    barriers: new Map<string, number>(),
+  };
+  for (const i of inputs) {
+    if (i.trend.realCagr != null && i.trend.grade) raw.growth.set(i.key, i.trend.realCagr);
+    if (i.geo) raw.size.set(i.key, i.geo.value);
+    if (i.csi?.published && i.csi.csi != null) raw.csi.set(i.key, i.csi.csi);
+    if (i.competitors != null) raw.competitors.set(i.key, i.competitors);
+    if (i.csi?.published && i.csi.barrierRate != null) raw.barriers.set(i.key, i.csi.barrierRate);
+  }
+  const pct = {
+    growth: percentileRanks(raw.growth),
+    size: percentileRanks(raw.size),
+    csi: percentileRanks(raw.csi),
+    competitors: percentileRanks(raw.competitors),
+    barriers: percentileRanks(raw.barriers),
+  };
+
+  const results = inputs.map((i) => {
+    const c: CellComponents = {};
+    const g = pct.growth.get(i.key);
+    if (g != null) c.growth = { pct: g, grade: i.trend.grade! };
+    const s = pct.size.get(i.key);
+    if (s != null) c.size = { pct: s, grade: "B" };
+    const v = pct.csi.get(i.key);
+    if (v != null) c.csi = { pct: v, grade: "C" };
+    const parts = [pct.competitors.get(i.key), pct.barriers.get(i.key)].filter((x): x is number => x != null);
+    if (parts.length) c.pressure = { pct: Math.round((parts.reduce((a, b) => a + b, 0) / parts.length) * 10) / 10, grade: "C" };
+    return { i, c, r: scoreMos(c, ws.weights) };
+  });
+  const ranks = rankByMos(new Map(results.map((x) => [x.i.key, x.r.mos])));
+
+  const rows = results.map(({ i, c, r }) => ({
+    category_id: i.catId,
+    territory_id: i.cityId,
+    weight_set_id: ws.id,
+    mos: r.mos,
+    grade: r.grade,
+    components: {
+      growth: { present: !!c.growth, pct: c.growth?.pct ?? null, raw: raw.growth.get(i.key) ?? null, grade: c.growth?.grade ?? null, contribution: r.contributions.growth ?? null },
+      size: { present: !!c.size, pct: c.size?.pct ?? null, raw: raw.size.get(i.key) ?? null, grade: c.size?.grade ?? null, contribution: r.contributions.size ?? null },
+      csi: { present: !!c.csi, pct: c.csi?.pct ?? null, raw: raw.csi.get(i.key) ?? null, grade: c.csi?.grade ?? null, contribution: r.contributions.csi ?? null },
+      pressure: {
+        present: !!c.pressure,
+        pct: c.pressure?.pct ?? null,
+        grade: c.pressure?.grade ?? null,
+        contribution: r.contributions.pressure ?? null,
+        competitors: { raw: raw.competitors.get(i.key) ?? null, pct: pct.competitors.get(i.key) ?? null },
+        barriers_per_mention: { raw: raw.barriers.get(i.key) ?? null, pct: pct.barriers.get(i.key) ?? null },
+      },
+      fit: { present: false, pct: null, grade: null, contribution: null },
+    },
+    coverage_pct: r.coveragePct,
+    is_partial: r.isPartial,
+    rank: ranks.get(i.key) ?? null,
+    input_snapshot_ids: { trend_snapshot_id: i.trend.id, geo_estimate_id: i.geo?.id ?? null, csi_snapshot_id: i.csi?.published ? i.csi.id : null },
+    method_version_id: "mos-v1",
+  }));
+  const { data: inserted, error } = await db.from("mos_snapshots").insert(rows).select("id, category_id, territory_id");
+  if (error) throw new Error(`write mos: ${error.message}`);
+  const idOf = new Map((inserted ?? []).map((x) => [`${x.category_id}|${x.territory_id}`, x.id]));
+  for (const { i, r } of results) {
+    const { error: ce } = await db
+      .from("cells")
+      .update({ mos_snapshot_id: idOf.get(`${i.catId}|${i.cityId}`), mos: r.mos, mos_is_partial: r.mos == null ? null : r.isPartial, mos_grade: r.grade })
+      .eq("category_id", i.catId)
+      .eq("territory_id", i.cityId);
+    if (ce) throw new Error(`cell mos ${i.key}: ${ce.message}`);
+  }
+  log(`compute: ${results.filter((x) => x.r.mos != null).length} MOS scores, ${results.filter((x) => x.r.mos != null && x.r.isPartial).length} partial`);
 }
 
 async function loadParams(db: SupabaseClient) {
@@ -333,8 +455,8 @@ async function computeCsiSnapshots(
   p: CsiParams,
   countries: string[],
   log: (m: string) => void,
-): Promise<Map<string, { id: number; published: boolean }>> {
-  const out = new Map<string, { id: number; published: boolean }>();
+): Promise<Map<string, CsiRef>> {
+  const out = new Map<string, CsiRef>();
   const end = new Date();
   const start = new Date(end.getTime() - p.window_days * 86400_000);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -422,7 +544,9 @@ async function computeCsiSnapshots(
         const { error: be } = await db.from("barriers").insert(mk(r.barriers, BARRIER_LABELS));
         if (be) throw new Error(`write barriers: ${be.message}`);
       }
-      out.set(`${cat.slug}|${countrySlug}`, { id: data.id, published: r.published });
+      // Barrier citations per relevant mention, counted from every mention (not only the listed barriers).
+      const barrierRate = ms.reduce((a, m) => a + m.barriers.length, 0) / ms.length;
+      out.set(`${cat.slug}|${countrySlug}`, { id: data.id, published: r.published, csi: r.csi, barrierRate });
     }
   }
   log(`compute: ${out.size} CSI snapshots (${[...out.values()].filter((x) => x.published).length} published)`);

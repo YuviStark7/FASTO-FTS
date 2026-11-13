@@ -95,4 +95,29 @@ G, D, F, V, P are the means over the relevant mentions of the window (`window_da
 
 ## Market Opportunity Score — `mos-v1` (module 06)
 
-Day 4. See SPEC section 5.
+Code: `lib/scoring/mos.ts` (pure, unit-tested), written by `pipelines/compute/compute.ts` after the cells. One snapshot per category × pilot city per compute run, under the system default weight set.
+
+**Components.** Each is the percentile rank (0 to 100) of a raw figure among the 300 cells that have it. Ties take the mid-rank: p = 100 × (values below + (equal values − 1) / 2) / (n − 1); a lone value gets 50.
+
+| Component | Raw figure | Present when | Grade |
+| --- | --- | --- | --- |
+| Growth | Real value CAGR of the national trend snapshot (`trend-v1`) | The trend is not insufficient data | The trend's grade (B) |
+| Size | Local demand estimate in EUR (`geo-v1`) | A geo estimate exists | B |
+| CSI | Published CSI of the category in the country (`csi-v1`) | The CSI is published (50 mentions or more) | C |
+| Pressure | Mean of two percentile ranks: distinct competitors with an offer for the category in the country (Open Food Facts), and barrier citations per relevant mention behind the published CSI | At least one of the two exists | C |
+| Fit | Product passport against the territory's levers | Only for an organisation with a passport; never in system snapshots | — |
+
+Growth, CSI and Pressure are national, so every pilot city in a country shares them. Size is the only city-level component today.
+
+**Score.** MOS = Σ wₖ pₖ / Σ wₖ over the present components, with Pressure entering as 100 − p. The default weights are 0.30 Growth, 0.20 Size, 0.20 CSI, 0.15 Pressure and 0.15 Fit (`weight_sets`, system default).
+
+- **No score:** without Growth or Size there is no MOS. The cell shows no number, and its missing inputs say why.
+- **Partial:** when any other component is missing, the weights are renormalised over the present ones and the score is labelled partial. Coverage is the share of total weight the present components carry. System snapshots never have Fit, so today every MOS is partial, with at most 85% coverage.
+- **Grade:** the weakest grade among the present components, never better than B. With CSI or Pressure present it is C.
+- **Rank:** the order by MOS, highest first, with ties sharing a rank.
+
+Each snapshot stores, per component, the raw figure, the percentile, the grade and the points it adds. It also stores the trend, geo and CSI snapshot ids it read and the weight set.
+
+**What-if.** The Opportunities screen re-ranks with other weights in the browser, using the same `scoreMos` on the stored percentiles. This is the only arithmetic done in the browser. Saved weight sets belong to the organisation.
+
+**Limits.** Percentiles are relative: a cell can rank high in a weak field. Competitor counts reflect Open Food Facts coverage, not the market. Barrier rates come from online posts, not a representative sample.
