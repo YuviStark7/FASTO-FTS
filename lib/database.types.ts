@@ -199,14 +199,14 @@ isOneToOne: false
                   ]
                 },"cells": {
                   Row: {
-                    "category_id": number,"coverage_pct": number,"csi_snapshot_id": number | null,"geo_estimate_id": number | null,"grade_mix": NonNullable<Json>,"is_demo": boolean,"missing_inputs": (string)[],"mos": number | null,"mos_is_partial": boolean | null,"mos_snapshot_id": number | null,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"trend_snapshot_id": number | null,"updated_at": string
+                    "category_id": number,"coverage_pct": number,"csi_snapshot_id": number | null,"geo_estimate_id": number | null,"grade_mix": NonNullable<Json>,"is_demo": boolean,"missing_inputs": (string)[],"mos": number | null,"mos_grade": Database["public"]['Enums']["grade"] | null,"mos_is_partial": boolean | null,"mos_snapshot_id": number | null,"status": Database["public"]['Enums']["cell_status"],"territory_id": number,"trend_snapshot_id": number | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id": number,"coverage_pct"?: number,"csi_snapshot_id"?: number | null,"geo_estimate_id"?: number | null,"grade_mix"?: NonNullable<Json>,"is_demo"?: boolean,"missing_inputs"?: (string)[],"mos"?: number | null,"mos_is_partial"?: boolean | null,"mos_snapshot_id"?: number | null,"status"?: Database["public"]['Enums']["cell_status"],"territory_id": number,"trend_snapshot_id"?: number | null,"updated_at"?: string
+                    "category_id": number,"coverage_pct"?: number,"csi_snapshot_id"?: number | null,"geo_estimate_id"?: number | null,"grade_mix"?: NonNullable<Json>,"is_demo"?: boolean,"missing_inputs"?: (string)[],"mos"?: number | null,"mos_grade"?: Database["public"]['Enums']["grade"] | null,"mos_is_partial"?: boolean | null,"mos_snapshot_id"?: number | null,"status"?: Database["public"]['Enums']["cell_status"],"territory_id": number,"trend_snapshot_id"?: number | null,"updated_at"?: string
                   }
                   Update: {
-                    "category_id"?: number,"coverage_pct"?: number,"csi_snapshot_id"?: number | null,"geo_estimate_id"?: number | null,"grade_mix"?: NonNullable<Json>,"is_demo"?: boolean,"missing_inputs"?: (string)[],"mos"?: number | null,"mos_is_partial"?: boolean | null,"mos_snapshot_id"?: number | null,"status"?: Database["public"]['Enums']["cell_status"],"territory_id"?: number,"trend_snapshot_id"?: number | null,"updated_at"?: string
+                    "category_id"?: number,"coverage_pct"?: number,"csi_snapshot_id"?: number | null,"geo_estimate_id"?: number | null,"grade_mix"?: NonNullable<Json>,"is_demo"?: boolean,"missing_inputs"?: (string)[],"mos"?: number | null,"mos_grade"?: Database["public"]['Enums']["grade"] | null,"mos_is_partial"?: boolean | null,"mos_snapshot_id"?: number | null,"status"?: Database["public"]['Enums']["cell_status"],"territory_id"?: number,"trend_snapshot_id"?: number | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -569,14 +569,14 @@ isOneToOne: false
                   ]
                 },"mos_snapshots": {
                   Row: {
-                    "category_id": number,"components": NonNullable<Json>,"computed_at": string,"coverage_pct": number,"id": number,"input_snapshot_ids": NonNullable<Json>,"is_demo": boolean,"is_partial": boolean,"method_version_id": string,"mos": number | null,"rank": number | null,"territory_id": number,"weight_set_id": number | null
+                    "category_id": number,"components": NonNullable<Json>,"computed_at": string,"coverage_pct": number,"grade": Database["public"]['Enums']["grade"] | null,"id": number,"input_snapshot_ids": NonNullable<Json>,"is_demo": boolean,"is_partial": boolean,"method_version_id": string,"mos": number | null,"rank": number | null,"territory_id": number,"weight_set_id": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "category_id": number,"components": NonNullable<Json>,"computed_at"?: string,"coverage_pct": number,"id"?: never,"input_snapshot_ids"?: NonNullable<Json>,"is_demo"?: boolean,"is_partial": boolean,"method_version_id": string,"mos"?: number | null,"rank"?: number | null,"territory_id": number,"weight_set_id"?: number | null
+                    "category_id": number,"components": NonNullable<Json>,"computed_at"?: string,"coverage_pct": number,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_snapshot_ids"?: NonNullable<Json>,"is_demo"?: boolean,"is_partial": boolean,"method_version_id": string,"mos"?: number | null,"rank"?: number | null,"territory_id": number,"weight_set_id"?: number | null
                   }
                   Update: {
-                    "category_id"?: number,"components"?: NonNullable<Json>,"computed_at"?: string,"coverage_pct"?: number,"id"?: never,"input_snapshot_ids"?: NonNullable<Json>,"is_demo"?: boolean,"is_partial"?: boolean,"method_version_id"?: string,"mos"?: number | null,"rank"?: number | null,"territory_id"?: number,"weight_set_id"?: number | null
+                    "category_id"?: number,"components"?: NonNullable<Json>,"computed_at"?: string,"coverage_pct"?: number,"grade"?: Database["public"]['Enums']["grade"] | null,"id"?: never,"input_snapshot_ids"?: NonNullable<Json>,"is_demo"?: boolean,"is_partial"?: boolean,"method_version_id"?: string,"mos"?: number | null,"rank"?: number | null,"territory_id"?: number,"weight_set_id"?: number | null
                   }
                   Relationships: [
                     {
