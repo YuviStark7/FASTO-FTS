@@ -140,6 +140,13 @@ describe("connector", () => {
     expect(calls).toEqual(["https://a.test/api", "https://b.test/api", "https://b.test/api"]);
   }, 15000);
 
+  it("runs only the cities named in --param cities", async () => {
+    const { ctx, calls } = fakeCtx((body) => (body.includes("Q490") ? answer("Q490", "Milano") : answer("Q220", "Roma")), { cities: "milano" });
+    const rows = await connector.run(ctx);
+    expect(new Set(rows.map((r) => r.territory))).toEqual(new Set(["milano"]));
+    expect(calls).toHaveLength(1);
+  }, 15000);
+
   it("throws when every city fails", async () => {
     const { ctx } = fakeCtx(() => new Error("HTTP 429"));
     await expect(connector.run(ctx)).rejects.toThrow(/no city produced data/);
