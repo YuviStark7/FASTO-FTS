@@ -136,5 +136,5 @@ jobs:
         run: |
           case "$MODE" in
             queued) pnpm pipeline --queued ;;
-            eval)   pnpm eval:mention-score ;;
+            eval)   failed=0; pnpm eval:mention-score || failed=1; pnpm eval:brief || failed=1; exit "$failed" ;;
           esac

@@ -13,7 +13,8 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local --schema public > lib/database.types.ts",
     "pipeline": "tsx pipelines/run.ts",
-    "eval:mention-score": "tsx pipelines/eval/mention-score.ts"
+    "eval:mention-score": "tsx pipelines/eval/mention-score.ts",
+    "eval:brief": "tsx pipelines/eval/brief.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
