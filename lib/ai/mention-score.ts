@@ -3,6 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { costOf, priceFor } from "./pricing";
 
 /**
  * Module 04 classifier: Haiku judges each mention (relevance, five 0-100 dimensions, levers,
@@ -44,15 +45,7 @@ export function systemPrompt(): string {
   return cachedPrompt;
 }
 
-/** Haiku 5.5 list prices, USD per token (cached 2026-11-03); logged spend is an estimate. */
-const PRICE: Record<string, { input: number; output: number }> = { "claude-haiku-5-5": { input: 0.1 / 1e6, output: 0.5 / 1e6 } };
-
-/** Prices for a model; an unknown model is an error, never a free model (a zero cost would bypass the budget gates). */
-export function priceFor(model: string): { input: number; output: number } {
-  const p = PRICE[model];
-  if (!p) throw new Error(`no price for model ${model}: add it to PRICE in lib/ai/mention-score.ts before using it`);
-  return p;
-}
+export { priceFor } from "./pricing";
 
 /**
  * `error` is set when the call was billed but produced nothing usable (refusal, truncation,
@@ -61,7 +54,7 @@ export function priceFor(model: string): { input: number; output: number } {
 export type BatchResult = { scores: MentionScore[]; inputTokens: number; outputTokens: number; costUsd: number; error?: string };
 
 export async function scoreBatch(client: Anthropic, model: string, batch: MentionForScoring[]): Promise<BatchResult> {
-  const p = priceFor(model);
+  priceFor(model); // unknown model: refuse before the call
   const response = await client.messages.create({
     model,
     max_tokens: 8000,
@@ -74,15 +67,7 @@ export async function scoreBatch(client: Anthropic, model: string, batch: Mentio
       },
     ],
   });
-  const u = response.usage;
-  const cacheWrite = u.cache_creation_input_tokens ?? 0;
-  const cacheRead = u.cache_read_input_tokens ?? 0;
-  const usage = {
-    inputTokens: u.input_tokens + cacheWrite + cacheRead,
-    outputTokens: u.output_tokens,
-    // Cache writes cost 1.25x and reads 0.1x the input price.
-    costUsd: (u.input_tokens + 1.25 * cacheWrite + 0.1 * cacheRead) * p.input + u.output_tokens * p.output,
-  };
+  const usage = costOf(model, response.usage);
   const fail = (error: string): BatchResult => ({ scores: [], ...usage, error });
   if (response.stop_reason === "refusal") return fail("classifier refused the batch");
   if (response.stop_reason === "max_tokens") return fail("classifier output truncated");

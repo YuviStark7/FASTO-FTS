@@ -1,0 +1,335 @@
+{
+  "note": "Fact packs built from production snapshots of 13 Nov 2026 (cheese-roma, chocolate-wien, honey-madrid). Snapshot ids are placeholders.",
+  "cases": [
+    {
+      "name": "cheese-roma-it-full",
+      "expect": {
+        "min_sentences": 10,
+        "sections": [
+          "summary",
+          "market",
+          "territory",
+          "consumers",
+          "competition",
+          "entry",
+          "limits"
+        ],
+        "must_mention_any": [
+          "campione",
+          "rappresentativ"
+        ]
+      },
+      "pack": {
+        "locale": "it",
+        "category": "Formaggi",
+        "territory": "Roma",
+        "country": "Italia",
+        "status": "consolidated",
+        "statusRule": "real value CAGR 0.39%, volume CAGR 0.28%: between the thresholds (2017-2022)",
+        "missingInputs": [],
+        "representativenessNote": "725 menzioni pertinenti da Bluesky, 13 nov 2025 – 13 nov 2026. Post pubblici online: non è un campione rappresentativo dei consumatori. Livello nazionale: ogni città pilota del paese lo condivide.",
+        "isDemo": false,
+        "facts": [
+          {
+            "id": "F1",
+            "section": "market",
+            "label": "Crescita annua del valore reale (CAGR)",
+            "display": "+0,4%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:1"
+          },
+          {
+            "id": "F2",
+            "section": "market",
+            "label": "Crescita annua del valore nominale (CAGR)",
+            "display": "+2,8%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:1"
+          },
+          {
+            "id": "F3",
+            "section": "market",
+            "label": "Crescita annua dei volumi (CAGR)",
+            "display": "+0,3%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:1"
+          },
+          {
+            "id": "F4",
+            "section": "territory",
+            "label": "Domanda locale stimata (intervallo)",
+            "display": "507,0 Mln € (449,8 Mln € – 571,4 Mln €)",
+            "grade": "B",
+            "period": "2022",
+            "method": "geo-v1",
+            "source": "Stima del modello geo-v1",
+            "observationIds": [],
+            "snapshotRef": "geo_estimates:1"
+          },
+          {
+            "id": "F5",
+            "section": "consumers",
+            "label": "Indice di sentiment dei consumatori (CSI, 0–100)",
+            "display": "54",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          },
+          {
+            "id": "F6",
+            "section": "consumers",
+            "label": "Menzioni analizzate",
+            "display": "725",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          },
+          {
+            "id": "F7",
+            "section": "consumers",
+            "label": "Leva: Qualità e gusto (quota delle menzioni)",
+            "display": "18%",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          },
+          {
+            "id": "F8",
+            "section": "consumers",
+            "label": "Leva: Origine e territorio (quota delle menzioni)",
+            "display": "5%",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          },
+          {
+            "id": "F9",
+            "section": "consumers",
+            "label": "Barriera: Gusto non gradito (quota delle menzioni)",
+            "display": "5%",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          },
+          {
+            "id": "F10",
+            "section": "consumers",
+            "label": "Barriera: Dubbi sull'autenticità (quota delle menzioni)",
+            "display": "2%",
+            "grade": "C",
+            "period": "2025-11-13 – 2026-11-13",
+            "method": "csi-v1",
+            "source": "Bluesky",
+            "observationIds": [],
+            "snapshotRef": "csi_snapshots:1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "chocolate-wien-en-no-csi",
+      "expect": {
+        "min_sentences": 8,
+        "sections": [
+          "summary",
+          "market",
+          "territory",
+          "consumers",
+          "entry",
+          "limits"
+        ],
+        "must_mention_any": [
+          "partial",
+          "insufficient",
+          "not available",
+          "no published"
+        ]
+      },
+      "pack": {
+        "locale": "en",
+        "category": "Chocolate and confectionery",
+        "territory": "Vienna",
+        "country": "Austria",
+        "status": "expanding",
+        "statusRule": "real value CAGR 6.37% >= 2.00% and volume CAGR 8.55% not falling (2017-2022)",
+        "missingInputs": [
+          "csi"
+        ],
+        "representativenessNote": null,
+        "isDemo": false,
+        "facts": [
+          {
+            "id": "F1",
+            "section": "market",
+            "label": "Real value growth per year (CAGR)",
+            "display": "+6.4%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:2"
+          },
+          {
+            "id": "F2",
+            "section": "market",
+            "label": "Nominal value growth per year (CAGR)",
+            "display": "+9.8%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:2"
+          },
+          {
+            "id": "F3",
+            "section": "market",
+            "label": "Volume growth per year (CAGR)",
+            "display": "+8.5%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:2"
+          },
+          {
+            "id": "F4",
+            "section": "territory",
+            "label": "Estimated local demand (interval)",
+            "display": "€142.1M (€139.1M – €145.2M)",
+            "grade": "B",
+            "period": "2022",
+            "method": "geo-v1",
+            "source": "geo-v1 model estimate",
+            "observationIds": [],
+            "snapshotRef": "geo_estimates:2"
+          },
+          {
+            "id": "F5",
+            "section": "entry",
+            "label": "Market Opportunity Score (0–100)",
+            "display": "90",
+            "grade": "C",
+            "period": "2026-11-13",
+            "method": "mos-v1",
+            "source": "mos-v1",
+            "observationIds": [],
+            "snapshotRef": "mos_snapshots:2"
+          },
+          {
+            "id": "F6",
+            "section": "entry",
+            "label": "MOS component coverage",
+            "display": "65%",
+            "grade": "C",
+            "period": "2026-11-13",
+            "method": "mos-v1",
+            "source": "mos-v1",
+            "observationIds": [],
+            "snapshotRef": "mos_snapshots:2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "honey-madrid-it-thin",
+      "expect": {
+        "min_sentences": 8,
+        "sections": [
+          "summary",
+          "market",
+          "territory",
+          "consumers",
+          "limits"
+        ],
+        "must_mention_any": [
+          "disponibil",
+          "insufficient",
+          "pubblicat",
+          "manca",
+          "mancan"
+        ]
+      },
+      "pack": {
+        "locale": "it",
+        "category": "Miele",
+        "territory": "Madrid",
+        "country": "Spagna",
+        "status": "expanding",
+        "statusRule": "real value CAGR 2.47% >= 2.00% and volume CAGR 1.87% not falling (2017-2022)",
+        "missingInputs": [
+          "csi"
+        ],
+        "representativenessNote": null,
+        "isDemo": false,
+        "facts": [
+          {
+            "id": "F1",
+            "section": "market",
+            "label": "Crescita annua del valore reale (CAGR)",
+            "display": "+2,5%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:3"
+          },
+          {
+            "id": "F2",
+            "section": "market",
+            "label": "Crescita annua dei volumi (CAGR)",
+            "display": "+1,9%",
+            "grade": "B",
+            "period": "2017–2022",
+            "method": "trend-v1",
+            "source": "Eurostat",
+            "observationIds": [],
+            "snapshotRef": "trend_snapshots:3"
+          },
+          {
+            "id": "F3",
+            "section": "territory",
+            "label": "Domanda locale stimata (intervallo)",
+            "display": "56,4 Mln € (50,2 Mln € – 63,3 Mln €)",
+            "grade": "B",
+            "period": "2022",
+            "method": "geo-v1",
+            "source": "Stima del modello geo-v1",
+            "observationIds": [],
+            "snapshotRef": "geo_estimates:3"
+          }
+        ]
+      }
+    }
+  ]
+}
