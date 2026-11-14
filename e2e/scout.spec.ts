@@ -18,7 +18,7 @@ test("Scout loads collapsed with the verdict and two pills, frames carry grade b
   await expect(zone).toHaveAttribute("data-state", "collapsed");
   await expect(page.getByRole("heading", { level: 1, name: /^(In espansione|Consolidato|Minacciato|Dati insufficienti)$/ })).toBeVisible();
   await expect(page.getByRole("link", { name: "Apri la scheda", exact: true }).first()).toHaveAttribute("href", /\/cell\/[^/]+\/[^/]+$/);
-  await expect(page.getByRole("link", { name: /^MOS( \d+| non disponibile)$/ })).toHaveAttribute("href", /\/matrix\?mode=mos&c=[^&]+&t=/);
+  await expect(page.getByRole("link", { name: /^MOS( \d+.*| non disponibile)$/ })).toHaveAttribute("href", /\/matrix\?mode=mos&c=[^&]+&t=/);
 
   // Frames: each shows its label plus a grade badge, or the hatched insufficient state. Never a bare number.
   const frames = page.getByTestId("scout-frames").locator("li");
@@ -40,7 +40,7 @@ test("Scout loads collapsed with the verdict and two pills, frames carry grade b
 test("MOS pill opens the matrix in MOS mode with the cell highlighted", async ({ page }, info) => {
   await signIn(page);
   await page.goto("/?c=honey&t=bologna");
-  await page.getByRole("link", { name: /^MOS( \d+| non disponibile)$/ }).click();
+  await page.getByRole("link", { name: /^MOS( \d+.*| non disponibile)$/ }).click();
   await expect(page).toHaveURL(/\/matrix\?mode=mos&c=honey&t=bologna/);
   await expect(page.getByRole("button", { name: "MOS", exact: true })).toHaveAttribute("aria-pressed", "true");
   const current = page.locator("[data-matrix-target]:visible");

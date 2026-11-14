@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { CoverageCell, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
 import { cellKey, localName, type Highlight, type ViewModel } from "./model";
+import { MosCell, useMosLabel } from "./mos-cell";
 
 /** Phone: categories as a list; one expands into a horizontal strip of territory dots. */
 export function MatrixList({ model, mode, locale, highlight }: { model: ViewModel; mode: ColourMode; locale: string; highlight?: Highlight | null }) {
@@ -17,6 +18,7 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
   const sc = useTranslations("scout");
   const [open, setOpen] = useState<number | null>(() => model.rows.find((r) => r.category.slug === highlight?.category)?.category.id ?? null);
   const covLabel = useCoverageLabel();
+  const mosLabel = useMosLabel();
   const coverage = mode === "coverage";
   const summary = coverage ? summariseGaps(model) : null;
 
@@ -62,7 +64,7 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                     <li key={col.id} className="w-20 shrink-0">
                       <Link
                         href={`/cell/${category.slug}/${col.slug}`}
-                        aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
+                        aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : mode === "mos" ? `${label}: ${status}, ${mosLabel(cell)}` : `${label}: ${status}`}
                         title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
                         aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
                         data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
@@ -74,11 +76,11 @@ export function MatrixList({ model, mode, locale, highlight }: { model: ViewMode
                         <span
                           className={cn(
                             "grid place-items-center border",
-                            coverage ? "h-11 w-16 rounded-lg" : "size-11 rounded-full",
+                            coverage || mode === "mos" ? "h-11 w-16 rounded-lg" : "size-11 rounded-full",
                             cellClass(cell.status, cell.mos, mode),
                           )}
                         >
-                          {coverage ? <CoverageCell cell={cell} compact /> : <Icon aria-hidden className="size-5" />}
+                          {coverage ? <CoverageCell cell={cell} compact /> : mode === "mos" ? <MosCell cell={cell} /> : <Icon aria-hidden className="size-5" />}
                         </span>
                         <span aria-hidden className="w-full truncate px-0.5 text-center text-[11px] text-muted">
                           {localName(col, locale)}

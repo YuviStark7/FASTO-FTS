@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { ArrowRight } from "lucide-react";
+import { Link } from "@/lib/i18n/navigation";
 import type { Category, CellRow, Territory } from "@/lib/queries/matrix";
 import { GapSummaryList, summariseGaps } from "./coverage";
 import { MatrixControls, type Filters } from "./controls";
@@ -98,6 +100,15 @@ export function MatrixView({ categories, territories, cells }: Props) {
             </p>
           )}
           <MatrixControls filters={filters} onChange={setFilters} onReset={() => setFilters(INITIAL)} countries={countries} />
+          {filters.mode === "mos" && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Link href="/opportunities" data-testid="to-opportunities" className="btn btn-primary group">
+                {t("toOpportunities")}
+                <ArrowRight aria-hidden className="-mr-1 size-4 transition-transform duration-(--dur-base) group-hover:translate-x-0.5" />
+              </Link>
+              {!mosMissing && <p className="t-meta max-w-[70ch]">{t("mosNote")}</p>}
+            </div>
+          )}
           <MatrixLegend mode={filters.mode} mosMissing={mosMissing} />
           {filters.mode === "status" && <p className="t-meta max-w-[90ch]">{t("nationalNote")}</p>}
           <p className="t-label num" aria-live="polite">

@@ -1,5 +1,7 @@
 import "server-only";
 import { CSI_EVIDENCE } from "./evidence";
+import { parseMosComponents } from "./mos-shape";
+import { COMPONENTS, REQUIRED, type ComponentKey } from "@/lib/scoring/mos";
 import { requireUser } from "@/lib/auth";
 import type { Database } from "@/lib/database.types";
 
@@ -125,6 +127,31 @@ export type CellSheet = {
       url: string | null;
     }[];
   };
+  /** MOS of the cell (mos-v1): the snapshot the cell points to. Null when none has been computed. */
+  opportunity: null | {
+    snapshotId: number;
+    isDemo: boolean;
+    computedAt: string;
+    /** Value and grade are null when a required input is missing: insufficient, never zero. */
+    mos: Figure;
+    isPartial: boolean;
+    coveragePct: number;
+    rank: number | null;
+    /** Required inputs (Growth, Size) the snapshot did not have. */
+    missingRequired: ComponentKey[];
+    components: {
+      key: ComponentKey;
+      present: boolean;
+      /** Percentile rank 0-100 among the cells that have the component. */
+      pct: number | null;
+      /** Points added to the MOS under the default weights. */
+      contribution: number | null;
+      grade: Grade | null;
+      /** The figure behind the percentile, in its own unit. Pressure has two parts instead. */
+      figure: Figure | null;
+      parts?: { key: "competitors" | "barriersPerMention"; pct: number | null; figure: Figure }[];
+    }[];
+  };
   /** Every observation behind the sheet: the Sources tab (evidence ledger). */
   ledger: LedgerRow[];
 };
@@ -151,16 +178,23 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
 
   const { data: cell } = await supabase
     .from("cells")
-    .select("status, coverage_pct, grade_mix, missing_inputs, is_demo, updated_at, trend_snapshot_id, geo_estimate_id, csi_snapshot_id")
+    .select("status, coverage_pct, grade_mix, missing_inputs, is_demo, updated_at, trend_snapshot_id, geo_estimate_id, csi_snapshot_id, mos_snapshot_id")
     .eq("category_id", category.id)
     .eq("territory_id", territory.id)
     .single();
   if (!cell) return null;
 
-  const [trendRes, geoRes, csiRes, attentionRes, assortmentRes, offersRes] = await Promise.all([
+  const [trendRes, geoRes, csiRes, mosRes, attentionRes, assortmentRes, offersRes] = await Promise.all([
     cell.trend_snapshot_id ? supabase.from("trend_snapshots").select("*").eq("id", cell.trend_snapshot_id).single() : null,
     cell.geo_estimate_id ? supabase.from("geo_estimates").select("*").eq("id", cell.geo_estimate_id).single() : null,
     cell.csi_snapshot_id ? supabase.from("csi_snapshots").select("*").eq("id", cell.csi_snapshot_id).single() : null,
+    cell.mos_snapshot_id
+      ? supabase
+          .from("mos_snapshots")
+          .select("id, mos, grade, is_partial, coverage_pct, rank, components, input_snapshot_ids, computed_at, method_version_id, is_demo")
+          .eq("id", cell.mos_snapshot_id)
+          .single()
+      : null,
     supabase
       .from("observations")
       .select("id, value, grade, unit, period_start, period_end, status_flag, indicators!inner(slug), territory_id")
@@ -186,6 +220,7 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
   const trend = trendRes?.data ?? null;
   const geo = geoRes?.data ?? null;
   const csi = csiRes?.data ?? null;
+  const mos = mosRes?.data ?? null;
 
   // ---------------------------------------------------------------- ledger: every observation behind the sheet
   const ids = new Set<number>([
@@ -247,6 +282,60 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
       series: rows.map((r) => ({ period: r.period_start.slice(0, 7), value: Number(r.value) })),
     };
   };
+
+  // ---------------------------------------------------------------- opportunity: the stored MOS snapshot, nothing recomputed
+  const opportunity = ((): CellSheet["opportunity"] => {
+    if (!mos) return null;
+    const c = parseMosComponents(mos.components);
+    const inputs = (mos.input_snapshot_ids ?? {}) as { trend_snapshot_id?: number | null; geo_estimate_id?: number | null; csi_snapshot_id?: number | null };
+    // The evidence is linked only when the snapshot read the same inputs the sheet shows.
+    const sameTrend = trend != null && inputs.trend_snapshot_id === trend.id;
+    const sameGeo = geo != null && inputs.geo_estimate_id === geo.id;
+    const sameCsi = csi != null && inputs.csi_snapshot_id === csi.id;
+    const computed = mos.computed_at.slice(0, 10);
+    const tIds = sameTrend ? trendIds : [];
+    const gIds = sameGeo ? geoIds : [];
+    const figures: Record<ComponentKey, Figure | null> = {
+      growth: { value: c.growth.raw, unit: "ratio_per_year", grade: c.growth.grade, period: sameTrend ? trendPeriod : "", methodVersion: "trend-v1", observationIds: tIds, flags: flagsOf(tIds) },
+      size: { value: c.size.raw, unit: "EUR", grade: c.size.grade, period: sameGeo ? String(geo.period_year) : "", methodVersion: sameGeo ? geo.method_version_id : "geo-v1", observationIds: gIds, flags: flagsOf(gIds) },
+      csi: { value: c.csi.raw, unit: "index_0_100", grade: c.csi.grade, period: sameCsi ? `${csi.period_start} – ${csi.period_end}` : "", methodVersion: sameCsi ? csi.method_version_id : "csi-v1", observationIds: [] },
+      pressure: null,
+      fit: null,
+    };
+    const part = (value: number | null, unit: string): Figure => ({ value, unit, grade: value == null ? null : c.pressure.grade, period: computed, methodVersion: mos.method_version_id, observationIds: [] });
+    return {
+      snapshotId: mos.id,
+      isDemo: mos.is_demo,
+      computedAt: mos.computed_at,
+      mos: {
+        value: mos.mos == null ? null : Number(mos.mos),
+        unit: "points_0_100",
+        grade: mos.grade,
+        period: computed,
+        methodVersion: mos.method_version_id,
+        observationIds: [...new Set([...tIds, ...gIds])],
+        flags: flagsOf([...tIds, ...gIds]),
+      },
+      isPartial: mos.is_partial,
+      coveragePct: Number(mos.coverage_pct),
+      rank: mos.rank,
+      missingRequired: REQUIRED.filter((k) => !c[k].present),
+      components: COMPONENTS.map((key) => ({
+        key,
+        present: c[key].present,
+        pct: c[key].pct,
+        contribution: c[key].contribution,
+        grade: c[key].grade,
+        figure: c[key].present ? figures[key] : null,
+        ...(key === "pressure" && {
+          parts: [
+            { key: "competitors" as const, pct: c.pressureParts.competitors.pct, figure: part(c.pressureParts.competitors.raw, "count") },
+            { key: "barriersPerMention" as const, pct: c.pressureParts.barriersPerMention.pct, figure: part(c.pressureParts.barriersPerMention.raw, "per_mention") },
+          ],
+        }),
+      })),
+    };
+  })();
 
   const latestAssortment = new Map<string, NonNullable<typeof assortmentRes.data>[number]>();
   for (const o of assortmentRes.data ?? []) if (!latestAssortment.has(o.series_key)) latestAssortment.set(o.series_key, o);
@@ -365,6 +454,7 @@ export async function getCellSheet(categorySlug: string, territorySlug: string, 
         url: o.url,
       })),
     },
+    opportunity,
     ledger,
   };
 }

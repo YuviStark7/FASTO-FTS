@@ -16,6 +16,6 @@ export type ColourMode = "status" | "mos" | "coverage";
 export function cellClass(status: CellStatus, mos: number | null, mode: ColourMode): string {
   // Coverage mode: neutral surface (the thin bar and the icons carry the information); unknown stays hatched.
   if (mode === "coverage") return status === "insufficient_data" ? STATUS_CLASS.insufficient_data : "bg-surface-2 text-text border-border";
-  if (mode === "mos") return mos === null ? STATUS_CLASS.insufficient_data : "bg-brand/20 text-text border-brand/50";
+  if (mode === "mos") return mos === null ? STATUS_CLASS.insufficient_data : "bg-brand/12 text-text border-brand/50";
   return STATUS_CLASS[status];
 }
