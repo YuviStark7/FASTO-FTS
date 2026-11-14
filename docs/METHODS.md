@@ -118,6 +118,14 @@ Growth, CSI and Pressure are national, so every pilot city in a country shares t
 
 Each snapshot stores, per component, the raw figure, the percentile, the grade and the points it adds. It also stores the trend, geo and CSI snapshot ids it read and the weight set.
 
+**Fit — `fit-v1`.** Code: `lib/scoring/fit.ts`. A product passport answers a set of purchase levers from the classifier's fixed vocabulary:
+
+- **Certifications:** DOP, IGP or STG imply certification and origin; BIO implies certification and organic.
+- **Price band:** an entry price band implies value for money.
+- **Claims:** every other lever comes from claims the firm ticks in the passport, stored in `attributes.claims`.
+
+fit_raw is the sum of the shares of the levers the passport answers, divided by the sum of all lever shares, using the published CSI levers of the category in the city's country. Without a published reading there is no Fit; it is never zero for lack of data. Fit enters MOS as the percentile rank among the passport's cells. It is grade C, and it is computed per organisation, never in system snapshots.
+
 **What-if.** The Opportunities screen re-ranks with other weights in the browser, using the same `scoreMos` on the stored percentiles. This is the only arithmetic done in the browser. Saved weight sets belong to the organisation.
 
 **Limits.** Percentiles are relative: a cell can rank high in a weak field. Competitor counts reflect Open Food Facts coverage, not the market. Barrier rates come from online posts, not a representative sample.

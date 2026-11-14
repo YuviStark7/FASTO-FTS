@@ -1,0 +1,214 @@
+{
+  "advisor": {
+    "factsTitle": "Sources and figures",
+    "period": "Period",
+    "method": "Method",
+    "source": "Source",
+    "indicative": "indicative",
+    "noGrade": "Grade not available",
+    "chipLabel": "Source {id}: {label}, {value}. {grade}",
+    "chipMissing": "Citation {id} has no source"
+  },
+  "ask": {
+    "title": "Ask",
+    "lead": "Answers in Italian or English, with every figure tied to its source.",
+    "conversation": "Conversation",
+    "inputLabel": "Your question",
+    "placeholder": "Ask about a category in a pilot city…",
+    "send": "Send the question",
+    "sending": "Searching the data…",
+    "newConversation": "New conversation",
+    "startersTitle": "Try one of these questions",
+    "starters": {
+      "s1": "How is the cheese market in Rome?",
+      "s2": "What are the best opportunities for pasta?",
+      "s3": "Compare chocolate in Vienna and Paris.",
+      "s4": "Which sources are behind the honey data for Madrid?"
+    },
+    "scopeNote": "Answers use only the data already in the cell sheets. Online sentiment is an exploratory signal, never a representative sample.",
+    "you": "You",
+    "assistant": "Answer",
+    "checked": "Checked: every figure matches a cited source.",
+    "checkedNoFigures": "Checked: this answer contains no figures.",
+    "unavailable": "Data not available",
+    "unavailableHint": "No figure is shown because it did not pass the citation check.",
+    "followUps": "You can also ask",
+    "unreadable": "This stored message cannot be read.",
+    "errors": {
+      "user_limit": {
+        "title": "You have reached your daily question limit",
+        "body": "The limit resets tomorrow. Your question is still in the text field."
+      },
+      "global_limit": {
+        "title": "The platform's daily limit has been reached",
+        "body": "Answers are back tomorrow. Cell sheets and briefs remain available."
+      },
+      "disabled": {
+        "title": "Automatic answers are paused",
+        "body": "An administrator has temporarily switched the assistant off. Cell sheets and briefs remain available."
+      },
+      "model_failed": {
+        "title": "The answer could not be composed",
+        "body": "No data was lost. Try again shortly."
+      },
+      "bad_input": {
+        "title": "The question cannot be sent",
+        "body": "Write a question of at most 2000 characters."
+      },
+      "network": {
+        "title": "Connection lost",
+        "body": "The question was not sent. Check your connection and try again."
+      }
+    }
+  },
+  "briefs": {
+    "title": "Briefs",
+    "lead": "Entry briefs per cell: every figure with its grade, period and source.",
+    "cell": "{category}, {territory}",
+    "version": "Version {n}",
+    "noVersion": "No version",
+    "generatedOn": "Generated on {date}",
+    "back": "All briefs",
+    "openCell": "Open the cell sheet",
+    "emptyTitle": "No briefs available",
+    "emptyBody": "A brief appears here once it is published. Meanwhile the cell sheets show all available data.",
+    "emptyBodyStaff": "No brief has been generated yet. Open a cell sheet and generate the brief from the Opportunity tab.",
+    "emptyAction": "Go to Scout",
+    "notCurrent": "You are viewing version {n}, which is not the brief's current version.",
+    "seeCurrent": "See the current version",
+    "noVersionTitle": "This brief has no version yet",
+    "noVersionBody": "The text appears here after the first generation.",
+    "unreadableTitle": "This version cannot be read",
+    "unreadableBody": "The stored content does not follow the expected format, so it is not shown. Generate a new version.",
+    "emptyVersionTitle": "No sentence passed the citation check",
+    "emptyVersionBody": "This version contains no verified text. The cell's data remains available in the cell sheet.",
+    "noFigures": "This version cites no figures.",
+    "dangling": "Some citations have no source ({ids}). The version cannot be exported or published.",
+    "status": {
+      "draft": "Draft",
+      "reviewed": "Reviewed",
+      "published": "Published"
+    },
+    "context": {
+      "title": "Context",
+      "cellStatus": "Cell status",
+      "missingInputs": "Missing data",
+      "missingHint": "Missing data is not a low score: it is left out, not estimated.",
+      "noneMissing": "None",
+      "representativeness": "Representativeness of sentiment"
+    },
+    "review": {
+      "title": "Review",
+      "markReviewed": "Mark reviewed",
+      "backToDraft": "Back to draft",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "publishVersion": "Publish this version",
+      "pending": "Saving…",
+      "done": "Status updated.",
+      "checkPassed": "Citation check passed.",
+      "checkFailed": "Citation check not passed: this version cannot be published or exported.",
+      "dropped": "{count, plural, =0 {No sentences removed by the citation check} one {# sentence removed by the citation check} other {# sentences removed by the citation check}}",
+      "droppedShow": "Show the removed sentences",
+      "droppedNote": "These sentences are not part of the brief and are not exported.",
+      "publishedAnalyst": "Only an administrator can unpublish or replace a published brief.",
+      "errors": {
+        "citation": "A version that did not pass the citation check cannot be published.",
+        "adminOnly": "Only administrators can publish or unpublish a brief.",
+        "notAllowed": "Your role does not allow this change.",
+        "versionNotFound": "The version no longer exists. Reload the page.",
+        "generic": "The status could not be updated."
+      }
+    },
+    "history": {
+      "title": "Versions",
+      "current": "Current",
+      "viewing": "Viewing",
+      "view": "View",
+      "viewLabel": "View version {n}",
+      "checkPassed": "Citations verified",
+      "checkFailed": "Citations not verified"
+    },
+    "generate": {
+      "button": "Generate the brief",
+      "refresh": "Generate a new version",
+      "pending": "Generating…",
+      "pendingHint": "This can take up to a minute. Stay on this page.",
+      "errors": {
+        "not_staff": "Only analysts and administrators can generate a brief.",
+        "no_cell": "This cell does not exist among the pilot cities.",
+        "no_facts": "Insufficient data: there are no graded figures to write the brief on.",
+        "disabled": "Automatic generation has been paused by an administrator.",
+        "global_limit": "The platform's daily limit has been reached. Try again tomorrow.",
+        "user_limit": "You have reached your daily brief limit. Try again tomorrow.",
+        "model_failed": "The brief could not be written. Try again shortly.",
+        "network": "Connection lost. Check whether the new version is listed under Versions before trying again."
+      }
+    },
+    "export": {
+      "pdf": "PDF",
+      "word": "Word",
+      "print": "Print / Save PDF",
+      "printHint": "In the print dialog choose \"Save as PDF\". The sheet is always in light colours, A4.",
+      "recordFailed": "The export could not be recorded. Try again.",
+      "back": "Back to the brief",
+      "viewer": "Your role is read-only: export is not available.",
+      "refusedBody": "This version cannot be exported because it did not pass the citation check.",
+      "refusedTitle": "Export not available",
+      "refused": {
+        "not_found": "The brief does not exist or is not visible to your account.",
+        "viewer": "Your role is read-only: export is not available.",
+        "check_failed": "This version did not pass the citation check and cannot be exported.",
+        "unreadable": "The stored content of this version cannot be read and cannot be exported."
+      },
+      "docTitle": "Entry brief: {category}, {territory}",
+      "demoNote": "Contains demonstration data, not market data.",
+      "category": "Category",
+      "city": "City",
+      "version": "Version",
+      "status": "Status",
+      "historyVersion": "Archived version (not current)",
+      "generated": "Generated on",
+      "language": "Language",
+      "model": "Model",
+      "promptVersion": "Prompt version",
+      "columns": {
+        "id": "No.",
+        "label": "Figure",
+        "value": "Value",
+        "grade": "Grade",
+        "reference": "Reference"
+      },
+      "footer": "FASTO FTS. Grades: A measured, B model estimate, C exploratory signal. Online sentiment is not a representative sample."
+    },
+    "notFound": {
+      "title": "Brief not found",
+      "body": "The brief does not exist or has not been published yet.",
+      "link": "All briefs"
+    }
+  },
+  "askEval": {
+    "tileTitle": "Reference questions",
+    "tileHint": "The ten control questions for conversational search.",
+    "title": "Reference questions",
+    "lead": "Ten control questions for Ask: tool called, citations verified, kind of figure cited.",
+    "run": "Run the ten questions",
+    "runAgain": "Run again",
+    "running": "Running…",
+    "runningHint": "The questions run one after the other: this can take a few minutes.",
+    "cost": "Each run uses ten questions of your daily limit.",
+    "emptyTitle": "No run in this session",
+    "emptyBody": "Results are not stored: they appear here after a run and are gone when you leave the page.",
+    "summary": "Passed {passed} of {total}",
+    "passed": "Passed",
+    "failed": "Failed",
+    "reasons": "Reasons",
+    "answer": "Answer text",
+    "noAnswer": "No answer.",
+    "rawNote": "The text is shown here without citations, for diagnosis only: figures with grade and source are visible by asking the same question in Ask.",
+    "errors": {
+      "refused": "Only administrators can run the reference questions.",
+      "failed": "The run was interrupted. Try again."
+    }
+  }
+}

@@ -1,0 +1,156 @@
+/*
+ * Print route of a brief. The sheet is always light (data-theme="light" on the wrapper picks the
+ * light tokens from globals.css), whatever theme the app is in. A4, with the app chrome removed.
+ */
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm;
+}
+
+.print-sheet {
+  position: relative;
+  margin-inline: auto;
+  max-width: 210mm;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.5rem 1.25rem 2rem;
+  font-size: 14px;
+  line-height: 1.55;
+  box-shadow: var(--shadow-2);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+@media (min-width: 640px) {
+  .print-sheet {
+    padding: 14mm 14mm 16mm;
+  }
+}
+
+.print-sheet h1 {
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.print-sheet h2 {
+  margin-top: 1.4rem;
+  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  break-after: avoid;
+}
+.print-sheet p {
+  orphans: 3;
+  widows: 3;
+}
+.print-sheet sup {
+  font-size: 0.68em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.print-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 1.25rem;
+  margin-top: 1rem;
+  border-block: 1px solid var(--border-strong);
+  padding-block: 0.75rem;
+  font-size: 12px;
+}
+@media (min-width: 640px) {
+  .print-meta {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.print-meta dt {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.print-table-wrap {
+  overflow-x: auto;
+}
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.print-table th,
+.print-table td {
+  border: 1px solid var(--border-strong);
+  padding: 0.3rem 0.4rem;
+  text-align: left;
+  vertical-align: top;
+}
+.print-table thead th {
+  background: var(--surface-2);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.print-table thead {
+  display: table-header-group;
+}
+.print-table tr {
+  break-inside: avoid;
+}
+
+/* DEMO watermark: repeated on every printed page (fixed), once over the sheet on screen. */
+.print-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-size: clamp(5rem, 22vw, 11rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--demo);
+  opacity: 0.11;
+  transform: rotate(-32deg);
+  user-select: none;
+}
+
+@media print {
+  html:has(.print-sheet),
+  html:has(.print-sheet) body {
+    background: #fff !important;
+  }
+  body:has(.print-sheet) > * header,
+  .print-hide {
+    display: none !important;
+  }
+  .print-sheet header {
+    display: block !important;
+  }
+  main:has(.print-sheet) {
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  .print-page {
+    padding: 0 !important;
+  }
+  .print-sheet {
+    max-width: none;
+    overflow: visible;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    font-size: 10.5pt;
+  }
+  .print-table-wrap {
+    overflow: visible;
+  }
+  .print-watermark {
+    position: fixed;
+    font-size: 9rem;
+  }
+}

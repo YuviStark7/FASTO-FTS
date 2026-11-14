@@ -1,0 +1,214 @@
+{
+  "advisor": {
+    "factsTitle": "Fonti e cifre",
+    "period": "Periodo",
+    "method": "Metodo",
+    "source": "Fonte",
+    "indicative": "indicativo",
+    "noGrade": "Grado non disponibile",
+    "chipLabel": "Fonte {id}: {label}, {value}. {grade}",
+    "chipMissing": "Citazione {id} senza fonte"
+  },
+  "ask": {
+    "title": "Chiedi",
+    "lead": "Risposte in italiano o in inglese, con ogni cifra legata alla sua fonte.",
+    "conversation": "Conversazione",
+    "inputLabel": "La tua domanda",
+    "placeholder": "Chiedi di una categoria in una città pilota…",
+    "send": "Invia la domanda",
+    "sending": "Cerco nei dati…",
+    "newConversation": "Nuova conversazione",
+    "startersTitle": "Prova con una di queste domande",
+    "starters": {
+      "s1": "Com'è il mercato dei formaggi a Roma?",
+      "s2": "Quali sono le migliori opportunità per la pasta?",
+      "s3": "Confronta il cioccolato a Vienna e a Parigi.",
+      "s4": "Da quali fonti provengono i dati sul miele a Madrid?"
+    },
+    "scopeNote": "Le risposte usano solo i dati già presenti nelle schede. Il sentiment online è un segnale esplorativo, mai un campione rappresentativo.",
+    "you": "Tu",
+    "assistant": "Risposta",
+    "checked": "Controllata: ogni cifra corrisponde a una fonte citata.",
+    "checkedNoFigures": "Controllata: questa risposta non contiene cifre.",
+    "unavailable": "Dati non disponibili",
+    "unavailableHint": "Nessuna cifra è stata mostrata perché non ha superato il controllo delle citazioni.",
+    "followUps": "Puoi chiedere anche",
+    "unreadable": "Questo messaggio salvato non è leggibile.",
+    "errors": {
+      "user_limit": {
+        "title": "Hai raggiunto il limite giornaliero di domande",
+        "body": "Il limite si azzera domani. La tua domanda è rimasta nel campo di testo."
+      },
+      "global_limit": {
+        "title": "Il limite giornaliero della piattaforma è stato raggiunto",
+        "body": "Le risposte tornano disponibili domani. Le schede e i brief restano consultabili."
+      },
+      "disabled": {
+        "title": "Le risposte automatiche sono sospese",
+        "body": "Un amministratore ha disattivato temporaneamente l'assistente. Le schede e i brief restano consultabili."
+      },
+      "model_failed": {
+        "title": "Non è stato possibile comporre la risposta",
+        "body": "Nessun dato è andato perso. Riprova tra poco."
+      },
+      "bad_input": {
+        "title": "La domanda non può essere inviata",
+        "body": "Scrivi una domanda di al massimo 2000 caratteri."
+      },
+      "network": {
+        "title": "Connessione interrotta",
+        "body": "La domanda non è partita. Controlla la connessione e riprova."
+      }
+    }
+  },
+  "briefs": {
+    "title": "Brief",
+    "lead": "Brief di ingresso per cella: ogni cifra con grado, periodo e fonte.",
+    "cell": "{category}, {territory}",
+    "version": "Versione {n}",
+    "noVersion": "Nessuna versione",
+    "generatedOn": "Generato il {date}",
+    "back": "Tutti i brief",
+    "openCell": "Apri la scheda",
+    "emptyTitle": "Nessun brief disponibile",
+    "emptyBody": "Quando un brief viene pubblicato compare qui. Nel frattempo le schede mostrano tutti i dati disponibili.",
+    "emptyBodyStaff": "Non è stato ancora generato alcun brief. Apri una scheda e genera il brief dalla sezione Opportunità.",
+    "emptyAction": "Vai a Scout",
+    "notCurrent": "Stai guardando la versione {n}, che non è quella attuale del brief.",
+    "seeCurrent": "Vedi la versione attuale",
+    "noVersionTitle": "Questo brief non ha ancora una versione",
+    "noVersionBody": "Il testo compare qui dopo la prima generazione.",
+    "unreadableTitle": "Questa versione non è leggibile",
+    "unreadableBody": "Il contenuto salvato non segue il formato previsto, quindi non lo mostriamo. Genera una nuova versione.",
+    "emptyVersionTitle": "Nessuna frase ha superato il controllo delle citazioni",
+    "emptyVersionBody": "Questa versione non contiene testo verificato. I dati della cella restano consultabili nella scheda.",
+    "noFigures": "Questa versione non cita alcuna cifra.",
+    "dangling": "Alcune citazioni non hanno una fonte ({ids}). La versione non può essere esportata né pubblicata.",
+    "status": {
+      "draft": "Bozza",
+      "reviewed": "Revisionato",
+      "published": "Pubblicato"
+    },
+    "context": {
+      "title": "Contesto",
+      "cellStatus": "Stato della cella",
+      "missingInputs": "Dati mancanti",
+      "missingHint": "Un dato mancante non è un punteggio basso: è escluso, non stimato.",
+      "noneMissing": "Nessuno",
+      "representativeness": "Rappresentatività del sentiment"
+    },
+    "review": {
+      "title": "Revisione",
+      "markReviewed": "Segna come revisionato",
+      "backToDraft": "Riporta in bozza",
+      "publish": "Pubblica",
+      "unpublish": "Ritira la pubblicazione",
+      "publishVersion": "Pubblica questa versione",
+      "pending": "Salvataggio…",
+      "done": "Stato aggiornato.",
+      "checkPassed": "Controllo delle citazioni superato.",
+      "checkFailed": "Controllo delle citazioni non superato: questa versione non può essere pubblicata né esportata.",
+      "dropped": "{count, plural, =0 {Nessuna frase rimossa dal controllo citazioni} one {# frase rimossa dal controllo citazioni} other {# frasi rimosse dal controllo citazioni}}",
+      "droppedShow": "Mostra le frasi rimosse",
+      "droppedNote": "Queste frasi non fanno parte del brief e non vengono esportate.",
+      "publishedAnalyst": "Solo un amministratore può ritirare o sostituire un brief pubblicato.",
+      "errors": {
+        "citation": "Una versione che non ha superato il controllo delle citazioni non può essere pubblicata.",
+        "adminOnly": "Solo gli amministratori possono pubblicare o ritirare un brief.",
+        "notAllowed": "Il tuo ruolo non consente questa modifica.",
+        "versionNotFound": "La versione non esiste più. Ricarica la pagina.",
+        "generic": "Non è stato possibile aggiornare lo stato."
+      }
+    },
+    "history": {
+      "title": "Versioni",
+      "current": "Attuale",
+      "viewing": "In visualizzazione",
+      "view": "Vedi",
+      "viewLabel": "Vedi la versione {n}",
+      "checkPassed": "Citazioni verificate",
+      "checkFailed": "Citazioni non verificate"
+    },
+    "generate": {
+      "button": "Genera il brief",
+      "refresh": "Genera una nuova versione",
+      "pending": "Generazione in corso…",
+      "pendingHint": "Può richiedere fino a un minuto. Resta su questa pagina.",
+      "errors": {
+        "not_staff": "Solo analisti e amministratori possono generare un brief.",
+        "no_cell": "Questa cella non esiste tra le città pilota.",
+        "no_facts": "Dati insufficienti: non ci sono cifre con un grado su cui scrivere il brief.",
+        "disabled": "La generazione automatica è sospesa da un amministratore.",
+        "global_limit": "Il limite giornaliero della piattaforma è stato raggiunto. Riprova domani.",
+        "user_limit": "Hai raggiunto il limite giornaliero di brief. Riprova domani.",
+        "model_failed": "Non è stato possibile scrivere il brief. Riprova tra poco.",
+        "network": "Connessione interrotta. Controlla se la nuova versione compare tra le versioni prima di riprovare."
+      }
+    },
+    "export": {
+      "pdf": "PDF",
+      "word": "Word",
+      "print": "Stampa / Salva PDF",
+      "printHint": "Nella finestra di stampa scegli «Salva come PDF». Il foglio è sempre a colori chiari, in formato A4.",
+      "recordFailed": "Non è stato possibile registrare l'esportazione. Riprova.",
+      "back": "Torna al brief",
+      "viewer": "Il tuo ruolo è di sola lettura: l'esportazione non è disponibile.",
+      "refusedBody": "Questa versione non può essere esportata perché non ha superato il controllo delle citazioni.",
+      "refusedTitle": "Esportazione non disponibile",
+      "refused": {
+        "not_found": "Il brief non esiste o non è visibile al tuo account.",
+        "viewer": "Il tuo ruolo è di sola lettura: l'esportazione non è disponibile.",
+        "check_failed": "Questa versione non ha superato il controllo delle citazioni e non può essere esportata.",
+        "unreadable": "Il contenuto salvato di questa versione non è leggibile e non può essere esportato."
+      },
+      "docTitle": "Brief di ingresso: {category}, {territory}",
+      "demoNote": "Contiene dati dimostrativi, non di mercato.",
+      "category": "Categoria",
+      "city": "Città",
+      "version": "Versione",
+      "status": "Stato",
+      "historyVersion": "Versione di archivio (non attuale)",
+      "generated": "Generato il",
+      "language": "Lingua",
+      "model": "Modello",
+      "promptVersion": "Versione del prompt",
+      "columns": {
+        "id": "N.",
+        "label": "Cifra",
+        "value": "Valore",
+        "grade": "Grado",
+        "reference": "Riferimento"
+      },
+      "footer": "FASTO FTS. Gradi: A dato misurato, B stima da modello, C segnale esplorativo. Il sentiment online non è un campione rappresentativo."
+    },
+    "notFound": {
+      "title": "Brief non trovato",
+      "body": "Il brief non esiste oppure non è ancora stato pubblicato.",
+      "link": "Tutti i brief"
+    }
+  },
+  "askEval": {
+    "tileTitle": "Domande di riferimento",
+    "tileHint": "Le dieci domande di controllo della ricerca conversazionale.",
+    "title": "Domande di riferimento",
+    "lead": "Dieci domande di controllo per Chiedi: strumento chiamato, citazioni verificate, tipo di cifra citata.",
+    "run": "Esegui le dieci domande",
+    "runAgain": "Esegui di nuovo",
+    "running": "Esecuzione in corso…",
+    "runningHint": "Le domande vengono eseguite una dopo l'altra: possono servire alcuni minuti.",
+    "cost": "Ogni esecuzione usa dieci domande del tuo limite giornaliero.",
+    "emptyTitle": "Nessuna esecuzione in questa sessione",
+    "emptyBody": "I risultati non vengono salvati: compaiono qui dopo l'esecuzione e spariscono quando lasci la pagina.",
+    "summary": "Superate {passed} su {total}",
+    "passed": "Superata",
+    "failed": "Non superata",
+    "reasons": "Motivi",
+    "answer": "Testo della risposta",
+    "noAnswer": "Nessuna risposta.",
+    "rawNote": "Qui il testo è mostrato senza citazioni, solo per diagnosi: le cifre con grado e fonte si vedono ripetendo la domanda in Chiedi.",
+    "errors": {
+      "refused": "Solo gli amministratori possono eseguire le domande di riferimento.",
+      "failed": "L'esecuzione si è interrotta. Riprova."
+    }
+  }
+}
