@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { CoverageCell, type GapSummary, summariseGaps, useCoverageLabel } from "./coverage";
 import { cellClass, type ColourMode } from "./cell-style";
 import { cellKey, localName, type Highlight, type ViewModel } from "./model";
+import { MosCell, useMosLabel } from "./mos-cell";
 
 /**
  * Tablet and desktop grid: a real table. It scrolls inside its own box (both axes), headers stay put,
@@ -16,6 +17,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
   const s = useTranslations("status");
   const sc = useTranslations("scout");
   const covLabel = useCoverageLabel();
+  const mosLabel = useMosLabel();
   const coverage = mode === "coverage";
   const summary: GapSummary | null = coverage ? summariseGaps(model) : null;
   // A thicker rule where a new country starts: cities of one country share the national trend.
@@ -86,7 +88,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                   <td key={col.id} className={cn("border-b border-border p-1 transition-colors duration-(--dur-fast) group-hover/row:bg-surface-2/60", startsCountry(i) && "border-l-2")}>
                     <Link
                       href={`/cell/${category.slug}/${col.slug}`}
-                      aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : `${label}: ${status}`}
+                      aria-label={coverage ? `${label}: ${status}, ${covLabel(cell).text}` : mode === "mos" ? `${label}: ${status}, ${mosLabel(cell)}` : `${label}: ${status}`}
                       title={t("tooltip", { name: label, status, coverage: Math.round(cell.coverage_pct) })}
                       aria-current={highlight?.category === category.slug && highlight.territory === col.slug ? "true" : undefined}
                         data-matrix-target={highlight?.category === category.slug && highlight.territory === col.slug ? "" : undefined}
@@ -96,7 +98,7 @@ export function MatrixTable({ model, mode, locale, highlight }: { model: ViewMod
                         highlight?.category === category.slug && highlight.territory === col.slug && "ring-2 ring-text ring-offset-2 ring-offset-surface",
                       )}
                     >
-                      {coverage ? <CoverageCell cell={cell} /> : <Icon aria-hidden className="size-4" />}
+                      {coverage ? <CoverageCell cell={cell} /> : mode === "mos" ? <MosCell cell={cell} /> : <Icon aria-hidden className="size-4" />}
                     </Link>
                   </td>
                 );

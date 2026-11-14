@@ -35,6 +35,13 @@
     "missingCount": "{count} missing inputs",
     "gapSummary": "Data gap map",
     "gapTotal": "{count} missing inputs across the cells shown",
-    "nationalNote": "Status is the category's national trend: cities in the same country share it. Local differences show in local demand and, from Day 4, in the MOS."
+    "nationalNote": "Status is the category's national trend: cities in the same country share it. Local differences show in local demand and, from Day 4, in the MOS.",
+    "toOpportunities": "Opportunity ranking",
+    "mosNote": "Each cell shows its MOS with its grade. Hatched cells have no score: they do not count as zero.",
+    "mosLegendScored": "MOS from 0 to 100, with grade",
+    "mosPartial": "partial",
+    "mosCell": "MOS {value}, grade {grade}",
+    "mosCellPartial": "MOS {value} partial, grade {grade}",
+    "mosCellMissing": "MOS not available"
   }
 }

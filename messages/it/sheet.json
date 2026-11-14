@@ -65,7 +65,9 @@
       "nights": "notti",
       "count": "conteggio",
       "views": "visualizzazioni",
-      "share": "quota delle menzioni pertinenti"
+      "share": "quota delle menzioni pertinenti",
+      "points_0_100": "punti da 0 a 100",
+      "per_mention": "citazioni per menzione pertinente"
     },
     "market": {
       "national": "Dati nazionali: il trend riguarda l'intero paese, non la città.",
@@ -174,9 +176,48 @@
       "noPrices": "La fonte non pubblica prezzi: la scala dei prezzi per formato compare quando una fonte con prezzi è collegata."
     },
     "opportunity": {
-      "title": "Opportunità di ingresso",
-      "body": "Il punteggio MOS e la nota di ingresso arrivano nel Giorno 4. Fino ad allora non mostriamo numeri.",
-      "badge": "In arrivo: Giorno 4"
+      "mos": "MOS, punteggio di opportunità",
+      "partial": "Parziale",
+      "complete": "Completo",
+      "coverage": "copertura {pct}",
+      "coverageLabel": "Copertura dei pesi",
+      "partialNote": "Non disponibili: {inputs}. I pesi sono ridistribuiti sulle componenti presenti.",
+      "rank": "Posizione {rank} in classifica",
+      "computed": "Calcolato il {date}, metodo {method}",
+      "insufficientTitle": "MOS non disponibile",
+      "insufficientBody": "Manca: {inputs}. Senza crescita e dimensione non c'è un punteggio. Il dato mancante non diventa uno zero.",
+      "insufficientNoInputs": "Per questa cella non c'è un punteggio. Il dato mancante non diventa uno zero.",
+      "notComputedTitle": "MOS non ancora calcolato",
+      "notComputedBody": "Per questa cella non c'è ancora un calcolo del MOS. Fino ad allora non mostriamo numeri.",
+      "components": "Componenti",
+      "componentsLead": "Ogni componente è un percentile da 0 a 100 tra le celle che la hanno. I punti sono la parte di MOS che porta, con i pesi predefiniti.",
+      "names": {
+        "growth": "Crescita",
+        "size": "Dimensione",
+        "csi": "CSI",
+        "pressure": "Pressione",
+        "fit": "Fit"
+      },
+      "what": {
+        "growth": "crescita reale annua del valore, trend nazionale",
+        "size": "domanda locale stimata",
+        "csi": "indice di sentiment pubblicato, nazionale",
+        "pressure": "concorrenti e barriere, nazionale",
+        "fit": "prodotto e leve del territorio"
+      },
+      "percentile": "percentile {value}",
+      "percentileLabel": "{name}: percentile {value} su 100",
+      "points": "{value} punti",
+      "missing": "Non disponibile",
+      "pressureNote": "Entra nel MOS rovesciata: meno pressione, più punti. I concorrenti vengono da un database collaborativo e le barriere da menzioni online: non sono un campione rappresentativo.",
+      "parts": {
+        "competitors": "Concorrenti con un'offerta",
+        "barriersPerMention": "Barriere citate per menzione"
+      },
+      "fitNote": "Fit richiede un passaporto di prodotto: senza, non entra nel punteggio.",
+      "brief": "Nota di ingresso",
+      "briefSoon": "La nota di ingresso arriva più tardi oggi.",
+      "toOpportunities": "Vedi la classifica delle opportunità"
     },
     "sources": {
       "title": "Registro delle evidenze",

@@ -7,7 +7,7 @@ import { getScoutFigures, type ScoutFigure } from "@/app/[locale]/(app)/scout-ac
 import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "./category-icon";
-import { DemoBadge } from "./grade-badge";
+import { DemoBadge, GradeBadge } from "./grade-badge";
 import { ScoutCombobox, type ComboItem } from "./scout-combobox";
 import { ScoutFrames } from "./scout-frames";
 import { STATUS_TEXT, statusIcon, type CellStatus } from "./status";
@@ -267,9 +267,18 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               </Link>
               <Link
                 href={mosHref}
-                className={cn(PILL, "num")}
+                // The badge sits on the inverse pill: it takes the pill's ink.
+                className={cn(PILL, "num [&_.grade]:border-current! [&_.grade]:text-current!")}
               >
-                {cell?.mos != null ? t("mosValue", { value: Math.round(Number(cell.mos)) }) : t("mosUnavailable")}
+                {cell?.mos != null && cell.mos_grade ? (
+                  <>
+                    {t("mosValue", { value: Math.round(Number(cell.mos)) })}
+                    <GradeBadge grade={cell.mos_grade} />
+                    {cell.mos_is_partial && <span className="text-[11px]">{t("mosPartial")}</span>}
+                  </>
+                ) : (
+                  t("mosUnavailable")
+                )}
               </Link>
             </div>
             {status !== "insufficient_data" ? (

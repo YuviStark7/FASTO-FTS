@@ -65,7 +65,9 @@
       "nights": "nights",
       "count": "count",
       "views": "views",
-      "share": "share of relevant mentions"
+      "share": "share of relevant mentions",
+      "points_0_100": "points from 0 to 100",
+      "per_mention": "citations per relevant mention"
     },
     "market": {
       "national": "National data: the trend covers the whole country, not the city.",
@@ -174,9 +176,48 @@
       "noPrices": "The source publishes no prices: the price ladder per pack size appears once a priced source is connected."
     },
     "opportunity": {
-      "title": "Entry opportunity",
-      "body": "The MOS score and the entry brief arrive on Day 4. Until then we show no numbers.",
-      "badge": "Coming: Day 4"
+      "mos": "MOS, opportunity score",
+      "partial": "Partial",
+      "complete": "Complete",
+      "coverage": "coverage {pct}",
+      "coverageLabel": "Weight coverage",
+      "partialNote": "Not available: {inputs}. The weights are redistributed over the components that are present.",
+      "rank": "Rank {rank}",
+      "computed": "Computed on {date}, method {method}",
+      "insufficientTitle": "MOS not available",
+      "insufficientBody": "Missing: {inputs}. Without growth and size there is no score. Missing data does not become a zero.",
+      "insufficientNoInputs": "There is no score for this cell. Missing data does not become a zero.",
+      "notComputedTitle": "MOS not computed yet",
+      "notComputedBody": "There is no MOS computation for this cell yet. Until then we show no numbers.",
+      "components": "Components",
+      "componentsLead": "Each component is a percentile from 0 to 100 among the cells that have it. Points are the share of MOS it brings under the default weights.",
+      "names": {
+        "growth": "Growth",
+        "size": "Size",
+        "csi": "CSI",
+        "pressure": "Pressure",
+        "fit": "Fit"
+      },
+      "what": {
+        "growth": "real annual value growth, national trend",
+        "size": "estimated local demand",
+        "csi": "published sentiment index, national",
+        "pressure": "competitors and barriers, national",
+        "fit": "product and territory levers"
+      },
+      "percentile": "percentile {value}",
+      "percentileLabel": "{name}: percentile {value} out of 100",
+      "points": "{value} points",
+      "missing": "Not available",
+      "pressureNote": "Enters MOS reversed: less pressure, more points. Competitors come from a crowd-sourced database and barriers from online mentions: neither is a representative sample.",
+      "parts": {
+        "competitors": "Competitors with an offer",
+        "barriersPerMention": "Barriers cited per mention"
+      },
+      "fitNote": "Fit needs a product passport: without one it does not enter the score.",
+      "brief": "Entry brief",
+      "briefSoon": "The entry brief arrives later today.",
+      "toOpportunities": "See the opportunity ranking"
     },
     "sources": {
       "title": "Evidence ledger",

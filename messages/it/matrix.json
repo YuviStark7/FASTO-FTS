@@ -35,6 +35,13 @@
     "missingCount": "{count} input mancanti",
     "gapSummary": "Mappa dei dati mancanti",
     "gapTotal": "{count} input mancanti nelle celle mostrate",
-    "nationalNote": "Lo stato è il trend nazionale della categoria: le città dello stesso paese lo condividono. Le differenze locali sono nella domanda locale e, dal Giorno 4, nel MOS."
+    "nationalNote": "Lo stato è il trend nazionale della categoria: le città dello stesso paese lo condividono. Le differenze locali sono nella domanda locale e, dal Giorno 4, nel MOS.",
+    "toOpportunities": "Classifica delle opportunità",
+    "mosNote": "Ogni cella mostra il MOS con il suo grado. Le celle tratteggiate non hanno un punteggio: non valgono zero.",
+    "mosLegendScored": "MOS da 0 a 100, con grado",
+    "mosPartial": "parziale",
+    "mosCell": "MOS {value}, grado {grade}",
+    "mosCellPartial": "MOS {value} parziale, grado {grade}",
+    "mosCellMissing": "MOS non disponibile"
   }
 }

@@ -13,6 +13,10 @@ export function formatValue(value: number, unit: string, locale: string): string
       return new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 }).format(value);
     case "count":
       return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
+    case "points_0_100":
+      return new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+    case "per_mention":
+      return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
     case "index_0_100":
       return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
     default:

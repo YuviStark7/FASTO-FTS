@@ -1,0 +1,82 @@
+{
+  "opportunities": {
+    "title": "Opportunità",
+    "lead": "Le celle ordinate per MOS, il punteggio di opportunità di mercato. Ogni punteggio porta il suo grado e dice quanta parte dei pesi è coperta da dati.",
+    "methodNote": "Metodo {method}. Ogni componente è un percentile tra le celle che la hanno: una cella può essere alta in un campo debole. La pressione entra rovesciata, quindi meno pressione vale più punti.",
+    "filters": "Filtri",
+    "category": "Categoria",
+    "allCategories": "Tutte le categorie",
+    "country": "Paese",
+    "allCountries": "Tutti i paesi",
+    "reset": "Azzera i filtri",
+    "summary": "{ranked, plural, one {# cella in classifica} other {# celle in classifica}}, {insufficient} senza punteggio",
+    "listLabel": "Classifica per MOS",
+    "noMatch": "Nessuna cella corrisponde ai filtri.",
+    "noRanked": "Nessuna delle celle mostrate ha un MOS.",
+    "showMore": "Mostra altre {count}",
+    "empty": {
+      "title": "Il MOS non è ancora calcolato",
+      "body": "Nessuna cella ha ancora un punteggio. La classifica compare dopo il primo calcolo: fino ad allora non mostriamo numeri.",
+      "matrix": "Vai alla matrice"
+    },
+    "col": {
+      "rank": "N.",
+      "cell": "Cella",
+      "mos": "MOS",
+      "bar": "Composizione"
+    },
+    "rank": "Posizione {rank}",
+    "partial": "Parziale",
+    "complete": "Completo",
+    "coverage": "copertura {pct}",
+    "components": {
+      "growth": "Crescita",
+      "size": "Dimensione",
+      "csi": "CSI",
+      "pressure": "Pressione",
+      "fit": "Fit"
+    },
+    "componentPoints": "{name}: {value} punti",
+    "na": "n.d.",
+    "naLong": "non disponibile",
+    "barLabel": "Punti per componente: {parts}",
+    "whatIf": {
+      "badge": "Simulazione",
+      "note": "Punteggi ricalcolati qui, nel browser, con i tuoi pesi sugli stessi percentili. Non sono salvati e non cambiano i dati."
+    },
+    "weights": {
+      "title": "Pesi",
+      "lead": "Sposta i pesi per vedere come cambia la classifica. Contano le proporzioni: la somma è sempre 100%.",
+      "open": "Apri i pesi",
+      "close": "Chiudi i pesi",
+      "stateDefault": "predefiniti (SPEC)",
+      "stateCustom": "simulazione",
+      "slider": "Peso di {name}",
+      "resetDefault": "Predefiniti (SPEC)",
+      "allZero": "Dai un peso ad almeno una componente: con tutti i pesi a zero non c'è una classifica.",
+      "fitNote": "Fit richiede un passaporto di prodotto. Oggi nessuna cella lo ha, quindi il suo peso riduce solo la copertura.",
+      "sets": "Insieme di pesi",
+      "setDefault": "Predefiniti (SPEC)",
+      "setCustom": "Personalizzati (non salvati)",
+      "saveTitle": "Salva come insieme di pesi",
+      "name": "Nome dell'insieme",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "saved": "Insieme salvato: {name}",
+      "viewer": "Il tuo ruolo può provare i pesi, ma non salvarli.",
+      "error": {
+        "name": "Dai un nome all'insieme, al massimo 80 caratteri.",
+        "weights": "Questi pesi non sono validi.",
+        "forbidden": "Il tuo ruolo non può salvare insiemi di pesi.",
+        "failed": "Non siamo riusciti a salvare. Riprova tra poco."
+      }
+    },
+    "insufficient": {
+      "title": "Dati insufficienti",
+      "lead": "Queste celle non hanno un MOS. Non sono in classifica e non valgono zero.",
+      "missing": "Manca: {inputs}",
+      "weights": "Nessun punteggio con questi pesi: tutto il peso è su componenti senza dati.",
+      "showAll": "Mostra tutte ({count})"
+    }
+  }
+}

@@ -77,7 +77,8 @@
       "csi": "Sentiment (CSI)",
       "pageviews": "Attenzione: visualizzazioni",
       "mediaAttention": "Attenzione nei media"
-    }
+    },
+    "mosPartial": "parziale"
   },
   "inputs": {
     "trend": "trend",
