@@ -21,6 +21,7 @@ export function WeightPanel({
   defaultWeights,
   sets,
   canSave,
+  fitNote,
   onChange,
   onSaved,
 }: {
@@ -31,6 +32,8 @@ export function WeightPanel({
   defaultWeights: Weights;
   sets: WeightSet[];
   canSave: boolean;
+  /** Replaces the default note under the sliders when a passport gives some cells a Fit. */
+  fitNote?: string;
   onChange: (s: Sliders) => void;
   onSaved: (s: WeightSet) => void;
 }) {
@@ -123,7 +126,7 @@ export function WeightPanel({
             );
           })}
         </ul>
-        <p className="t-meta">{t("weights.fitNote")}</p>
+        <p className="t-meta">{fitNote ?? t("weights.fitNote")}</p>
         {!weights && (
           <p role="alert" className="note">
             {t("weights.allZero")}
