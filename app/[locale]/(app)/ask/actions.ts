@@ -64,16 +64,34 @@ export async function askAction(conversationId: number | null, question: string,
 
 /** Runs the ten reference questions (admins only). Uses the admin's own chat allowance. */
 export async function runReferenceQuestions(): Promise<{ ok: boolean; results: (ReferenceResult & { question: string; answer: string; sentences: { text: string; facts: string[] }[]; facts: Fact[] })[] }> {
-  const { role } = await getStaffRole();
+  const { role, supabase, userId } = await getStaffRole();
   if (role !== "admin") return { ok: false, results: [] };
   const results = [];
+  const stored: { conversation_id: number; org_id: string; role: "user" | "assistant"; content: { [key: string]: Json } }[] = [];
   for (const q of REFERENCE_QUESTIONS) {
     const turn = await chatTurn(q.question, [], q.locale);
     if (!turn.ok) {
       results.push({ id: q.id, passed: false, reasons: [`turn failed: ${turn.reason}`], question: q.question, answer: "", sentences: [], facts: [] });
       continue;
     }
-    results.push({ ...gradeTurn(q, turn, numbersIn), question: q.question, answer: turn.answer.sentences.map((s) => s.text).join(" "), sentences: turn.answer.sentences, facts: turn.facts });
+    const graded = gradeTurn(q, turn, numbersIn);
+    results.push({ ...graded, question: q.question, answer: turn.answer.sentences.map((s) => s.text).join(" "), sentences: turn.answer.sentences, facts: turn.facts });
+    stored.push(
+      { conversation_id: 0, org_id: "", role: "user", content: { text: q.question, reference_id: q.id } },
+      { conversation_id: 0, org_id: "", role: "assistant", content: JSON.parse(JSON.stringify({ ...turn, grade: graded })) as { [key: string]: Json } },
+    );
+  }
+  // Keep the run as a conversation of the admin, so the gate can be checked afterwards (RLS: owner only).
+  const { data: mem } = await supabase.from("memberships").select("org_id, created_at").eq("user_id", userId).order("created_at", { ascending: true }).limit(1);
+  const orgId = mem?.[0]?.org_id;
+  if (orgId) {
+    const passed = results.filter((r) => r.passed).length;
+    const { data: conv } = await supabase
+      .from("conversations")
+      .insert({ org_id: orgId, user_id: userId, title: `Reference questions ${new Date().toISOString().slice(0, 16)}Z: ${passed}/${results.length}`, locale: "it" })
+      .select("id")
+      .single();
+    if (conv && stored.length) await supabase.from("messages").insert(stored.map((m) => ({ ...m, conversation_id: conv.id, org_id: orgId })));
   }
   return { ok: true, results };
 }

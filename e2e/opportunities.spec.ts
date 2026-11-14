@@ -197,7 +197,11 @@ test("Opportunity tab shows the MOS with grade, partial label and component brea
     }
   }
   await expect(page.locator('[data-component="fit"]').getByText(/passaporto di prodotto/)).toBeVisible();
-  await expect(page.getByText("La nota di ingresso arriva più tardi oggi.")).toBeVisible();
+  // Brief panel: no brief yet for this cell; a member gets no generate button (staff only).
+  const briefPanel = page.getByTestId("opportunity-brief");
+  await expect(briefPanel).toBeVisible();
+  await expect(briefPanel.getByText(/Nessuna nota di ingresso|Apri la nota di ingresso/)).toBeVisible();
+  await expect(briefPanel.getByTestId("generate-brief")).toHaveCount(0);
   expect(await noSideScroll(page)).toBe(true);
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${SCREENS}/opportunity-tab-${info.project.name}.png`, fullPage: true });

@@ -21,7 +21,9 @@ import { TerritoryTab } from "./territory-tab";
 const TABS = ["market", "territory", "consumers", "competition", "opportunity", "sources"] as const;
 type Tab = (typeof TABS)[number];
 
-export function SheetView({ sheet }: { sheet: CellSheet }) {
+export type BriefInfo = { canGenerate: boolean; existing: { id: number; status: "draft" | "reviewed" | "published" } | null };
+
+export function SheetView({ sheet, brief }: { sheet: CellSheet; brief?: BriefInfo }) {
   const t = useTranslations("sheet");
   const locale = useLocale();
   // Deep link from the Opportunities ranking: ?tab=opportunity opens that tab.
@@ -122,7 +124,7 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
               {tab === "territory" && <TerritoryTab data={sheet.territoryTab} />}
               {tab === "consumers" && <ConsumersTab consumers={sheet.consumers} attention={sheet.attention} />}
               {tab === "competition" && <CompetitionTab competition={sheet.competition} />}
-              {tab === "opportunity" && <OpportunityTab opportunity={sheet.opportunity} />}
+              {tab === "opportunity" && <OpportunityTab opportunity={sheet.opportunity} brief={brief} category={sheet.category.slug} territory={sheet.territory.slug} />}
               {tab === "sources" && <SourcesTab ledger={sheet.ledger} filter={filter} onClear={() => setFilter(null)} />}
             </div>
           </div>

@@ -216,8 +216,14 @@
       },
       "fitNote": "Fit needs a product passport: without one it does not enter the score.",
       "brief": "Entry brief",
-      "briefSoon": "The entry brief arrives later today.",
-      "toOpportunities": "See the opportunity ranking"
+      "toOpportunities": "See the opportunity ranking",
+      "briefOpen": "Open the entry brief ({status})",
+      "briefNone": "No entry brief for this cell yet. Analysts and admins generate briefs.",
+      "briefStatus": {
+        "draft": "draft",
+        "reviewed": "reviewed",
+        "published": "published"
+      }
     },
     "sources": {
       "title": "Evidence ledger",
