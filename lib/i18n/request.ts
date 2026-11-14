@@ -6,7 +6,7 @@ import { routing } from "./routing";
  * Messages are split per feature (messages/<locale>/<namespace>.json) so parallel work on
  * different screens never edits the same file. Top-level keys must not collide across files.
  */
-export const MESSAGE_FILES = ["core", "matrix", "admin", "sheet", "map", "feedback", "shell"] as const;
+export const MESSAGE_FILES = ["core", "matrix", "admin", "sheet", "map", "feedback", "shell", "advisor"] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
