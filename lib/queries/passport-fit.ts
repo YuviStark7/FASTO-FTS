@@ -9,8 +9,10 @@ export type PassportSummary = { id: number; name: string; categorySlug: string }
 /** Fit for one passport, per pilot city of its category, keyed like opportunity rows ("cat:city"). */
 export type PassportFit = {
   passport: PassportSummary;
+  methodVersion: "fit-v1";
   levers: LeverCode[];
-  cells: Record<string, { raw: number; pct: number; grade: "C"; csiSnapshotId: number }>;
+  /** isDemo: the lever reading behind the figure is demonstration data (show the DEMO badge). */
+  cells: Record<string, { raw: number; pct: number; grade: "C"; csiSnapshotId: number; isDemo: boolean }>;
 };
 
 const CODE_BY_LABEL = new Map<string, LeverCode>(Object.entries(LEVER_LABELS).map(([code, l]) => [l.en, code as LeverCode]));
@@ -61,14 +63,20 @@ export async function getPassportFit(passportId: number): Promise<PassportFit | 
 
   const { data: csis } = await supabase
     .from("csi_snapshots")
-    .select("id, territory_id, computed_at")
+    .select("id, territory_id, computed_at, is_demo")
     .eq("category_id", p.category_id)
     .in("territory_id", countryIds)
     .eq("is_published", true)
-    .eq("is_demo", false)
+    .order("is_demo", { ascending: true })
     .order("computed_at", { ascending: false });
+  // Latest published reading per country, real readings before demo ones; demo is flagged, never hidden.
   const latest = new Map<number, number>();
-  for (const c of csis ?? []) if (!latest.has(c.territory_id)) latest.set(c.territory_id, c.id);
+  const demo = new Set<number>();
+  for (const c of csis ?? []) {
+    if (latest.has(c.territory_id)) continue;
+    latest.set(c.territory_id, c.id);
+    if (c.is_demo) demo.add(c.id);
+  }
 
   const { data: levers } = latest.size
     ? await supabase.from("levers").select("csi_snapshot_id, label_en, share").in("csi_snapshot_id", [...latest.values()])
@@ -93,7 +101,10 @@ export async function getPassportFit(passportId: number): Promise<PassportFit | 
   for (const c of cities) {
     const key = `${categorySlug}:${c.slug}`;
     const country = countryOf(c.id);
-    if (raw.has(key) && country) cells[key] = { raw: raw.get(key)!, pct: pct.get(key)!, grade: "C", csiSnapshotId: latest.get(country.id)! };
+    if (raw.has(key) && country) {
+      const snap = latest.get(country.id)!;
+      cells[key] = { raw: raw.get(key)!, pct: pct.get(key)!, grade: "C", csiSnapshotId: snap, isDemo: demo.has(snap) };
+    }
   }
-  return { passport: { id: p.id, name: p.name, categorySlug }, levers: [...matched], cells };
+  return { passport: { id: p.id, name: p.name, categorySlug }, methodVersion: "fit-v1", levers: [...matched], cells };
 }
