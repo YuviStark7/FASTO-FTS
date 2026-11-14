@@ -38,6 +38,21 @@ export function MatrixLegend({ mode, mosMissing }: { mode: ColourMode; mosMissin
           </span>
           {t("mosLegend")}
         </li>
+      ) : mode === "mos" ? (
+        <>
+          <li className="flex items-center gap-2">
+            <span aria-hidden className="num grid h-6 min-w-8 place-items-center rounded-md border border-brand/50 bg-brand/12 px-1 text-[11px] font-medium">
+              0–100
+            </span>
+            {t("mosLegendScored")}
+          </li>
+          <li className="flex items-center gap-2">
+            <span aria-hidden className="hatched grid size-6 place-items-center rounded-md border border-border">
+              <CircleDashed className="size-4 text-muted" />
+            </span>
+            {t("mosLegend")}
+          </li>
+        </>
       ) : (
         STATUS_ORDER.map((st) => {
           const Icon = statusIcon(st);

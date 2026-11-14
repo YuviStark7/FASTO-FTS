@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
@@ -23,7 +24,9 @@ type Tab = (typeof TABS)[number];
 export function SheetView({ sheet }: { sheet: CellSheet }) {
   const t = useTranslations("sheet");
   const locale = useLocale();
-  const [tab, setTab] = useState<Tab>("market");
+  // Deep link from the Opportunities ranking: ?tab=opportunity opens that tab.
+  const tabParam = useSearchParams().get("tab");
+  const [tab, setTab] = useState<Tab>(() => (TABS.includes(tabParam as Tab) ? (tabParam as Tab) : "market"));
   const [filter, setFilter] = useState<number[] | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const touch = useRef<{ x: number; y: number } | null>(null);
@@ -119,7 +122,7 @@ export function SheetView({ sheet }: { sheet: CellSheet }) {
               {tab === "territory" && <TerritoryTab data={sheet.territoryTab} />}
               {tab === "consumers" && <ConsumersTab consumers={sheet.consumers} attention={sheet.attention} />}
               {tab === "competition" && <CompetitionTab competition={sheet.competition} />}
-              {tab === "opportunity" && <OpportunityTab />}
+              {tab === "opportunity" && <OpportunityTab opportunity={sheet.opportunity} />}
               {tab === "sources" && <SourcesTab ledger={sheet.ledger} filter={filter} onClear={() => setFilter(null)} />}
             </div>
           </div>

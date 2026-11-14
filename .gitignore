@@ -42,6 +42,7 @@ yarn-error.log*
 next-env.d.ts
 /test-results/
 /playwright-report/
+/e2e/__screens__/
 supabase/.temp/
 
 # Sub agent worktrees

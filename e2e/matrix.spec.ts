@@ -22,7 +22,8 @@ test("matrix shows all 300 cells and filters on the client", async ({ page }, in
 
     // MOS mode: nothing is faked, the state is explained.
     await page.getByRole("button", { name: "MOS", exact: true }).click();
-    await expect(page.getByText("Il MOS non è ancora disponibile")).toBeVisible();
+    await expect(page.getByText("Il MOS non è ancora disponibile").or(table.locator("abbr.grade").first())).toBeVisible();
+    await expect(page.getByRole("link", { name: "Classifica delle opportunità" })).toHaveAttribute("href", /\/opportunities$/);
     await page.getByRole("button", { name: "Stato", exact: true }).click();
 
     await page.getByLabel("Filtra per stato").selectOption("insufficient_data");

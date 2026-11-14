@@ -109,6 +109,8 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
   /* Shape: 28 tray and sheets, 20 cards, 14 tiles and inputs, 8 small chips, full for pills and tokens. */
+  /* Room for a nine-column ranking table beside the weights panel. */
+  --breakpoint-wide: 85rem;
   --radius-tray: 28px;
   --radius-card: 20px;
   --radius-tile: 14px;
