@@ -30,6 +30,7 @@ function Missing({ children }: { children: React.ReactNode }) {
  */
 export function OpportunityTab({ opportunity }: { opportunity: CellSheet["opportunity"] }) {
   const t = useTranslations("sheet.opportunity");
+  const tp = useTranslations("passport");
   const locale = useLocale();
   const pct = (v: number) => new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 }).format(v / 100);
   const points = (v: number) => formatValue(v, "points_0_100", locale);
@@ -120,7 +121,14 @@ export function OpportunityTab({ opportunity }: { opportunity: CellSheet["opport
               {!c.present ? (
                 <div className="space-y-2">
                   <Missing>{t("missing")}</Missing>
-                  {c.key === "fit" && <p className="max-w-[75ch] text-sm leading-relaxed text-muted">{t("fitNote")}</p>}
+                  {c.key === "fit" && (
+                    <p className="max-w-[75ch] text-sm leading-relaxed text-muted">
+                      {t("fitNote")}{" "}
+                      <Link href="/passport" className="link">
+                        {tp("fitLink")}
+                      </Link>
+                    </p>
+                  )}
                 </div>
               ) : (
                 <>

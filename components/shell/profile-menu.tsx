@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
-import { FileText, LogOut, Map as MapIcon, Moon, Settings, Sun } from "lucide-react";
+import { FileText, IdCard, LogOut, Map as MapIcon, Moon, Settings, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { setTheme, signOut } from "@/app/[locale]/(app)/more/actions";
@@ -15,6 +15,7 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
   const ta = useTranslations("admin");
   const tmap = useTranslations("map");
   const tb = useTranslations("briefs");
+  const tp = useTranslations("passport");
   const locale = useLocale();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -26,7 +27,16 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) return;
-    const raf = window.setTimeout(() => ref.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus(), 60);
+    // Move focus into the menu once its first item is rendered and focusable (retries for ~600 ms:
+    // a single fixed delay lost the race on a busy main thread).
+    let tries = 0;
+    let raf = 0;
+    const focusFirst = () => {
+      const first = ref.current?.querySelector<HTMLElement>('[role="menuitem"]');
+      if (first) first.focus();
+      if ((!first || document.activeElement !== first) && ++tries < 12) raf = window.setTimeout(focusFirst, 50);
+    };
+    raf = window.setTimeout(focusFirst, 30);
     const onDown = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
@@ -112,6 +122,10 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
         <Link role="menuitem" tabIndex={-1} href="/briefs" className={ITEM}>
           <FileText aria-hidden className="size-4" />
           {tb("title")}
+        </Link>
+        <Link role="menuitem" tabIndex={-1} href="/passport" className={ITEM}>
+          <IdCard aria-hidden className="size-4" />
+          {tp("menu")}
         </Link>
         {isStaff && (
           <Link role="menuitem" tabIndex={-1} href="/admin" className={ITEM}>

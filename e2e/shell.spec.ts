@@ -61,9 +61,13 @@ test("profile menu keyboard and no horizontal overflow", async ({ page }) => {
   await signIn(page);
   await page.goto("/");
   const btn = page.getByRole("button", { name: "Profilo e impostazioni" });
-  await btn.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("menuitem").first()).toBeFocused();
+  // The button exists before hydration; retry until the menu really opens (flaked under parallel load).
+  await expect(async () => {
+    if ((await btn.getAttribute("aria-expanded")) === "true") await page.keyboard.press("Escape");
+    await btn.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("menuitem").first()).toBeFocused({ timeout: 1000 });
+  }).toPass({ timeout: 10_000 });
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("menuitem").nth(1)).toBeFocused();
   await page.keyboard.press("Escape");

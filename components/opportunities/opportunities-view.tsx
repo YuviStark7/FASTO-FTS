@@ -2,19 +2,27 @@
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CircleDashed } from "lucide-react";
-import { Link } from "@/lib/i18n/navigation";
+import { Link, getPathname } from "@/lib/i18n/navigation";
 import type { OpportunitiesData, OpportunityRow, WeightSet } from "@/lib/queries/opportunities";
 import { toCellComponents, type Grade } from "@/lib/queries/mos-shape";
-import { COMPONENTS, REQUIRED, rankByMos, scoreMos, type ComponentKey } from "@/lib/scoring/mos";
+import type { PassportFit, PassportSummary } from "@/lib/queries/passport-fit";
+import { COMPONENTS, REQUIRED, rankByMos, scoreMos, type ComponentKey, type ComponentValue } from "@/lib/scoring/mos";
 import { CategoryIcon } from "@/components/cell/category-icon";
 import { DemoBadge, GradeBadge } from "@/components/cell/grade-badge";
 import { cn } from "@/lib/utils";
 import { SEGMENT, normaliseWeights, sameWeights, toSliders, type Sliders } from "./weights";
 import { WeightPanel } from "./weight-panel";
 
-/** One row as shown: the stored snapshot under the default weights, or the what-if result. */
+/**
+ * One row as shown: the stored snapshot under the default weights, the what-if result, or, with a
+ * passport selected, the organisation's own score for the rows that have its Fit.
+ */
 type Shown = {
   row: OpportunityRow;
+  /** Fit of the selected passport for this cell (fit-v1, grade C). Null: the row is as the system scored it. */
+  fit: ComponentValue | null;
+  /** The lever reading behind that Fit is demonstration data. */
+  fitDemo: boolean;
   mos: number | null;
   grade: Grade | null;
   isPartial: boolean;
@@ -25,6 +33,17 @@ type Shown = {
   why: "inputs" | "weights" | null;
 };
 
+export type OpportunitiesViewProps = OpportunitiesData & {
+  /** Passports of the user's organisation (RLS). */
+  passports: PassportSummary[];
+  /** Fit of the passport chosen with `?passport=ID`, computed on the server. Null: none chosen. */
+  fit: PassportFit | null;
+  /** A passport was asked for but the user cannot read it (deleted, or another organisation's). */
+  passportMissing: boolean;
+};
+
+const BADGE = "rounded-full border border-border-strong px-2.5 py-0.5 text-[11px] font-semibold tracking-[0.08em] uppercase";
+
 // Table layout from 85rem up: one row per cell, the coverage label under the score.
 const GRID = "wide:grid wide:grid-cols-[2.5rem_minmax(0,1fr)_9.5rem_6.5rem_repeat(5,5.75rem)] wide:items-center wide:gap-x-3 wide:gap-y-0.5";
 const COMPONENT_COL = ["wide:col-start-5", "wide:col-start-6", "wide:col-start-7", "wide:col-start-8", "wide:col-start-9"];
@@ -34,10 +53,16 @@ const PAGE = 30;
  * Opportunities: ranked cells with their MOS, grade and component bars.
  * The what-if weights re-rank in the browser with `scoreMos` on the percentiles already loaded
  * (the only arithmetic the browser does, SPEC section 6). Moving a slider never calls the server.
+ *
+ * With a passport selected the screen is an organisation view: the passport's Fit percentile joins
+ * the components of the rows of its category and those rows are scored with the same `scoreMos`.
+ * Rows of other categories keep their stored score. The stored system snapshots never change.
  */
-export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }: OpportunitiesData) {
+export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave, passports, fit, passportMissing }: OpportunitiesViewProps) {
   const t = useTranslations("opportunities");
+  const tp = useTranslations("passport.opportunities");
   const locale = useLocale();
+  const [switching, setSwitching] = useState(false);
   const [sliders, setSliders] = useState<Sliders>(() => toSliders(defaultWeights));
   const [sets, setSets] = useState<WeightSet[]>(weightSets);
   const [category, setCategory] = useState("");
@@ -49,34 +74,54 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
   const one = useMemo(() => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), [locale]);
   const pct = useMemo(() => new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 }), [locale]);
 
-  const inputs = useMemo(() => rows.map((row) => ({ row, components: toCellComponents(row.components) })), [rows]);
+  const inputs = useMemo(
+    () =>
+      rows.map((row) => {
+        const components = toCellComponents(row.components);
+        const cell = fit?.cells[row.key];
+        const rowFit: ComponentValue | null = cell ? { pct: cell.pct, grade: cell.grade } : null;
+        return { row, fit: rowFit, fitDemo: cell?.isDemo ?? false, components: rowFit ? { ...components, fit: rowFit } : components };
+      }),
+    [rows, fit],
+  );
+  /** At least one listed cell carries the passport's Fit: the scores shown are the organisation's. */
+  const orgView = useMemo(() => inputs.some((i) => i.fit != null), [inputs]);
   const weights = useMemo(() => normaliseWeights(sliders), [sliders]);
   const isDefault = weights != null && sameWeights(weights, defaultWeights);
 
   const shown = useMemo<Shown[]>(() => {
     const missingRequired = (row: OpportunityRow) => REQUIRED.some((k) => !row.components[k].present);
-    if (isDefault) {
-      // Default weights: the stored snapshot as it is, nothing recomputed.
-      return inputs.map(({ row }) => ({
-        row,
-        ...row.stored,
-        points: Object.fromEntries(COMPONENTS.flatMap((k) => (row.components[k].contribution == null ? [] : [[k, row.components[k].contribution]]))),
-        why: row.stored.mos == null ? "inputs" : null,
-      }));
-    }
-    const results = inputs.map(({ row, components }) => ({ row, r: weights ? scoreMos(components, weights) : null }));
-    const ranks = rankByMos(new Map(results.map(({ row, r }) => [row.key, r?.mos ?? null])));
-    return results.map(({ row, r }) => ({
+    // Default weights and no Fit: the stored snapshot as it is, nothing recomputed.
+    const asStored = (row: OpportunityRow): Shown => ({
       row,
-      mos: r?.mos ?? null,
-      grade: r?.grade ?? null,
-      isPartial: r?.isPartial ?? true,
-      coveragePct: r?.coveragePct ?? 0,
-      rank: ranks.get(row.key) ?? null,
-      points: r?.contributions ?? {},
-      why: r?.mos != null ? null : missingRequired(row) ? "inputs" : "weights",
-    }));
-  }, [inputs, weights, isDefault]);
+      fit: null,
+      fitDemo: false,
+      ...row.stored,
+      points: Object.fromEntries(COMPONENTS.flatMap((k) => (row.components[k].contribution == null ? [] : [[k, row.components[k].contribution]]))),
+      why: row.stored.mos == null ? "inputs" : null,
+    });
+    if (isDefault && !orgView) return inputs.map(({ row }) => asStored(row));
+
+    const scored = inputs.map(({ row, fit: rowFit, fitDemo, components }): Shown => {
+      // Organisation view under the default weights: only the rows with Fit are rescored.
+      if (isDefault && !rowFit) return asStored(row);
+      const r = weights ? scoreMos(components, weights) : null;
+      return {
+        row,
+        fit: rowFit,
+        fitDemo,
+        mos: r?.mos ?? null,
+        grade: r?.grade ?? null,
+        isPartial: r?.isPartial ?? true,
+        coveragePct: r?.coveragePct ?? 0,
+        rank: null,
+        points: r?.contributions ?? {},
+        why: r?.mos != null ? null : missingRequired(row) ? "inputs" : "weights",
+      };
+    });
+    const ranks = rankByMos(new Map(scored.map((s) => [s.row.key, s.grade == null ? null : s.mos])));
+    return scored.map((s) => ({ ...s, rank: ranks.get(s.row.key) ?? null }));
+  }, [inputs, weights, isDefault, orgView]);
 
   const categories = useMemo(() => [...new Map(rows.map((r) => [r.category.slug, r.category])).values()], [rows]);
   const countries = useMemo(() => [...new Set(rows.map((r) => r.territory.country_code))].filter((c): c is string => !!c), [rows]);
@@ -85,6 +130,14 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
   const ranked = visible.filter((s) => s.mos != null && s.grade != null).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
   const insufficient = visible.filter((s) => s.mos == null || s.grade == null);
   const dirty = category !== "" || country !== "";
+  const passportCategory = fit ? categories.find((c) => c.slug === fit.passport.categorySlug) : undefined;
+  const passportCategoryName = passportCategory ? name(passportCategory) : "";
+  const choosePassport = (id: string) => {
+    setSwitching(true);
+    // The Fit is computed on the server, so this is a document load with the passport in the URL
+    // (not a client transition: see components/advisor/document-link.tsx).
+    window.location.assign(`${getPathname({ href: "/opportunities", locale })}${id ? `?passport=${id}` : ""}`);
+  };
   const resetFilters = () => {
     setCategory("");
     setCountry("");
@@ -128,6 +181,7 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
           defaultWeights={defaultWeights}
           sets={sets}
           canSave={canSave}
+          fitNote={orgView && fit ? tp("weightsFitNote", { name: fit.passport.name, category: passportCategoryName }) : undefined}
           onChange={setSliders}
           onSaved={(s) => setSets((prev) => [...prev, s])}
         />
@@ -156,6 +210,32 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
                 ))}
               </select>
             </label>
+            {passports.length > 0 ? (
+              <label className="col-span-2 block sm:col-span-1">
+                <span className="t-label mb-1.5 block">{tp("select")}</span>
+                <select
+                  className="field sm:w-auto sm:min-w-60"
+                  data-testid="passport-select"
+                  value={fit ? String(fit.passport.id) : ""}
+                  disabled={switching}
+                  onChange={(e) => choosePassport(e.target.value)}
+                >
+                  <option value="">{tp("none")}</option>
+                  {passports.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              <p className="t-meta col-span-2 sm:col-span-1 sm:pb-3">
+                {tp("createLead")}{" "}
+                <Link href="/passport" prefetch={false} className="link">
+                  {tp("create")}
+                </Link>
+              </p>
+            )}
             {dirty && (
               <button type="button" onClick={resetFilters} className="btn col-span-2 px-4 text-brand-alt hover:bg-surface-2 sm:col-span-1">
                 {t("reset")}
@@ -167,12 +247,38 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
             <p className="t-label num" aria-live="polite" data-testid="opp-summary">
               {t("summary", { ranked: ranked.length, insufficient: insufficient.length })}
             </p>
+            {orgView && (
+              <span data-testid="orgview-badge" className={BADGE}>
+                {tp("badge")}
+              </span>
+            )}
             {!isDefault && (
-              <span data-testid="whatif-badge" className="rounded-full border border-border-strong px-2.5 py-0.5 text-[11px] font-semibold tracking-[0.08em] uppercase">
+              <span data-testid="whatif-badge" className={BADGE}>
                 {t("whatIf.badge")}
               </span>
             )}
           </div>
+          {orgView && fit && (
+            <p role="status" className="note max-w-[80ch]" data-testid="orgview-note">
+              {tp("note", { name: fit.passport.name, category: passportCategoryName })}{" "}
+              <Link href={`/passport/${fit.passport.id}`} prefetch={false} className="link">
+                {tp("manage")}
+              </Link>
+            </p>
+          )}
+          {fit && !orgView && (
+            <p role="status" className="note max-w-[80ch]" data-testid="orgview-nofit">
+              {Object.keys(fit.cells).length === 0 ? tp("noFit", { name: fit.passport.name }) : tp("noCells", { name: fit.passport.name })}{" "}
+              <Link href={`/passport/${fit.passport.id}`} prefetch={false} className="link">
+                {tp("manage")}
+              </Link>
+            </p>
+          )}
+          {passportMissing && (
+            <p role="status" className="note max-w-[80ch]" data-testid="orgview-missing">
+              {tp("notFound")}
+            </p>
+          )}
           {!isDefault && weights && (
             <p role="status" className="note max-w-[80ch]">
               {t("whatIf.note")}
@@ -215,7 +321,7 @@ export function OpportunitiesView({ rows, defaultWeights, weightSets, canSave }:
                   </div>
                   <ol aria-label={t("listLabel")} data-testid="opp-list" className="space-y-2.5 wide:space-y-0">
                     {ranked.slice(0, limit).map((s) => (
-                      <RankedRow key={s.row.key} s={s} name={name} one={one} pct={pct} />
+                      <RankedRow key={s.row.key} s={s} name={name} one={one} pct={pct} passportName={fit?.passport.name ?? ""} />
                     ))}
                   </ol>
                 </div>
@@ -285,18 +391,21 @@ function RankedRow({
   name,
   one,
   pct,
+  passportName,
 }: {
   s: Shown;
+  passportName: string;
   name: (x: { name_it: string; name_en: string }) => string;
   one: Intl.NumberFormat;
   pct: Intl.NumberFormat;
 }) {
   const t = useTranslations("opportunities");
+  const tp = useTranslations("passport.opportunities");
   const { row } = s;
   const parts = COMPONENTS.filter((k) => s.points[k] != null);
   const label = (k: ComponentKey) => t(`components.${k}`);
   return (
-    <li data-testid="opp-row" data-key={row.key} className="card wide:rounded-none wide:border-0 wide:border-b wide:border-border wide:bg-transparent wide:shadow-none wide:last:border-b-0">
+    <li data-testid="opp-row" data-key={row.key} data-org={s.fit ? "true" : undefined} className="card wide:rounded-none wide:border-0 wide:border-b wide:border-border wide:bg-transparent wide:shadow-none wide:last:border-b-0">
       <Link
         href={`/cell/${row.category.slug}/${row.territory.slug}?tab=opportunity`}
         // No prefetch: a re-rank must not make the browser fetch the rows that scroll into view.
@@ -330,6 +439,16 @@ function RankedRow({
           <GradeBadge grade={s.grade!} />
         </span>
 
+        {s.fit && (
+          // Its own line under the row from 85rem: the cell column is too narrow for it.
+          <span className="col-span-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] wide:col-span-8 wide:col-start-2 wide:row-start-3 wide:text-xs" data-testid="opp-fit-note">
+            <span className="num">{tp("rowFit", { value: one.format(s.fit.pct) })}</span>
+            <GradeBadge grade={s.fit.grade} />
+            {s.fitDemo && <DemoBadge />}
+            <span className="min-w-0 break-words text-muted">{tp("rowNote", { name: passportName })}</span>
+          </span>
+        )}
+
         <span className="col-span-3 text-[13px] leading-snug wide:col-span-1 wide:col-start-3 wide:row-start-2 wide:self-start wide:text-xs" data-testid="opp-coverage">
           <span className="font-medium">{s.isPartial ? t("partial") : t("complete")}</span>
           <span className="text-muted before:content-['_·_']">{t("coverage", { pct: pct.format(s.coveragePct / 100) })}</span>
@@ -347,10 +466,11 @@ function RankedRow({
 
         <ul className="col-span-3 flex flex-wrap gap-x-4 gap-y-2 text-[13px] wide:contents">
           {COMPONENTS.map((k, i) => {
-            const c = row.components[k];
+            // Fit is never in a stored snapshot: when present it is the selected passport's.
+            const c = k === "fit" ? { present: s.fit != null, grade: s.fit?.grade ?? null } : row.components[k];
             const points = s.points[k];
             return (
-              <li key={k} className={cn("flex items-center gap-1.5 wide:row-span-2 wide:row-start-1", COMPONENT_COL[i])}>
+              <li key={k} data-component={k} className={cn("flex items-center gap-1.5 wide:row-span-2 wide:row-start-1", COMPONENT_COL[i])}>
                 <span aria-hidden className={cn("size-2 shrink-0 rounded-[3px] wide:hidden", SEGMENT[k])} />
                 <span className="text-muted wide:sr-only">{label(k)}</span>
                 {c.present && c.grade && points != null ? (
