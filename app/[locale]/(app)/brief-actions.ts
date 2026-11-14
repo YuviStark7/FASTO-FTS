@@ -36,5 +36,6 @@ export async function setBriefStatus(briefId: number, status: BriefStatus, versi
   if (error) return { ok: false, error: error.message };
   if (!data?.length) return { ok: false, error: "not_allowed" };
   revalidatePath("/[locale]/briefs", "page");
+  revalidatePath(`/[locale]/briefs/${briefId}`, "page");
   return { ok: true };
 }

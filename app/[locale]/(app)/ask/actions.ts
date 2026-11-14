@@ -4,6 +4,7 @@ import type { Json } from "@/lib/database.types";
 import { requireUser } from "@/lib/auth";
 import { getStaffRole } from "@/lib/admin";
 import { numbersIn } from "@/lib/ai/brief/citation-check";
+import type { Fact } from "@/lib/ai/brief/types";
 import { chatTurn, type ChatTurn } from "@/lib/ai/chat/orchestrator";
 import { gradeTurn, REFERENCE_QUESTIONS, type ReferenceResult } from "@/lib/ai/chat/reference-questions";
 
@@ -62,17 +63,17 @@ export async function askAction(conversationId: number | null, question: string,
 }
 
 /** Runs the ten reference questions (admins only). Uses the admin's own chat allowance. */
-export async function runReferenceQuestions(): Promise<{ ok: boolean; results: (ReferenceResult & { question: string; answer: string })[] }> {
+export async function runReferenceQuestions(): Promise<{ ok: boolean; results: (ReferenceResult & { question: string; answer: string; sentences: { text: string; facts: string[] }[]; facts: Fact[] })[] }> {
   const { role } = await getStaffRole();
   if (role !== "admin") return { ok: false, results: [] };
   const results = [];
   for (const q of REFERENCE_QUESTIONS) {
     const turn = await chatTurn(q.question, [], q.locale);
     if (!turn.ok) {
-      results.push({ id: q.id, passed: false, reasons: [`turn failed: ${turn.reason}`], question: q.question, answer: "" });
+      results.push({ id: q.id, passed: false, reasons: [`turn failed: ${turn.reason}`], question: q.question, answer: "", sentences: [], facts: [] });
       continue;
     }
-    results.push({ ...gradeTurn(q, turn, numbersIn), question: q.question, answer: turn.answer.sentences.map((s) => s.text).join(" ") });
+    results.push({ ...gradeTurn(q, turn, numbersIn), question: q.question, answer: turn.answer.sentences.map((s) => s.text).join(" "), sentences: turn.answer.sentences, facts: turn.facts });
   }
   return { ok: true, results };
 }
