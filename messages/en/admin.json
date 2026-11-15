@@ -2,16 +2,23 @@
   "admin": {
     "title": "Administration",
     "link": "Administration",
-    "lead": "Sources and connector runs.",
+    "lead": "Sources, runs, AI usage, users and the audit log.",
     "tiles": {
       "sources": "Sources",
       "sourcesHint": "Licence, grade, last run and rerun.",
       "runs": "Runs",
-      "runsHint": "The latest 50, with rows written and rejected."
+      "runsHint": "The latest 50, with rows written and rejected.",
+      "usage": "Usage and spend",
+      "usageHint": "Estimated AI spend, caps and the kill switch.",
+      "audit": "Audit log",
+      "auditHint": "Who changed what: weights, sources, roles, briefs, caps.",
+      "users": "Users and roles",
+      "usersHint": "Who has signed up, and with which role."
     },
     "notAllowed": {
       "title": "Access not allowed",
-      "body": "This area is for analysts and admins. If you need it, ask an admin to change your role."
+      "body": "This area is for analysts and admins. If you need it, ask an admin to change your role.",
+      "adminBody": "This page is for admins only. If you think you need it, ask an admin to change your role."
     },
     "sources": {
       "title": "Sources",
@@ -66,6 +73,169 @@
       "succeeded": "Succeeded",
       "partial": "Partial",
       "failed": "Failed"
+    },
+    "roles": {
+      "admin": "Admin",
+      "analyst": "Analyst",
+      "member": "Member",
+      "viewer": "Viewer"
+    },
+    "usage": {
+      "title": "Usage and spend",
+      "lead": "What AI costs today, who is using it and which caps apply.",
+      "estimateNote": "Estimate: costs are computed from logged tokens and the models' list prices. They are not Anthropic's invoice, which may differ.",
+      "truncated": "Only the {n} most recent rows were read: totals for the earliest days are partial.",
+      "todayTitle": "Today's spend (estimate)",
+      "classificationTitle": "Mention classification, today (estimate)",
+      "classificationHint": "Part of today's spend, with its own cap inside the global limit.",
+      "ofLimit": "of {limit} limit",
+      "noLimit": "No limit configured",
+      "limitReached": "Limit reached",
+      "calls": "{n, plural, =0 {No calls logged today} one {# call today} other {# calls today}}",
+      "ofCap": "{n} of {cap}",
+      "byModuleTitle": "Today by module and kind",
+      "todayEmpty": "No calls logged today.",
+      "topUsersTitle": "Most active users today",
+      "topUsersEmpty": "Nobody has used AI today.",
+      "byDayTitle": "Last {days} days, estimated cost by kind",
+      "utcNote": "Days follow UTC, like the daily caps.",
+      "emptyTitle": "No usage logged in the last {days} days",
+      "emptyBody": "Rows appear when someone uses the chat, generates a brief or a classification runs.",
+      "notConfigured": "Not configured",
+      "kinds": {
+        "chat_turn": "Chat",
+        "brief": "Brief",
+        "classification": "Classification",
+        "pipeline": "Pipeline"
+      },
+      "col": {
+        "module": "Module",
+        "kind": "Kind",
+        "calls": "Calls",
+        "inputTokens": "Input tokens",
+        "outputTokens": "Output tokens",
+        "cost": "Estimated cost",
+        "user": "User",
+        "chatTurns": "Chat turns",
+        "briefs": "Briefs",
+        "day": "Day",
+        "total": "Estimated total"
+      },
+      "kill": {
+        "title": "AI kill switch",
+        "on": "AI on",
+        "off": "AI suspended",
+        "onHint": "Chat, briefs and mention classification are running, within the caps below.",
+        "offHint": "Chat, briefs and mention classification are stopped for every user until you turn AI back on. Data already computed stays available.",
+        "suspend": "Suspend AI",
+        "resume": "Turn AI back on",
+        "confirmSuspend": "Suspend all AI calls for every user?",
+        "confirmResume": "Turn AI calls back on for every user?",
+        "confirmSuspendButton": "Yes, suspend",
+        "confirmResumeButton": "Yes, turn on",
+        "cancel": "Cancel",
+        "saving": "Saving…",
+        "error": "The state could not be changed. Try again.",
+        "missing": "The AI state cannot be read: the ai.enabled key is missing from the configuration."
+      },
+      "caps": {
+        "title": "Caps",
+        "lead": "They apply from the next use. Every change goes to the audit log.",
+        "fields": {
+          "chatTurns": "Chat turns per user per day",
+          "briefs": "Briefs per user per day",
+          "globalSpend": "Global spend per day (USD)",
+          "classification": "Classification budget per day (USD)",
+          "maxTokens": "Max tokens per chat turn"
+        },
+        "range": "From {min} to {max}",
+        "errors": {
+          "required": "Enter a number from {min} to {max}.",
+          "range": "Out of range: from {min} to {max}.",
+          "integer": "A whole number from {min} to {max} is needed."
+        },
+        "save": "Save caps",
+        "saving": "Saving…",
+        "saved": "Caps saved.",
+        "error": "The caps could not be saved. Try again."
+      },
+      "models": {
+        "orchestrator": "Model for chat, orchestration and briefs",
+        "classifier": "Model for classification",
+        "readOnly": "Models are changed with a migration, not from here."
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "lead": "Every write to weights, sources, roles, briefs and configuration. The log is read-only.",
+      "filterTable": "Table",
+      "filterAction": "Action",
+      "allTables": "All tables",
+      "allActions": "All actions",
+      "apply": "Filter",
+      "clear": "Clear filters",
+      "count": "{count, plural, =0 {No entries} one {# entry} other {# entries}}",
+      "actions": {
+        "INSERT": "Created",
+        "UPDATE": "Changed",
+        "DELETE": "Deleted"
+      },
+      "actor": "Actor",
+      "system": "system",
+      "rowKey": "Row key",
+      "changes": "{count, plural, one {# field changed} other {# fields changed}}",
+      "noChanges": "No field changed.",
+      "before": "Before",
+      "after": "After",
+      "absent": "(absent)",
+      "emptyTitle": "The log is empty",
+      "emptyBody": "Changes to weights, sources, roles, briefs and configuration appear here.",
+      "emptyFilteredTitle": "No entries match these filters",
+      "emptyFilteredBody": "Change the table or action, or go back to the full list.",
+      "pagination": "Log pages",
+      "newer": "Newer",
+      "older": "Older",
+      "pageOf": "Page {page} of {pages}"
+    },
+    "users": {
+      "title": "Users and roles",
+      "lead": "Everyone who has signed up, with organisation and role.",
+      "rolesTitle": "What each role can do",
+      "can": {
+        "admin": "Everything, including sources, weights, users, audit log and publishing briefs.",
+        "analyst": "Runs pipelines, reviews taxonomy mappings and briefs, edits weight sets.",
+        "member": "Reads all cells, uses the chat, saves watchlists, creates product passports, exports.",
+        "viewer": "Reads published sheets and briefs only."
+      },
+      "rolesNote": "New sign-ups start as Member. Every role change goes to the audit log.",
+      "search": "Search by email",
+      "searchPlaceholder": "name@example.com",
+      "searchButton": "Search",
+      "clear": "Show all",
+      "count": "{count, plural, =0 {No users} one {# user} other {# users}}",
+      "countFiltered": "{count} of {total}",
+      "emptyTitle": "No users",
+      "emptyBody": "Users appear here after they sign up.",
+      "emptySearchTitle": "No user found",
+      "emptySearchBody": "No email contains “{q}”.",
+      "name": "Name",
+      "noName": "Not given",
+      "organisation": "Organisation",
+      "signedUp": "Signed up",
+      "lastSignIn": "Last sign-in",
+      "never": "Never",
+      "ownRow": "This is you: your own role cannot be changed from here.",
+      "changeRole": "Change role",
+      "roleOf": "Role of {email}",
+      "confirm": "Change the role of {email} from {from} to {to}?",
+      "confirmButton": "Confirm",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "error": "The role could not be changed.",
+      "selfError": "You cannot change your own role from here.",
+      "lastAdmin": "This is the last admin: they cannot be demoted or removed.",
+      "dbError": "The database refused the change.",
+      "dbMessage": "Database message: {message}"
     }
   }
 }

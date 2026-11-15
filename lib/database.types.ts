@@ -957,7 +957,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "ai_quota_check":
+            "admin_users":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "created_at": string,"display_name": string,"email": string,"last_sign_in_at": string,"org_id": string,"org_name": string,"role": Database["public"]['Enums']["app_role"],"user_id": string
+            }[]
+                           },
+"ai_quota_check":
 { Args: { "p_kind": string,"p_user": string }; Returns: string
                            },
 "feedback_summary":
