@@ -1,3 +1,4 @@
+import { ScoutIntroGate } from "@/components/cell/scout-intro";
 import { Header } from "@/components/shell/header";
 import { requireUser } from "@/lib/auth";
 
@@ -8,6 +9,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   await requireUser();
   return (
     <div style={{ "--header-h": "calc(5rem + env(safe-area-inset-top))" } as React.CSSProperties}>
+      <ScoutIntroGate />
       <Header />
       <main className="min-h-dvh pt-[var(--header-h)]">{children}</main>
     </div>

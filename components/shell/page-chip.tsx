@@ -62,6 +62,7 @@ export function PageChip() {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
       data-open={open}
+      data-intro-part="chip"
       className="pointer-events-auto flex items-center rounded-full bg-brand text-brand-contrast shadow-e2 ring-1 ring-inset ring-white/15 transition-shadow duration-(--dur-slow) data-[open=true]:shadow-e3"
     >
       <button
