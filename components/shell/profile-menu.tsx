@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
-import { FileText, IdCard, LogOut, Map as MapIcon, Moon, Settings, Sun } from "lucide-react";
+import { FileText, IdCard, LogOut, Moon, Settings, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { setTheme, signOut } from "@/app/[locale]/(app)/more/actions";
@@ -13,7 +13,6 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
   const t = useTranslations("shell");
   const tm = useTranslations("more");
   const ta = useTranslations("admin");
-  const tmap = useTranslations("map");
   const tb = useTranslations("briefs");
   const tp = useTranslations("passport");
   const locale = useLocale();
@@ -115,10 +114,6 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
             </Link>
           ))}
         </div>
-        <Link role="menuitem" tabIndex={-1} href="/map" className={ITEM}>
-          <MapIcon aria-hidden className="size-4" />
-          {tmap("title")}
-        </Link>
         <Link role="menuitem" tabIndex={-1} href="/briefs" className={ITEM}>
           <FileText aria-hidden className="size-4" />
           {tb("title")}

@@ -11,6 +11,14 @@ test("chip expands, navigates to Matrice and shows the active page", async ({ pa
   await chip.click();
   await expect(chip).toHaveAttribute("aria-expanded", "true");
   await expect(nav.getByRole("link", { name: "Scout" })).toHaveAttribute("aria-current", "page");
+  // Fully open (after the width transition), the chip stays clear of the profile badge.
+  const badgeBox = await page.getByRole("button", { name: "Profilo e impostazioni" }).boundingBox();
+  await expect(async () => {
+    const n = (await nav.boundingBox())!;
+    const last = (await nav.getByRole("link", { name: "Chiedi" }).boundingBox())!;
+    expect(last.x + last.width, "the chip is fully open").toBeLessThanOrEqual(n.x + n.width);
+    expect(n.x + n.width, "the open chip does not run under the profile badge").toBeLessThanOrEqual(badgeBox!.x);
+  }).toPass({ timeout: 3000 });
   await page.waitForTimeout(400);
   await page.screenshot({ path: `test-results/shell-chip-expanded-${info.project.name}.png` });
   await nav.getByRole("link", { name: "Matrice" }).click();
@@ -21,6 +29,12 @@ test("chip expands, navigates to Matrice and shows the active page", async ({ pa
   await expect(nav.getByRole("link", { name: "Matrice" })).toHaveAttribute("aria-current", "page");
   const box = await nav.getByRole("link", { name: "Chiedi" }).boundingBox();
   expect(box!.height).toBeGreaterThanOrEqual(44);
+  // Four pages in order, and the open chip stays clear of the profile badge and the viewport.
+  await expect(nav.getByRole("link")).toHaveText([/Scout/i, /Mappa/i, /Matrice/i, /Chiedi/i]);
+  const badge = await page.getByRole("button", { name: "Profilo e impostazioni" }).boundingBox();
+  const chipBox = await nav.boundingBox();
+  expect(chipBox!.x).toBeGreaterThanOrEqual(0);
+  expect(chipBox!.x + chipBox!.width, "the open chip does not run under the profile badge").toBeLessThanOrEqual(badge!.x);
   await page.keyboard.press("Escape");
   await expect(chip).toHaveAttribute("aria-expanded", "false");
 });
@@ -32,7 +46,7 @@ test("profile menu signs out", async ({ page }, info) => {
   const menu = page.getByRole("menu");
   await expect(menu).toBeVisible();
   await expect(menu).toContainText(email);
-  await expect(menu.getByRole("menuitem", { name: "Mappa" })).toBeVisible();
+  await expect(menu.getByRole("menuitem", { name: "Mappa" })).toHaveCount(0); // Map moved to the header chip
   await expect(menu.getByRole("menuitem", { name: "Amministrazione" })).toHaveCount(0);
   await page.waitForTimeout(400);
   await page.screenshot({ path: `test-results/shell-profile-menu-${info.project.name}.png` });
@@ -51,6 +65,8 @@ test("keyboard: Tab to chip, Enter expands, arrow to Matrice, Enter navigates", 
   await expect(chip).toHaveAttribute("aria-expanded", "true");
   await page.waitForTimeout(300);
   await page.keyboard.press("ArrowRight"); // Scout
+  await page.keyboard.press("ArrowRight"); // Mappa
+  await expect(page.getByRole("link", { name: "Mappa" })).toBeFocused();
   await page.keyboard.press("ArrowRight"); // Matrice
   await expect(page.getByRole("link", { name: "Matrice" })).toBeFocused();
   await page.keyboard.press("Enter");
