@@ -13,10 +13,10 @@ import { CategoryIcon } from "./category-icon";
  * server-rendered underneath from the start, nothing here delays data or hydration.
  *
  * Two inline scripts decide and drive it before first paint, without waiting for React:
- *  - ScoutIntroGate (app layout): plays only on a full page load of the Scout landing route, once per
- *    browser (`localStorage["fasto.intro.v1"]`, then sessionStorage, else once per page lifetime: the
- *    script never runs again on client navigations). Never with reduced motion. Never under
- *    automation (`navigator.webdriver`) unless the URL carries `?intro=1`.
+ *  - ScoutIntroGate (app layout): plays on every full page load (or reload) of the Scout landing
+ *    route; the script never runs again on client navigations, so moving around the app does not
+ *    replay it. Never with reduced motion. Never under automation (`navigator.webdriver`) unless the
+ *    URL carries `?intro=1`.
  *  - ScoutIntroPetals (Scout page): starts the choreography once the petals are on screen.
  * Any pointer press or key press ends it at once.
  */
@@ -25,17 +25,12 @@ import { CategoryIcon } from "./category-icon";
 const PLAY_MS = 2500;
 /** If the Scout page has not arrived by then, give up and show the normal loading state. */
 const PENDING_MS = 2000;
-const STORAGE_KEY = "fasto.intro.v1";
 
 const gateScript = () => `(function(){try{
-var d=document.documentElement,A="data-scout-intro",K=${JSON.stringify(STORAGE_KEY)},w=window,t;
+var d=document.documentElement,A="data-scout-intro",w=window,t;
 if(!/^\\/(?:${routing.locales.join("|")})?\\/?$/.test(location.pathname))return;
 if(w.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
 if(navigator.webdriver&&!/[?&]intro=1(?:&|$)/.test(location.search))return;
-var seen;
-try{seen=localStorage.getItem(K);localStorage.setItem(K,"1")}
-catch(e){try{seen=sessionStorage.getItem(K);sessionStorage.setItem(K,"1")}catch(f){}}
-if(seen)return;
 function end(){clearTimeout(t);d.removeAttribute(A);w.removeEventListener("pointerdown",skip,true);w.removeEventListener("keydown",end,true)}
 function skip(){end();
 function c(e){e.preventDefault();e.stopPropagation();w.removeEventListener("click",c,true)}
