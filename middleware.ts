@@ -6,7 +6,7 @@ import { routing } from "@/lib/i18n/routing";
 const intl = createIntlMiddleware(routing);
 
 // Routes reachable without signing in (locale prefix stripped).
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/privacy"];
 
 export async function middleware(request: NextRequest) {
   const response = intl(request);

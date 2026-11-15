@@ -1,0 +1,60 @@
+{
+  "account": {
+    "exportTitle": "I tuoi dati",
+    "exportBody": "Scarica in un file JSON tutto ciò che la piattaforma conserva sul tuo account: profilo, ruoli, conversazioni con Chiedi, valutazioni, passaporti e pesi che hai creato, consumo di AI.",
+    "exportButton": "Scarica i miei dati",
+    "privacyLink": "Informativa privacy",
+    "delete": {
+      "title": "Elimina l'account",
+      "open": "Elimina il mio account",
+      "warning": "L'eliminazione è definitiva e non si può annullare.",
+      "deletes": "Vengono eliminati: account, profilo, ruoli, conversazioni, valutazioni, liste salvate e l'organizzazione personale con i suoi passaporti, pesi ed esportazioni.",
+      "keeps": "Restano: le schede e le note pubblicate (dati di mercato, non personali) e il registro delle modifiche, che conserva solo l'identificativo dell'account.",
+      "typeEmail": "Per confermare, scrivi la tua email: {email}",
+      "cancel": "Annulla",
+      "confirm": "Elimina definitivamente",
+      "pending": "Eliminazione…",
+      "error": {
+        "confirm_mismatch": "L'email non corrisponde.",
+        "last_admin": "Sei l'unico amministratore: nomina prima un altro amministratore da Amministrazione → Utenti e ruoli.",
+        "failed": "L'eliminazione non è riuscita. Riprova o contatta un amministratore."
+      }
+    },
+    "deleted": "Il tuo account è stato eliminato."
+  },
+  "privacy": {
+    "title": "Informativa privacy",
+    "updated": "Aggiornata il 15 novembre 2026",
+    "sections": [
+      {
+        "h": "Chi tratta i dati",
+        "p": "FASTO FTS è una piattaforma di ricerca e sviluppo sui mercati agroalimentari. I dati degli utenti sono trattati dal gruppo di progetto che gestisce la piattaforma. Per qualsiasi richiesta puoi usare le funzioni di esportazione e cancellazione in Impostazioni o scrivere all'amministratore della piattaforma."
+      },
+      {
+        "h": "Quali dati conserviamo su di te",
+        "p": "Email e data di accesso (per l'accesso con link magico), nome visualizzato e lingua se li imposti, organizzazione e ruolo, le domande che fai a Chiedi con le risposte, le valutazioni che lasci, i passaporti prodotto e i pesi che crei, e il consumo di AI (numero di richieste e costo stimato) per applicare i limiti giornalieri."
+      },
+      {
+        "h": "Dati sui consumatori",
+        "p": "La piattaforma non conserva dati personali di consumatori. Le menzioni online usate per il sentiment sono brevi estratti di post pubblici: identificativi, nomi utente e link degli autori vengono rimossi al momento della raccolta."
+      },
+      {
+        "h": "Perché e su quale base",
+        "p": "Per fornirti il servizio che hai richiesto registrandoti (esecuzione del servizio) e per tenerlo sicuro e sostenibile: limiti di utilizzo, registro delle modifiche a ruoli, pesi, fonti e note (legittimo interesse)."
+      },
+      {
+        "h": "Dove sono i dati e chi li elabora",
+        "p": "Database e autenticazione: Supabase, nell'Unione europea (Francoforte). Sito: Vercel, con esecuzione in Europa. Funzioni di AI: le domande a Chiedi e i dati di mercato usati per le note sono inviati ad Anthropic per generare la risposta; non inviamo la tua email."
+      },
+      {
+        "h": "Per quanto tempo",
+        "p": "Finché l'account esiste. Quando lo elimini, cancelliamo l'account e i dati collegati; il registro delle modifiche, che è a sola aggiunta, conserva solo l'identificativo dell'account. I backup giornalieri del database scadono secondo la politica del fornitore."
+      },
+      {
+        "h": "I tuoi diritti",
+        "p": "Puoi scaricare i tuoi dati ed eliminare il tuo account in qualsiasi momento da Impostazioni. Puoi chiedere rettifica o limitazione all'amministratore della piattaforma e proporre reclamo all'autorità di controllo (in Italia, il Garante per la protezione dei dati personali)."
+      }
+    ],
+    "back": "Torna all'accesso"
+  }
+}

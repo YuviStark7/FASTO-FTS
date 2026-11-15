@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getStaffRole } from "@/lib/admin";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
+import { DeleteAccount } from "@/components/account/delete-account";
 import { requireUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { setTheme, signOut } from "./actions";
@@ -11,6 +12,7 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("more");
+  const tacc = await getTranslations("account");
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
   const { email } = await requireUser();
   const ta = await getTranslations("admin");
@@ -27,6 +29,23 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
       <section className="card space-y-2 p-5">
         <h2 className="t-label">{t("account")}</h2>
         <p className="truncate">{email}</p>
+      </section>
+
+      <section className="card space-y-3 p-5" data-testid="account-export">
+        <h2 className="t-label">{tacc("exportTitle")}</h2>
+        <p className="text-sm text-muted">{tacc("exportBody")}</p>
+        {/* Plain link: a file download, not a client navigation. */}
+        <a href={`${locale === "en" ? "/en" : ""}/account/export`} download className="btn btn-ghost h-11 w-full">
+          {tacc("exportButton")}
+        </a>
+        <Link href="/privacy" className="block text-sm text-muted underline underline-offset-4 hover:text-text">
+          {tacc("privacyLink")}
+        </Link>
+      </section>
+
+      <section className="card space-y-3 p-5" data-testid="account-delete">
+        <h2 className="t-label">{tacc("delete.title")}</h2>
+        <DeleteAccount email={email} />
       </section>
 
       <section className="card space-y-3 p-5">
