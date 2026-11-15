@@ -234,7 +234,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
           bloomed ? "top-[calc(var(--header-h,96px)+1rem)] translate-y-0" : "top-1/2 -translate-y-1/2",
         )}
       >
-        <div className="flex flex-col items-center gap-4">
+        <div data-intro-part="stat" className="flex flex-col items-center gap-4">
           {/* Keyed on the cell: label and status cross-fade when the selection changes. */}
           <div
             key={`${catSlug}:${terSlug}`}
@@ -320,6 +320,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
       >
         {/* Collapsed chips: category icon and location. Hover or tap blooms the flower again. */}
         <div
+          data-intro-part="chips"
           className={cn(
             "absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-3",
             move,

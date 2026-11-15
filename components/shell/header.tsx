@@ -14,7 +14,7 @@ export async function Header() {
     <header className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[var(--header-h)] px-3 pt-[calc(env(safe-area-inset-top)+1rem)] before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-full before:bg-gradient-to-b before:from-bg before:from-55% before:via-bg/90 before:via-80% before:to-transparent sm:px-4">
       <div className="relative mx-auto flex max-w-[1600px] items-start justify-center">
         <PageChip />
-        <div className="pointer-events-auto absolute right-0 top-0">
+        <div data-intro-part="badge" className="pointer-events-auto absolute right-0 top-0">
           <ProfileMenu email={email} isStaff={role !== null} theme={theme} />
         </div>
       </div>

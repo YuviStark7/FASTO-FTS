@@ -44,7 +44,8 @@ export default async function LocaleLayout({
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
 
   return (
-    <html lang={locale} data-theme={theme} className={`${geist.variable} ${geistMono.variable}`}>
+    // The Scout intro script sets a transient attribute on <html> before hydration.
+    <html lang={locale} data-theme={theme} suppressHydrationWarning className={`${geist.variable} ${geistMono.variable}`}>
       <body className="min-h-dvh">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

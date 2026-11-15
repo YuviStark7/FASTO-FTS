@@ -676,3 +676,190 @@ details > summary::-webkit-details-marker {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(var(--dx, 6px), var(--dy, -10px), 0); }
 }
+
+/*
+ * Scout first-visit intro (components/cell/scout-intro.tsx). Everything hangs off one attribute on
+ * <html>: "pending" shows the brand on the page background, "play" runs the choreography, removing it
+ * is the final state. Transform and opacity only; nothing here changes layout.
+ *   0     brand in, petals bloom outwards (staggered) while the ring makes a 3/4 turn
+ *   1050  ring glides down to the Scout flower's resting point and collapses, as the real flower does;
+ *         brand and background fade, the real chips scale in
+ *   1550  header chip floats down, 1650 profile badge
+ *   1950  verdict floats up, frames fade in (ends 2450)
+ */
+.scout-intro,
+.scout-intro-flower {
+  display: none;
+}
+html[data-scout-intro] .scout-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  /* Catches the tap that skips the intro, so it never reaches the page underneath. */
+  touch-action: none;
+}
+.scout-intro-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+}
+.scout-intro-brand {
+  position: relative;
+}
+html[data-scout-intro] .scout-intro-brand {
+  animation: intro-brand-in 420ms var(--ease-out) both;
+}
+html[data-scout-intro="play"] .scout-intro-brand {
+  animation:
+    intro-brand-in 420ms var(--ease-out) both,
+    intro-brand-out 380ms var(--ease-in-out) 1000ms forwards;
+}
+html[data-scout-intro="play"] .scout-intro-bg {
+  animation: intro-fade-out 460ms var(--ease-in-out) 1100ms forwards;
+}
+
+html[data-scout-intro="play"] .scout-intro-flower {
+  --b: calc(var(--R) * 0.1 + var(--p) / 2 + 1.75rem);
+  position: fixed;
+  top: 50dvh;
+  left: 50%;
+  z-index: 61;
+  display: block;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: intro-settle 620ms var(--ease-in-out) 1050ms forwards;
+}
+.scout-intro-ring,
+.scout-intro-petal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+.scout-intro-ring {
+  animation: intro-turn 1300ms var(--ease-in-out) both;
+}
+.scout-intro-petal {
+  animation: intro-petal 640ms var(--ease-spring) calc(var(--i) * 28ms) both;
+}
+.scout-intro-face {
+  position: absolute;
+  top: calc(var(--p) / -2);
+  left: calc(var(--p) / -2);
+  width: var(--p);
+  height: var(--p);
+  /* Counter-turn, in step with the ring, so the icons stay upright. */
+  animation: intro-upright 1300ms var(--ease-in-out) both;
+}
+
+html[data-scout-intro="play"] [data-intro-part="chips"] {
+  animation: intro-chips 440ms var(--ease-spring) 1380ms both;
+}
+html[data-scout-intro="play"] [data-intro-part="chip"] {
+  animation: intro-drop 500ms var(--ease-spring) 1550ms both;
+}
+html[data-scout-intro="play"] [data-intro-part="badge"] {
+  animation: intro-drop 500ms var(--ease-spring) 1650ms both;
+}
+html[data-scout-intro="play"] [data-intro-part="stat"] {
+  animation: intro-rise 500ms var(--ease-out) 1950ms both;
+}
+html[data-scout-intro="play"] [data-intro-part="frames"] {
+  animation: fade-in 500ms var(--ease-out) 1950ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-scout-intro] .scout-intro,
+  html[data-scout-intro] .scout-intro-flower {
+    display: none;
+  }
+}
+
+@keyframes intro-brand-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes intro-brand-out {
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+@keyframes intro-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes intro-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(270deg);
+  }
+}
+@keyframes intro-petal {
+  from {
+    opacity: 0;
+    /* Starts clear of the brand, so no petal crosses the text. */
+    transform: rotate(var(--a)) translateY(calc(var(--R) * -0.6)) scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(calc(var(--R) * -1)) scale(1);
+  }
+}
+@keyframes intro-upright {
+  from {
+    transform: rotate(calc(var(--a) * -1));
+  }
+  to {
+    transform: rotate(calc(var(--a) * -1 - 270deg));
+  }
+}
+@keyframes intro-settle {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  50% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(calc(50dvh - var(--b))) scale(0.12);
+  }
+}
+@keyframes intro-chips {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+@keyframes intro-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-1.75rem);
+  }
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+}

@@ -86,6 +86,7 @@ export function ScoutFrames({
       aria-label={t("framesLabel")}
       aria-busy={loading}
       data-testid="scout-frames"
+      data-intro-part="frames"
       className={cn("pointer-events-none absolute inset-0 z-0 m-0 list-none p-0", !visible && "invisible")}
     >
       {!figures &&

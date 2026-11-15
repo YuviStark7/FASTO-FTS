@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { getScoutData } from "@/lib/queries/scout";
+import { ScoutIntroPetals } from "@/components/cell/scout-intro";
 import { ScoutView } from "@/components/cell/scout-view";
 
 export default async function ScoutPage({
@@ -13,5 +14,10 @@ export default async function ScoutPage({
   setRequestLocale(locale);
   const { c, t } = await searchParams;
   const data = await getScoutData();
-  return <ScoutView {...data} initialCategory={c} initialTerritory={t} />;
+  return (
+    <>
+      <ScoutIntroPetals categories={data.categories} />
+      <ScoutView {...data} initialCategory={c} initialTerritory={t} />
+    </>
+  );
 }
