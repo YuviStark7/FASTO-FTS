@@ -7,6 +7,8 @@ import { DemoBadge, GradeBadge } from "@/components/cell/grade-badge";
 import { FigureValue } from "./figure-value";
 import { formatDate, formatValue } from "./format";
 import { InsufficientState, Panel } from "./ui";
+import { GenerateBriefButton } from "@/components/advisor/generate-brief-button";
+import type { BriefInfo } from "./sheet-view";
 
 type Opportunity = NonNullable<CellSheet["opportunity"]>;
 type Component = Opportunity["components"][number];
@@ -28,7 +30,7 @@ function Missing({ children }: { children: React.ReactNode }) {
  * Opportunity tab: the stored MOS snapshot (mos-v1) with its grade, coverage and component breakdown.
  * Nothing is computed here. A missing score or component is hatched and named, never a zero.
  */
-export function OpportunityTab({ opportunity }: { opportunity: CellSheet["opportunity"] }) {
+export function OpportunityTab({ opportunity, brief: briefInfo, category, territory }: { opportunity: CellSheet["opportunity"]; brief?: BriefInfo; category: string; territory: string }) {
   const t = useTranslations("sheet.opportunity");
   const tp = useTranslations("passport");
   const locale = useLocale();
@@ -44,7 +46,18 @@ export function OpportunityTab({ opportunity }: { opportunity: CellSheet["opport
   );
   const brief = (
     <Panel title={t("brief")}>
-      <p className="text-sm text-muted">{t("briefSoon")}</p>
+      <div className="space-y-3" data-testid="opportunity-brief">
+        {briefInfo?.existing ? (
+          <a href={`/${locale === "en" ? "en/" : ""}briefs/${briefInfo.existing.id}`} className="btn btn-ghost max-sm:w-full">
+            {t("briefOpen", { status: t(`briefStatus.${briefInfo.existing.status}`) })}
+          </a>
+        ) : (
+          <p className="text-sm text-muted">{t("briefNone")}</p>
+        )}
+        {briefInfo?.canGenerate && (
+          <GenerateBriefButton category={category} territory={territory} locale={locale === "en" ? "en" : "it"} refresh={!!briefInfo.existing} />
+        )}
+      </div>
     </Panel>
   );
 

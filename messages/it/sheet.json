@@ -216,8 +216,14 @@
       },
       "fitNote": "Fit richiede un passaporto di prodotto: senza, non entra nel punteggio.",
       "brief": "Nota di ingresso",
-      "briefSoon": "La nota di ingresso arriva più tardi oggi.",
-      "toOpportunities": "Vedi la classifica delle opportunità"
+      "toOpportunities": "Vedi la classifica delle opportunità",
+      "briefOpen": "Apri la nota di ingresso ({status})",
+      "briefNone": "Nessuna nota di ingresso per questa cella. Le note sono generate da analisti e amministratori.",
+      "briefStatus": {
+        "draft": "bozza",
+        "reviewed": "revisionata",
+        "published": "pubblicata"
+      }
     },
     "sources": {
       "title": "Registro delle evidenze",
