@@ -63,3 +63,24 @@ Blocked from 19:50 UTC on 11 November to the night: GitHub Actions failed every 
 - Bluesky run 15 (after PR 14): 20,155 posts collected before the 20,000 cap; the vinegar-condiments queries never ran. All mentions are now scored: 26,591 of 26,593, 16,388 relevant. Classifier spend was $2.35 on 12 November, under the $3 daily budget.
 - Published CSI (latest non-demo snapshot per category and country): 62 of 75 pairs. Below the 50-mention minimum: coffee fr (31), honey es (10) and it (25), organic es (36) and it (2), premium-soft-drinks fr (4). No snapshot: chocolate es and nl, and every vinegar-condiments country.
 - OSM diagnostic run 14: Bari candidates show the comune is relation 41038, wikidata Q3519, admin_level 8; `areas.ts` held Q8553. Fixed in `day-4/osm-bari`. Verona had no candidate list because every Overpass mirror failed that night (504s, timeouts, overpass-api.de 406), as did Milano, Torino, Genova, Bologna, Firenze, Venezia and Barcelona. OSM now takes `--param cities=a,b` so a queued run can retry only those cities.
+
+## Day 4, 13–15 November (advisor)
+
+Merged: PR 15–17 (OSM boundaries for Bari and Verona; all 20 cities now have store counts), 18–19 (MOS `mos-v1`, Opportunities screen with what-if weights, Opportunity tab), 20 (briefs with citation check, Ask with typed tools, PDF and Word export), 21 (product passport and Fit `fit-v1`), 22 (generate briefs from the Opportunity tab; reference-question runs stored).
+
+Production:
+- Migrations `20261113100000` (MOS grade), `20261113110000` (fit method) and `20261114090000` (brief version guards) are applied and fingerprint-verified against local.
+- Compute run 43591784921 wrote 279 MOS scores out of 300 cells. All are partial and grade C until a passport supplies Fit. They range from 17.6 to 90.3. The 21 cells without a trend have no score.
+- `SUPABASE_SECRET_KEY` was added to Vercel (production and preview) for the server-side quota checks and usage logging of briefs and Ask.
+
+Gate, checked against the production database on 15 November:
+- **Reference questions: 10/10.** Every answer passed the citation check and called the expected tool with the expected slugs. The out-of-scope question (Tokyo prices) was declined with no figure. Three further questions asked by the user also passed the check. The run is stored as conversation 1.
+- **Briefs: two generated so far,** cheese in Milano (it, published) and cheese in Roma (en, reviewed). Both pass the citation check, with 0 sentences dropped. A re-read of every sentence finds each figure in a cited fact. Exports: Milano as Word and PDF, Roma as Word. **The third brief and its export are still open**; the user's brief allowance for the day had 1 left.
+- **Prompt evals (Actions):** brief 3/3, classifier 8/8, about $0.04.
+
+Fixes after the gate: the PDF print page lost its margins in real browsers. Side margins moved into the content (PR 23).
+
+Known issues:
+- Under Playwright, a server action that revalidates sometimes leaves the client router suspended. The screens use a reload or plain links as a workaround.
+- The passport and opportunities specs collide when repeated in parallel (`--repeat-each 3`), because they seed the same demo category.
+- Local Docker stops on every session restart; restart `dockerd` and `supabase start`.

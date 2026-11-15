@@ -2,9 +2,12 @@
  * Print route of a brief. The sheet is always light (data-theme="light" on the wrapper picks the
  * light tokens from globals.css), whatever theme the app is in. A4, with the app chrome removed.
  */
+/* Side margins live in the content (padding-inline below), which every browser keeps on every
+   page; Safari ignores @page margins and Chrome's "Margins: None" drops them. Top and bottom stay
+   on @page, and a browser that ignores it applies its own default. */
 @page {
   size: A4;
-  margin: 16mm 14mm 18mm;
+  margin: 16mm 0 18mm;
 }
 
 .print-sheet {
@@ -142,7 +145,7 @@
     max-width: none;
     overflow: visible;
     border-radius: 0;
-    padding: 0;
+    padding: 0 14mm;
     box-shadow: none;
     font-size: 10.5pt;
   }
