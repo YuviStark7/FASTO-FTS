@@ -2,16 +2,23 @@
   "admin": {
     "title": "Amministrazione",
     "link": "Amministrazione",
-    "lead": "Fonti e esecuzioni dei connettori.",
+    "lead": "Fonti, esecuzioni, utilizzo dell'AI, utenti e registro delle modifiche.",
     "tiles": {
       "sources": "Fonti",
       "sourcesHint": "Licenza, grado, ultima esecuzione e riavvio.",
       "runs": "Esecuzioni",
-      "runsHint": "Le ultime 50, con righe scritte e scartate."
+      "runsHint": "Le ultime 50, con righe scritte e scartate.",
+      "usage": "Utilizzo e spesa",
+      "usageHint": "Spesa AI stimata, limiti e interruttore generale.",
+      "audit": "Registro delle modifiche",
+      "auditHint": "Chi ha cambiato cosa: pesi, fonti, ruoli, brief, limiti.",
+      "users": "Utenti e ruoli",
+      "usersHint": "Chi è iscritto, con quale ruolo."
     },
     "notAllowed": {
       "title": "Accesso non consentito",
-      "body": "Quest'area è riservata ad analisti e amministratori. Se pensi di averne bisogno, chiedi a un amministratore di cambiare il tuo ruolo."
+      "body": "Quest'area è riservata ad analisti e amministratori. Se pensi di averne bisogno, chiedi a un amministratore di cambiare il tuo ruolo.",
+      "adminBody": "Questa pagina è riservata agli amministratori. Se pensi di averne bisogno, chiedi a un amministratore di cambiare il tuo ruolo."
     },
     "sources": {
       "title": "Fonti",
@@ -66,6 +73,169 @@
       "succeeded": "Riuscita",
       "partial": "Parziale",
       "failed": "Fallita"
+    },
+    "roles": {
+      "admin": "Amministratore",
+      "analyst": "Analista",
+      "member": "Membro",
+      "viewer": "Lettore"
+    },
+    "usage": {
+      "title": "Utilizzo e spesa",
+      "lead": "Quanto costa oggi l'AI, chi la usa e quali limiti valgono.",
+      "estimateNote": "Stima: i costi sono calcolati dai token registrati e dai prezzi di listino dei modelli. Non sono la fattura di Anthropic, che può differire.",
+      "truncated": "Sono state lette solo le {n} righe più recenti: i totali dei giorni più lontani sono parziali.",
+      "todayTitle": "Spesa di oggi (stima)",
+      "classificationTitle": "Classificazione delle menzioni, oggi (stima)",
+      "classificationHint": "Parte della spesa di oggi, con un proprio tetto dentro il limite globale.",
+      "ofLimit": "su {limit} di limite",
+      "noLimit": "Limite non configurato",
+      "limitReached": "Limite raggiunto",
+      "calls": "{n, plural, =0 {Nessuna chiamata registrata oggi} one {# chiamata oggi} other {# chiamate oggi}}",
+      "ofCap": "{n} su {cap}",
+      "byModuleTitle": "Oggi per modulo e tipo",
+      "todayEmpty": "Nessuna chiamata registrata oggi.",
+      "topUsersTitle": "Utenti più attivi oggi",
+      "topUsersEmpty": "Oggi nessun utente ha usato l'AI.",
+      "byDayTitle": "Ultimi {days} giorni, costo stimato per tipo",
+      "utcNote": "I giorni seguono l'ora UTC, come i limiti giornalieri.",
+      "emptyTitle": "Nessun utilizzo registrato negli ultimi {days} giorni",
+      "emptyBody": "Le righe compaiono quando qualcuno usa la chat, genera un brief o parte una classificazione.",
+      "notConfigured": "Non configurato",
+      "kinds": {
+        "chat_turn": "Chat",
+        "brief": "Brief",
+        "classification": "Classificazione",
+        "pipeline": "Pipeline"
+      },
+      "col": {
+        "module": "Modulo",
+        "kind": "Tipo",
+        "calls": "Chiamate",
+        "inputTokens": "Token in ingresso",
+        "outputTokens": "Token in uscita",
+        "cost": "Costo stimato",
+        "user": "Utente",
+        "chatTurns": "Turni di chat",
+        "briefs": "Brief",
+        "day": "Giorno",
+        "total": "Totale stimato"
+      },
+      "kill": {
+        "title": "Interruttore generale dell'AI",
+        "on": "AI attiva",
+        "off": "AI sospesa",
+        "onHint": "Chat, brief e classificazione delle menzioni funzionano, entro i limiti qui sotto.",
+        "offHint": "Chat, brief e classificazione delle menzioni sono fermi per tutti gli utenti finché non la riattivi. I dati già calcolati restano consultabili.",
+        "suspend": "Sospendi l'AI",
+        "resume": "Riattiva l'AI",
+        "confirmSuspend": "Sospendere tutte le chiamate AI per tutti gli utenti?",
+        "confirmResume": "Riattivare le chiamate AI per tutti gli utenti?",
+        "confirmSuspendButton": "Sì, sospendi",
+        "confirmResumeButton": "Sì, riattiva",
+        "cancel": "Annulla",
+        "saving": "Salvataggio…",
+        "error": "Non è stato possibile cambiare lo stato. Riprova.",
+        "missing": "Lo stato dell'AI non è leggibile: manca la chiave ai.enabled nella configurazione."
+      },
+      "caps": {
+        "title": "Limiti",
+        "lead": "Valgono dal prossimo utilizzo. Ogni modifica finisce nel registro.",
+        "fields": {
+          "chatTurns": "Turni di chat per utente al giorno",
+          "briefs": "Brief per utente al giorno",
+          "globalSpend": "Spesa globale al giorno (USD)",
+          "classification": "Budget classificazione al giorno (USD)",
+          "maxTokens": "Token massimi per turno di chat"
+        },
+        "range": "Da {min} a {max}",
+        "errors": {
+          "required": "Inserisci un numero da {min} a {max}.",
+          "range": "Fuori intervallo: da {min} a {max}.",
+          "integer": "Serve un numero intero da {min} a {max}."
+        },
+        "save": "Salva i limiti",
+        "saving": "Salvataggio…",
+        "saved": "Limiti salvati.",
+        "error": "Non è stato possibile salvare i limiti. Riprova."
+      },
+      "models": {
+        "orchestrator": "Modello per chat, orchestrazione e brief",
+        "classifier": "Modello per la classificazione",
+        "readOnly": "I modelli si cambiano con una migrazione, non da qui."
+      }
+    },
+    "audit": {
+      "title": "Registro delle modifiche",
+      "lead": "Ogni scrittura su pesi, fonti, ruoli, brief e configurazione. Il registro si può solo leggere.",
+      "filterTable": "Tabella",
+      "filterAction": "Azione",
+      "allTables": "Tutte le tabelle",
+      "allActions": "Tutte le azioni",
+      "apply": "Filtra",
+      "clear": "Togli i filtri",
+      "count": "{count, plural, =0 {Nessuna voce} one {# voce} other {# voci}}",
+      "actions": {
+        "INSERT": "Creazione",
+        "UPDATE": "Modifica",
+        "DELETE": "Eliminazione"
+      },
+      "actor": "Autore",
+      "system": "sistema",
+      "rowKey": "Chiave della riga",
+      "changes": "{count, plural, one {# campo cambiato} other {# campi cambiati}}",
+      "noChanges": "Nessun campo cambiato.",
+      "before": "Prima",
+      "after": "Dopo",
+      "absent": "(assente)",
+      "emptyTitle": "Il registro è vuoto",
+      "emptyBody": "Le modifiche a pesi, fonti, ruoli, brief e configurazione compaiono qui.",
+      "emptyFilteredTitle": "Nessuna voce con questi filtri",
+      "emptyFilteredBody": "Cambia tabella o azione, oppure torna all'elenco completo.",
+      "pagination": "Pagine del registro",
+      "newer": "Più recenti",
+      "older": "Più vecchie",
+      "pageOf": "Pagina {page} di {pages}"
+    },
+    "users": {
+      "title": "Utenti e ruoli",
+      "lead": "Tutti gli iscritti, con organizzazione e ruolo.",
+      "rolesTitle": "Cosa può fare ogni ruolo",
+      "can": {
+        "admin": "Tutto, compresi fonti, pesi, utenti, registro delle modifiche e pubblicazione dei brief.",
+        "analyst": "Avvia le pipeline, rivede le mappature di tassonomia e i brief, modifica i set di pesi.",
+        "member": "Legge tutte le celle, usa la chat, salva liste, crea passaporti di prodotto, esporta.",
+        "viewer": "Legge solo le schede e i brief pubblicati."
+      },
+      "rolesNote": "Chi si iscrive parte come Membro. Ogni cambio di ruolo finisce nel registro delle modifiche.",
+      "search": "Cerca per email",
+      "searchPlaceholder": "nome@esempio.it",
+      "searchButton": "Cerca",
+      "clear": "Mostra tutti",
+      "count": "{count, plural, =0 {Nessun utente} one {# utente} other {# utenti}}",
+      "countFiltered": "{count} su {total}",
+      "emptyTitle": "Nessun utente",
+      "emptyBody": "Gli utenti compaiono qui dopo l'iscrizione.",
+      "emptySearchTitle": "Nessun utente trovato",
+      "emptySearchBody": "Nessuna email contiene «{q}».",
+      "name": "Nome",
+      "noName": "Non indicato",
+      "organisation": "Organizzazione",
+      "signedUp": "Iscrizione",
+      "lastSignIn": "Ultimo accesso",
+      "never": "Mai",
+      "ownRow": "Questo sei tu: il tuo ruolo non si cambia da qui.",
+      "changeRole": "Cambia ruolo",
+      "roleOf": "Ruolo di {email}",
+      "confirm": "Cambiare il ruolo di {email} da {from} a {to}?",
+      "confirmButton": "Conferma",
+      "cancel": "Annulla",
+      "saving": "Salvataggio…",
+      "error": "Non è stato possibile cambiare il ruolo.",
+      "selfError": "Non puoi cambiare il tuo ruolo da qui.",
+      "lastAdmin": "È l'ultimo amministratore: non può essere declassato né rimosso.",
+      "dbError": "Il database ha rifiutato la modifica.",
+      "dbMessage": "Messaggio del database: {message}"
     }
   }
 }

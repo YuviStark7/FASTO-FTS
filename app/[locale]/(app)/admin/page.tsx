@@ -1,4 +1,4 @@
-import { ArrowUpRight, Database, ListChecks, MessageSquareQuote, MessagesSquare } from "lucide-react";
+import { ArrowUpRight, Database, Gauge, ListChecks, MessageSquareQuote, MessagesSquare, ScrollText, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getStaffRole } from "@/lib/admin";
 import { Link } from "@/lib/i18n/navigation";
@@ -15,7 +15,15 @@ export default async function AdminIndex({ params }: { params: Promise<{ locale:
     { href: "/admin/runs", Icon: ListChecks, title: t("tiles.runs"), hint: t("tiles.runsHint") },
     { href: "/admin/feedback", Icon: MessageSquareQuote, title: tf("tileTitle"), hint: tf("tileHint") },
     // Admins only: the run spends chat turns and the action refuses everyone else.
-    ...(role === "admin" ? [{ href: "/admin/ask-eval", Icon: MessagesSquare, title: te("tileTitle"), hint: te("tileHint") }] : []),
+    ...(role === "admin"
+      ? [
+          { href: "/admin/ask-eval", Icon: MessagesSquare, title: te("tileTitle"), hint: te("tileHint") },
+          // Admins only: RLS returns nothing to anyone else, and the pages show the not-allowed state.
+          { href: "/admin/usage", Icon: Gauge, title: t("tiles.usage"), hint: t("tiles.usageHint") },
+          { href: "/admin/users", Icon: Users, title: t("tiles.users"), hint: t("tiles.usersHint") },
+          { href: "/admin/audit", Icon: ScrollText, title: t("tiles.audit"), hint: t("tiles.auditHint") },
+        ]
+      : []),
   ];
   return (
     <>
