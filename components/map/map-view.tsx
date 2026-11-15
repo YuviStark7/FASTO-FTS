@@ -114,8 +114,13 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
           markers.push(m);
         }
 
+        // Follow the card's size (layout settles after client navigation, rotation, panels).
+        const observer = new ResizeObserver(() => map.resize());
+        observer.observe(el);
+
         cleanup = () => {
           clearTimeout(timer);
+          observer.disconnect();
           markers.forEach((m) => m.remove());
           map.remove();
         };
@@ -222,7 +227,9 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
           aria-label={t("canvasLabel")}
           className="card relative h-[58dvh] min-h-80 overflow-hidden lg:h-[calc(100dvh-19rem)]"
         >
-          <div ref={containerRef} className="absolute inset-0" />
+          {/* Explicit size: MapLibre adds .maplibregl-map { position: relative } to this element, which
+              overrides `absolute inset-0` and collapsed the map to zero height (empty card). */}
+          <div ref={containerRef} className="absolute inset-0 h-full w-full" />
           {mode === "loading" && (
             <p role="status" className="skeleton absolute inset-0 grid place-items-center rounded-none text-muted">
               …
