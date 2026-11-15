@@ -25,15 +25,19 @@ test("the map is drawn at full size on a direct load", async ({ page }) => {
   await expectDrawnMap(page);
 });
 
-test("the map is drawn when opened from the profile menu", async ({ page }) => {
+test("the map is drawn when opened from the header chip", async ({ page }) => {
   await signIn(page);
   await page.goto("/");
-  const btn = page.getByRole("button", { name: "Profilo e impostazioni" });
+  const nav = page.getByRole("navigation", { name: "Navigazione principale" });
   await expect(async () => {
-    await btn.click();
-    await expect(page.getByRole("menuitem", { name: /Mappa/ })).toBeVisible({ timeout: 1000 });
+    await nav.getByRole("button").click();
+    await expect(nav.getByRole("link", { name: "Mappa" })).toBeVisible({ timeout: 1000 });
   }).toPass({ timeout: 10_000 });
-  await page.getByRole("menuitem", { name: /Mappa/ }).click();
+  await nav.getByRole("link", { name: "Mappa" }).click();
   await expect(page).toHaveURL(/\/map/);
   await expectDrawnMap(page);
+  // The chip now shows Map as the current page, and the profile menu no longer lists it.
+  await expect(nav.getByRole("button")).toHaveAccessibleName(/Pagina attuale: Mappa/);
+  await page.getByRole("button", { name: "Profilo e impostazioni" }).click();
+  await expect(page.getByRole("menuitem", { name: /Mappa/ })).toHaveCount(0);
 });

@@ -1,17 +1,18 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
-import { Compass, Grid3x3, MessageCircleQuestion } from "lucide-react";
+import { Compass, Grid3x3, Map as MapIcon, MessageCircleQuestion } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/", key: "scout", Icon: Compass },
+  { href: "/map", key: "map", Icon: MapIcon },
   { href: "/matrix", key: "matrix", Icon: Grid3x3 },
   { href: "/ask", key: "ask", Icon: MessageCircleQuestion },
 ] as const;
 
-/** Brand pill: shows the active page icon, expands into the three page choices. */
+/** Brand pill: shows the active page icon, expands into the page choices (Scout, Map, Matrix, Ask). */
 export function PageChip() {
   const t = useTranslations("nav");
   const ts = useTranslations("shell");
@@ -102,7 +103,7 @@ export function PageChip() {
                 <Link href={href} aria-current={isActive ? "page" : undefined} className="group flex min-h-11 items-center focus-visible:!outline-0">
                   <span
                     className={cn(
-                      "flex h-9 items-center gap-1.5 rounded-full px-2 text-xs font-semibold tracking-[0.06em] uppercase sm:tracking-[0.1em] ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",
+                      "flex h-9 items-center gap-1.5 rounded-full px-1 text-xs font-semibold tracking-[0.02em] uppercase sm:tracking-[0.1em] ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",
                       isActive ? "bg-brand-contrast text-brand" : "group-hover:bg-brand-contrast/12",
                     )}
                   >
