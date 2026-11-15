@@ -2,7 +2,6 @@ import { test, expect, type Page } from "@playwright/test";
 import { signIn } from "./helpers";
 
 // The intro never plays under automation unless the URL asks for it with ?intro=1.
-const KEY = "fasto.intro.v1";
 const FRAMES = [300, 900, 1500, 2000, 2600];
 
 type Probe = { play: number | null; end: number | null; states: (string | null)[] };
@@ -61,7 +60,6 @@ test("first visit: the intro plays once, ends within 3.2 s and leaves the normal
   await page.waitForTimeout(900);
   const reference = await boxes(page);
   expect((await read(page)).states, "no intro under automation").toEqual([]);
-  expect(await page.evaluate((k) => localStorage.getItem(k), KEY)).toBeNull();
 
   await page.goto("/?intro=1", { waitUntil: "commit" });
   const overlay = page.getByTestId("scout-intro");
@@ -94,7 +92,6 @@ test("first visit: the intro plays once, ends within 3.2 s and leaves the normal
   }
   expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  expect(await page.evaluate((k) => localStorage.getItem(k), KEY)).toBe("1");
 
   expect(errors, "no script or hydration errors").toEqual([]);
 
@@ -102,12 +99,11 @@ test("first visit: the intro plays once, ends within 3.2 s and leaves the normal
   await parts(page).badge.click();
   await expect(page.getByRole("menu")).toBeVisible();
 
-  // Second visit in the same browser: no intro, even when asked for.
-  await page.goto("/?intro=1");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await page.waitForTimeout(300);
-  expect((await read(page)).states).toEqual([]);
-  await expect(overlay).toBeHidden();
+  // Every reload plays it again.
+  await page.reload({ waitUntil: "commit" });
+  await expect(overlay).toBeVisible();
+  await expect(overlay).toBeHidden({ timeout: 4000 });
+  expect((await read(page)).states).toEqual(["pending", "play", null]);
 });
 
 test("a tap or click during the intro ends it at once, and only that", async ({ page }, info) => {
@@ -146,16 +142,22 @@ test("a key press during the intro ends it at once", async ({ page }) => {
   expect(p.end! - p.play!).toBeLessThan(1500);
 });
 
-test("no intro once the browser has seen it", async ({ page }) => {
+test("moving around the app and back to Scout does not replay it", async ({ page }) => {
   await probe(page);
-  await page.addInitScript((k) => localStorage.setItem(k, "1"), KEY);
   await signIn(page);
   await page.goto("/?intro=1");
+  await expect(page.getByTestId("scout-intro")).toBeHidden({ timeout: 4000 });
+  const nav = page.getByRole("navigation", { name: "Navigazione principale" });
+  await nav.getByRole("button").click();
+  await nav.getByRole("link", { name: "Matrice" }).click();
+  await expect(page).toHaveURL(/\/matrix/);
+  await nav.getByRole("button").click();
+  await nav.getByRole("link", { name: "Scout" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.waitForTimeout(400);
-  expect((await read(page)).states).toEqual([]);
+  // Same document: the intro ran once on the full load, and the client navigation back added nothing.
+  expect((await read(page)).states).toEqual(["pending", "play", null]);
   await expect(page.getByTestId("scout-intro")).toBeHidden();
-  await expect(page.getByTestId("scout-intro-flower")).toBeHidden();
 });
 
 test("no intro on other routes", async ({ page }) => {
