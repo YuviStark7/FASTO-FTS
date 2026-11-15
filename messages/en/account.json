@@ -1,0 +1,60 @@
+{
+  "account": {
+    "exportTitle": "Your data",
+    "exportBody": "Download, as a JSON file, everything the platform keeps about your account: profile, roles, Ask conversations, ratings, passports and weights you created, AI usage.",
+    "exportButton": "Download my data",
+    "privacyLink": "Privacy notice",
+    "delete": {
+      "title": "Delete account",
+      "open": "Delete my account",
+      "warning": "Deletion is permanent and cannot be undone.",
+      "deletes": "Deleted: your account, profile, roles, conversations, ratings, saved lists, and your personal organisation with its passports, weights and exports.",
+      "keeps": "Kept: published sheets and briefs (market data, not personal) and the change log, which keeps only the account id.",
+      "typeEmail": "To confirm, type your email: {email}",
+      "cancel": "Cancel",
+      "confirm": "Delete permanently",
+      "pending": "Deleting…",
+      "error": {
+        "confirm_mismatch": "The email does not match.",
+        "last_admin": "You are the only admin: make someone else an admin first in Admin → Users and roles.",
+        "failed": "Deletion failed. Try again or contact an admin."
+      }
+    },
+    "deleted": "Your account has been deleted."
+  },
+  "privacy": {
+    "title": "Privacy notice",
+    "updated": "Updated 15 November 2026",
+    "sections": [
+      {
+        "h": "Who processes the data",
+        "p": "FASTO FTS is a research and development platform on agri-food markets. User data is processed by the project team that runs the platform. For any request you can use the export and deletion functions in Settings or write to the platform's administrator."
+      },
+      {
+        "h": "What we keep about you",
+        "p": "Email and sign-in dates (for magic-link sign-in), display name and language if you set them, organisation and role, the questions you ask in Ask with their answers, the ratings you leave, the product passports and weights you create, and AI usage (number of requests and estimated cost) to apply the daily limits."
+      },
+      {
+        "h": "Consumer data",
+        "p": "The platform keeps no personal data about consumers. Online mentions used for sentiment are short excerpts of public posts: author ids, handles and links are removed when they are collected."
+      },
+      {
+        "h": "Why, and on what basis",
+        "p": "To provide the service you asked for when you signed up (performance of the service), and to keep it safe and sustainable: usage limits and the change log for roles, weights, sources and briefs (legitimate interest)."
+      },
+      {
+        "h": "Where the data is and who processes it",
+        "p": "Database and authentication: Supabase, in the European Union (Frankfurt). Website: Vercel, running in Europe. AI features: your Ask questions and the market data used for briefs are sent to Anthropic to generate the answer; we do not send your email."
+      },
+      {
+        "h": "How long",
+        "p": "As long as the account exists. When you delete it, we delete the account and the data linked to it; the change log, which is append-only, keeps only the account id. Daily database backups expire under the provider's policy."
+      },
+      {
+        "h": "Your rights",
+        "p": "You can download your data and delete your account at any time from Settings. You can ask the platform's administrator for correction or restriction, and complain to the supervisory authority (in Italy, the Garante per la protezione dei dati personali)."
+      }
+    ],
+    "back": "Back to sign in"
+  }
+}
