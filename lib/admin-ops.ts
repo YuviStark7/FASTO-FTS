@@ -10,7 +10,7 @@ export const ROLES = ["admin", "analyst", "member", "viewer"] as const;
 export type AppRole = (typeof ROLES)[number];
 
 /** Tables with an audit trigger (supabase/migrations). Used for the filter list only. */
-export const AUDITED_TABLES = ["app_config", "brief_versions", "briefs", "memberships", "sources", "weight_sets"] as const;
+export const AUDITED_TABLES = ["acceptance_targets", "app_config", "brief_versions", "briefs", "memberships", "sources", "weight_sets"] as const;
 export const AUDIT_ACTIONS = ["INSERT", "UPDATE", "DELETE"] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 export const AUDIT_PAGE_SIZE = 50;

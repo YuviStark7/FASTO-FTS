@@ -13,7 +13,9 @@
       "audit": "Registro delle modifiche",
       "auditHint": "Chi ha cambiato cosa: pesi, fonti, ruoli, brief, limiti.",
       "users": "Utenti e ruoli",
-      "usersHint": "Chi è iscritto, con quale ruolo."
+      "usersHint": "Chi è iscritto, con quale ruolo.",
+      "acceptance": "Obiettivi di accettazione",
+      "acceptanceHint": "A che punto siamo rispetto al rilascio e al progetto a 12 mesi."
     },
     "notAllowed": {
       "title": "Accesso non consentito",
@@ -236,6 +238,63 @@
       "lastAdmin": "È l'ultimo amministratore: non può essere declassato né rimosso.",
       "dbError": "Il database ha rifiutato la modifica.",
       "dbMessage": "Messaggio del database: {message}"
+    },
+    "acceptance": {
+      "title": "Obiettivi di accettazione",
+      "lead": "A che punto è ogni obiettivo della proposta, rispetto al rilascio e al progetto a 12 mesi.",
+      "summaryTitle": "Obiettivi di rilascio",
+      "summaryMet": "{due, plural, one {su # obiettivo di rilascio raggiunto} other {su # obiettivi di rilascio raggiunti}}",
+      "summaryAfterRelease": "{n, plural, one {# obiettivo parte dopo il rilascio: non conta né come raggiunto né come mancato.} other {# obiettivi partono dopo il rilascio: non contano né come raggiunti né come mancati.}}",
+      "releaseLabel": "Data del rilascio",
+      "projectNote": "Gli obiettivi della proposta appartengono al progetto finanziato di 12 mesi. Il rilascio è la sua base di lavoro.",
+      "emptyTitle": "Nessun obiettivo configurato",
+      "emptyBody": "Gli obiettivi di accettazione si caricano con una migrazione. Qui non ce n'è ancora nessuno.",
+      "state": {
+        "met": "Raggiunto",
+        "inProgress": "In corso",
+        "notStarted": "Non iniziato",
+        "afterRelease": "Dopo il rilascio",
+        "notRecorded": "Non registrato"
+      },
+      "measured": "Misurato",
+      "manual": "Registrato a mano",
+      "projectMet": "Obiettivo a 12 mesi raggiunto",
+      "howLabel": "Come si misura:",
+      "how": {
+        "categories": "categorie presenti nella tassonomia.",
+        "territories": "territori pilota configurati.",
+        "cells": "celle valutate dal calcolo, con uno stato oppure con dati insufficienti espliciti. Le celle dimostrative non contano.",
+        "reviewed_sheets": "celle con un brief pubblicato la cui versione corrente ha superato il controllo delle citazioni.",
+        "sources": "fonti attive con almeno un'esecuzione che ha scritto righe.",
+        "sentiment_controls": "letture CSI pubblicate, non dimostrative, valutate da almeno una persona.",
+        "reports": "versioni di brief distinte che hanno superato il controllo delle citazioni e sono state esportate.",
+        "firms": "numero registrato a mano da un amministratore, con una nota. Avviene fuori dalla piattaforma.",
+        "trained_users": "numero registrato a mano da un amministratore, con una nota. La formazione avviene fuori dalla piattaforma."
+      },
+      "noteLabel": "Nota",
+      "notRecordedValue": "Non ancora registrato",
+      "ofRelease": "{value} su {target} per il rilascio",
+      "ofProject": "{value} su {target} a 12 mesi",
+      "ofReleaseSuffix": "su {target} per il rilascio",
+      "ofProjectSuffix": "su {target} a 12 mesi",
+      "releaseTarget": "Rilascio:",
+      "releaseAfter": "parte dopo il rilascio",
+      "projectTarget": "Progetto (12 mesi):",
+      "editor": {
+        "open": "Aggiorna il valore",
+        "openLabel": "Aggiorna il valore: {target}",
+        "value": "Valore",
+        "valueHint": "Numero intero da 0. Vuoto: non registrato.",
+        "valueError": "Serve un numero intero da 0 a {max}.",
+        "note": "Nota",
+        "noteHint": "{n} di {max} caratteri. Da dove viene il numero.",
+        "noteError": "La nota può avere al massimo {max} caratteri.",
+        "save": "Salva",
+        "saving": "Salvataggio…",
+        "cancel": "Annulla",
+        "error": "Non è stato possibile salvare il valore. Riprova.",
+        "audited": "Ogni modifica finisce nel registro."
+      }
     }
   }
 }
