@@ -56,5 +56,12 @@
       }
     ],
     "back": "Torna all'accesso"
+  },
+  "pwa": {
+    "title": "App",
+    "install": "Installa l'app",
+    "installed": "L'app è installata su questo dispositivo.",
+    "ios": "Su iPhone e iPad: tocca Condividi, poi «Aggiungi alla schermata Home».",
+    "unsupported": "Questo browser non offre l'installazione. Prova con Chrome o Edge, o su iPhone con Safari."
   }
 }
