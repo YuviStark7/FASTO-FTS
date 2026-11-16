@@ -35,7 +35,8 @@ export function SourcesTab({ ledger, filter, onClear }: { ledger: CellSheet["led
         </p>
       ) : null}
       {/* relative: screen-reader-only spans inside the table stay inside the scroll box and never widen the page. */}
-      <div className="card relative overflow-x-auto">
+      {/* Focusable region: keyboard users can scroll the wide table with the arrow keys. */}
+      <div className="card relative overflow-x-auto focus-visible:outline-2" tabIndex={0} role="region" aria-label={t("table")}>
         <table className="table min-w-[1040px]" data-testid="ledger">
           <caption className="sr-only">{t("table")}</caption>
           <thead className="bg-surface-2/60">
