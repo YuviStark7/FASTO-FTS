@@ -13,7 +13,9 @@
       "audit": "Audit log",
       "auditHint": "Who changed what: weights, sources, roles, briefs, caps.",
       "users": "Users and roles",
-      "usersHint": "Who has signed up, and with which role."
+      "usersHint": "Who has signed up, and with which role.",
+      "acceptance": "Acceptance targets",
+      "acceptanceHint": "Where we stand against the release and the 12-month project."
     },
     "notAllowed": {
       "title": "Access not allowed",
@@ -236,6 +238,63 @@
       "lastAdmin": "This is the last admin: they cannot be demoted or removed.",
       "dbError": "The database refused the change.",
       "dbMessage": "Database message: {message}"
+    },
+    "acceptance": {
+      "title": "Acceptance targets",
+      "lead": "Where each target of the proposal stands, against the release and the 12-month project.",
+      "summaryTitle": "Release targets",
+      "summaryMet": "{due, plural, one {of # release target met} other {of # release targets met}}",
+      "summaryAfterRelease": "{n, plural, one {# target starts after the release: it counts neither as met nor as missed.} other {# targets start after the release: they count neither as met nor as missed.}}",
+      "releaseLabel": "Release date",
+      "projectNote": "The proposal's targets belong to the 12-month funded project. The release is its working base.",
+      "emptyTitle": "No targets configured",
+      "emptyBody": "Acceptance targets are loaded by a migration. There are none here yet.",
+      "state": {
+        "met": "Met",
+        "inProgress": "In progress",
+        "notStarted": "Not started",
+        "afterRelease": "After release",
+        "notRecorded": "Not recorded"
+      },
+      "measured": "Measured",
+      "manual": "Recorded by hand",
+      "projectMet": "12-month target met",
+      "howLabel": "How it is measured:",
+      "how": {
+        "categories": "categories in the taxonomy.",
+        "territories": "pilot territories configured.",
+        "cells": "cells the compute step evaluated, with a status or explicit insufficient data. Demo cells do not count.",
+        "reviewed_sheets": "cells with a published brief whose current version passed the citation check.",
+        "sources": "active sources with at least one run that wrote rows.",
+        "sentiment_controls": "published, non-demo CSI readings rated by at least one person.",
+        "reports": "distinct brief versions that passed the citation check and were exported.",
+        "firms": "number recorded by hand by an admin, with a note. It happens outside the platform.",
+        "trained_users": "number recorded by hand by an admin, with a note. Training happens outside the platform."
+      },
+      "noteLabel": "Note",
+      "notRecordedValue": "Not recorded yet",
+      "ofRelease": "{value} of {target} for the release",
+      "ofProject": "{value} of {target} at 12 months",
+      "ofReleaseSuffix": "of {target} for the release",
+      "ofProjectSuffix": "of {target} at 12 months",
+      "releaseTarget": "Release:",
+      "releaseAfter": "starts after the release",
+      "projectTarget": "Project (12 months):",
+      "editor": {
+        "open": "Update the value",
+        "openLabel": "Update the value: {target}",
+        "value": "Value",
+        "valueHint": "Whole number from 0. Blank: not recorded.",
+        "valueError": "A whole number from 0 to {max} is needed.",
+        "note": "Note",
+        "noteHint": "{n} of {max} characters. Where the number comes from.",
+        "noteError": "The note can be at most {max} characters.",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
+        "error": "The value could not be saved. Try again.",
+        "audited": "Every change goes to the audit log."
+      }
     }
   }
 }

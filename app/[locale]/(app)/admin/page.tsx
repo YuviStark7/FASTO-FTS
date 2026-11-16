@@ -1,4 +1,4 @@
-import { ArrowUpRight, Database, Gauge, ListChecks, MessageSquareQuote, MessagesSquare, ScrollText, Users } from "lucide-react";
+import { ArrowUpRight, Database, Gauge, ListChecks, MessageSquareQuote, MessagesSquare, ScrollText, Target, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getStaffRole } from "@/lib/admin";
 import { Link } from "@/lib/i18n/navigation";
@@ -14,6 +14,7 @@ export default async function AdminIndex({ params }: { params: Promise<{ locale:
     { href: "/admin/sources", Icon: Database, title: t("tiles.sources"), hint: t("tiles.sourcesHint") },
     { href: "/admin/runs", Icon: ListChecks, title: t("tiles.runs"), hint: t("tiles.runsHint") },
     { href: "/admin/feedback", Icon: MessageSquareQuote, title: tf("tileTitle"), hint: tf("tileHint") },
+    { href: "/admin/acceptance", Icon: Target, title: t("tiles.acceptance"), hint: t("tiles.acceptanceHint") },
     // Admins only: the run spends chat turns and the action refuses everyone else.
     ...(role === "admin"
       ? [

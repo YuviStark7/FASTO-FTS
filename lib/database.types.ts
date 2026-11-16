@@ -7,14 +7,14 @@ export type Database = {
           Tables: {
             "acceptance_targets": {
                   Row: {
-                    "label_en": string,"label_it": string,"project_target": number,"release_target": number,"slug": string,"sort_order": number
+                    "label_en": string,"label_it": string,"manual_note": string | null,"manual_value": number | null,"project_target": number,"release_target": number,"slug": string,"sort_order": number,"updated_at": string | null,"updated_by": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "label_en": string,"label_it": string,"project_target": number,"release_target": number,"slug": string,"sort_order"?: number
+                    "label_en": string,"label_it": string,"manual_note"?: string | null,"manual_value"?: number | null,"project_target": number,"release_target": number,"slug": string,"sort_order"?: number,"updated_at"?: string | null,"updated_by"?: string | null
                   }
                   Update: {
-                    "label_en"?: string,"label_it"?: string,"project_target"?: number,"release_target"?: number,"slug"?: string,"sort_order"?: number
+                    "label_en"?: string,"label_it"?: string,"manual_note"?: string | null,"manual_value"?: number | null,"project_target"?: number,"release_target"?: number,"slug"?: string,"sort_order"?: number,"updated_at"?: string | null,"updated_by"?: string | null
                   }
                   Relationships: [
                     
@@ -957,7 +957,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_users":
+            "acceptance_progress":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "current_value": number,"label_en": string,"label_it": string,"manual_note": string,"measured": boolean,"project_target": number,"release_target": number,"slug": string,"sort_order": number,"updated_at": string
+            }[]
+                           },
+"admin_users":
 { Args: Record<PropertyKey, never>; Returns: {
               "created_at": string,"display_name": string,"email": string,"last_sign_in_at": string,"org_id": string,"org_name": string,"role": Database["public"]['Enums']["app_role"],"user_id": string
             }[]
