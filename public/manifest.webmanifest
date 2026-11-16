@@ -1,9 +1,25 @@
 {
-  "name": "FASTO FTS",
+  "id": "/",
+  "name": "FASTO FTS — Food Trend Scout",
   "short_name": "FASTO FTS",
+  "description": "Market intelligence for Italian agri-food: 15 categories in 20 European cities, every figure graded and sourced.",
+  "lang": "it",
+  "dir": "ltr",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0A0C10",
   "theme_color": "#0A0C10",
-  "icons": []
+  "categories": ["business", "food", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Matrice", "url": "/matrix", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Mappa", "url": "/map", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Chiedi", "url": "/ask", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
 }

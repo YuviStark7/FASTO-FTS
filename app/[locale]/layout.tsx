@@ -6,6 +6,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import "../globals.css";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 
 // One sans family with a wide weight range (SPEC section 7); the mono cut is for method ids, series keys and refs.
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"], weight: "variable", display: "swap" });
@@ -18,7 +19,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  return { title: { default: t("title"), template: `%s · ${t("title")}` }, description: t("description"), manifest: "/manifest.webmanifest" };
+  return {
+    title: { default: t("title"), template: `%s · ${t("title")}` },
+    description: t("description"),
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [
+        { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+    },
+    appleWebApp: { capable: true, title: "FASTO FTS", statusBarStyle: "black-translucent" },
+  };
 }
 
 export const viewport: Viewport = {
@@ -48,6 +61,7 @@ export default async function LocaleLayout({
     <html lang={locale} data-theme={theme} suppressHydrationWarning className={`${geist.variable} ${geistMono.variable}`}>
       <body className="min-h-dvh">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <RegisterServiceWorker />
       </body>
     </html>
   );

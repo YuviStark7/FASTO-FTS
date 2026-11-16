@@ -4,6 +4,7 @@ import { getStaffRole } from "@/lib/admin";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/navigation";
 import { DeleteAccount } from "@/components/account/delete-account";
+import { InstallApp } from "@/components/pwa/install-app";
 import { requireUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { setTheme, signOut } from "./actions";
@@ -42,6 +43,8 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
           {tacc("privacyLink")}
         </Link>
       </section>
+
+      <InstallApp />
 
       <section className="card space-y-3 p-5" data-testid="account-delete">
         <h2 className="t-label">{tacc("delete.title")}</h2>

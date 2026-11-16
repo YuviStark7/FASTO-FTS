@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A0C10">
+<title>FASTO FTS · Offline</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: #0a0c10; color: #e8eaee;
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; padding: 24px; box-sizing: border-box; }
+  .mark { width: 64px; height: 64px; border-radius: 50%; background: #ffd400; color: #0a0c10; display: grid; place-items: center;
+          font-weight: 700; letter-spacing: .04em; margin: 0 auto 20px; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { margin: 0 0 6px; color: #a3a9b5; max-width: 32ch; }
+  button { margin-top: 18px; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid #3a404c; background: transparent;
+           color: #e8eaee; font: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true">FT</div>
+    <h1>Sei offline</h1>
+    <p>FASTO FTS mostra solo dati aggiornati dal server, con grado e fonte: riconnettiti per continuare.</p>
+    <p lang="en">You are offline. FASTO FTS only shows fresh data from the server: reconnect to continue.</p>
+    <button type="button" onclick="location.reload()">Riprova · Retry</button>
+  </main>
+</body>
+</html>
