@@ -90,7 +90,8 @@ test("profile menu keyboard and no horizontal overflow", async ({ page }) => {
   await expect(btn).toHaveAttribute("aria-expanded", "false");
   for (const path of ["/", "/matrix", "/more"]) {
     await page.goto(path);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    // Against the device width: a too-wide page makes mobile browsers zoom out, which also widens innerWidth.
+    const overflow = (await page.evaluate(() => document.documentElement.scrollWidth)) - page.viewportSize()!.width;
     expect(overflow, path).toBeLessThanOrEqual(0);
   }
 });

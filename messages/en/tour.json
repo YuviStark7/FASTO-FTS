@@ -1,0 +1,44 @@
+{
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "done": "Done",
+    "skip": "Skip the tour",
+    "counter": "{current} / {total}",
+    "counterLabel": "Step {current} of {total}",
+    "settingsLink": "Settings",
+    "replayTitle": "Guided tour",
+    "replayBody": "Seven steps to find your way: the pages, the cell, the grades and where your things live.",
+    "replay": "Replay the tour",
+    "steps": {
+      "pages": {
+        "title": "Switch page",
+        "body": "This chip is your compass: open it to move between Scout, Map, Matrix and Ask."
+      },
+      "select": {
+        "title": "Pick a category and a city",
+        "body": "Tap the chips to open the flower, then pick a petal. You can also type a category or city name in the tags."
+      },
+      "verdict": {
+        "title": "The verdict and the grades",
+        "body": "Every cell gets a verdict and every number carries its grade. Hatched means insufficient data: never a low score."
+      },
+      "sheet": {
+        "title": "The cell sheet",
+        "body": "Six sections: market, territory, consumers, competition, opportunity and sources. Every figure opens its source, date and method."
+      },
+      "mos": {
+        "title": "Opportunity",
+        "body": "The MOS (Market Opportunity Score) sums up how much room there is to enter. It takes you to the matrix in MOS mode; from there, open the opportunity ranking and move the weights."
+      },
+      "ask": {
+        "title": "Ask",
+        "body": "Ask a question in Italian or English. Answers only use figures with their citation; if a figure is missing, it says so."
+      },
+      "profile": {
+        "title": "Your space",
+        "body": "Here you find briefs, the product passport and settings: that is where you download your data and replay this tour any time."
+      }
+    }
+  }
+}

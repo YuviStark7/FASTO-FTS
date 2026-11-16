@@ -1,0 +1,44 @@
+{
+  "tour": {
+    "next": "Avanti",
+    "back": "Indietro",
+    "done": "Fine",
+    "skip": "Salta il tour",
+    "counter": "{current} / {total}",
+    "counterLabel": "Passo {current} di {total}",
+    "settingsLink": "Impostazioni",
+    "replayTitle": "Tour guidato",
+    "replayBody": "Sette passi per orientarti: le pagine, la cella, i gradi e dove trovare le tue cose.",
+    "replay": "Ripeti il tour",
+    "steps": {
+      "pages": {
+        "title": "Cambia pagina",
+        "body": "Questo chip è la tua bussola: aprilo per passare tra Scout, Mappa, Matrice e Chiedi."
+      },
+      "select": {
+        "title": "Scegli categoria e città",
+        "body": "Tocca i chip per aprire il fiore, poi scegli un petalo. Nelle etichette puoi anche scrivere il nome di una categoria o di una città."
+      },
+      "verdict": {
+        "title": "Il verdetto e i gradi",
+        "body": "Ogni cella ha un verdetto e ogni numero porta il suo grado. Tratteggiato vuol dire dati insufficienti: mai un punteggio basso."
+      },
+      "sheet": {
+        "title": "La scheda della cella",
+        "body": "Sei sezioni: mercato, territorio, consumatori, concorrenza, opportunità e fonti. Ogni cifra apre la sua fonte, la data e il metodo."
+      },
+      "mos": {
+        "title": "Opportunità",
+        "body": "Il MOS (Market Opportunity Score) riassume quanto spazio c'è per entrare. Ti porta alla matrice in modalità MOS; da lì apri la classifica delle opportunità e sposti i pesi."
+      },
+      "ask": {
+        "title": "Chiedi",
+        "body": "Fai una domanda in italiano o in inglese. Le risposte usano solo cifre con la loro citazione; se un dato manca, te lo dice."
+      },
+      "profile": {
+        "title": "Il tuo spazio",
+        "body": "Qui trovi i brief, il passaporto di prodotto e le impostazioni: da lì scarichi i tuoi dati e ripeti questo tour quando vuoi."
+      }
+    }
+  }
+}

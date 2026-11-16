@@ -4,6 +4,7 @@ import { Compass, Grid3x3, Map as MapIcon, MessageCircleQuestion } from "lucide-
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { TOUR_CHIP_EVENT } from "@/components/tour/guided-tour";
 
 const ITEMS = [
   { href: "/", key: "scout", Icon: Compass },
@@ -17,7 +18,10 @@ export function PageChip() {
   const t = useTranslations("nav");
   const ts = useTranslations("shell");
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [selfOpen, setOpen] = useState(false);
+  // The guided tour holds the chip open while it points at one of the pages (components/tour).
+  const [held, setHeld] = useState(false);
+  const open = selfOpen || held;
   const ref = useRef<HTMLElement>(null);
   const panelId = useId();
   const lastPointer = useRef("");
@@ -27,6 +31,11 @@ export function PageChip() {
   const ActiveIcon = current.Icon;
 
   useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const onTour = (e: Event) => setHeld((e as CustomEvent<boolean>).detail === true);
+    window.addEventListener(TOUR_CHIP_EVENT, onTour);
+    return () => window.removeEventListener(TOUR_CHIP_EVENT, onTour);
+  }, []);
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
@@ -63,6 +72,7 @@ export function PageChip() {
       }}
       data-open={open}
       data-intro-part="chip"
+      data-tour="chip"
       className="pointer-events-auto flex items-center rounded-full bg-brand text-brand-contrast shadow-e2 ring-1 ring-inset ring-white/15 transition-shadow duration-(--dur-slow) data-[open=true]:shadow-e3"
     >
       <button
@@ -101,7 +111,7 @@ export function PageChip() {
             return (
               <li key={key}>
                 {/* 44 px hit area; the visible pill and its focus ring sit inside the chip. */}
-                <Link href={href} aria-current={isActive ? "page" : undefined} className="group flex min-h-11 items-center focus-visible:!outline-0">
+                <Link href={href} data-tour={key === "ask" ? "ask" : undefined} aria-current={isActive ? "page" : undefined} className="group flex min-h-11 items-center focus-visible:!outline-0">
                   <span
                     className={cn(
                       "flex h-9 items-center gap-1.5 rounded-full px-1 text-xs font-semibold tracking-[0.02em] uppercase sm:tracking-[0.1em] ring-brand-contrast ring-offset-2 ring-offset-brand transition-[background-color,color,transform] duration-(--dur-base) group-focus-visible:ring-2 group-active:scale-[0.96] sm:gap-2 sm:px-3.5",

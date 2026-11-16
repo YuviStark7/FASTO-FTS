@@ -16,6 +16,7 @@ async function scan(page: Page, path: string) {
 }
 
 test.beforeEach(async ({ page }) => {
+  test.setTimeout(120_000); // each test scans many pages
   await page.context().route("https://tiles.openfreemap.org/**", (r) => r.fulfill({ contentType: "application/json", body: STYLE }));
 });
 
@@ -30,6 +31,18 @@ test("member screens", async ({ page }) => {
   for (const path of ["/", "/matrix", "/map", "/cell/cheese/roma", "/cell/cheese/roma?tab=consumers", "/cell/cheese/roma?tab=opportunity", "/cell/cheese/roma?tab=sources", "/opportunities", "/ask", "/briefs", "/passport", "/more"]) {
     found.push(...(await scan(page, path)));
   }
+  expect(found, found.join("\n")).toEqual([]);
+});
+
+test("guided tour open on its first step", async ({ page }) => {
+  await signIn(page, "member", "a11y");
+  await page.goto("/?tour=1");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByTestId("tour-spotlight")).toHaveAttribute("data-target", "true");
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(600);
+  const r = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  const found = r.violations.map((v) => `tour [${v.impact}] ${v.id}: ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
   expect(found, found.join("\n")).toEqual([]);
 });
 
