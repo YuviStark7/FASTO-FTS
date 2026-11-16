@@ -110,6 +110,9 @@ export function MapView({ categories, territories, cells, estimates }: Props) {
         for (const x of located) {
           const host = document.createElement("div");
           const m = new maplibre.Marker({ element: host }).setLngLat(x.lonLat!).addTo(map);
+          // MapLibre makes the marker wrapper a focusable "Map marker" control; our city button
+          // inside it is the real control, so the wrapper must not be interactive too.
+          for (const a of ["aria-label", "role", "tabindex"]) host.removeAttribute(a);
           made.set(x.slug, host);
           markers.push(m);
         }
