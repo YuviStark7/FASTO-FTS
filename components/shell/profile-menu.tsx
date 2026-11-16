@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
-import { FileText, IdCard, LogOut, Moon, Settings, Sun } from "lucide-react";
+import { FileText, IdCard, LogOut, Moon, Settings, SlidersHorizontal, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { setTheme, signOut } from "@/app/[locale]/(app)/more/actions";
@@ -15,6 +15,7 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
   const ta = useTranslations("admin");
   const tb = useTranslations("briefs");
   const tp = useTranslations("passport");
+  const tt = useTranslations("tour");
   const locale = useLocale();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -121,6 +122,10 @@ export function ProfileMenu({ email, isStaff, theme }: { email: string; isStaff:
         <Link role="menuitem" tabIndex={-1} href="/passport" className={ITEM}>
           <IdCard aria-hidden className="size-4" />
           {tp("menu")}
+        </Link>
+        <Link role="menuitem" tabIndex={-1} href="/more" className={ITEM}>
+          <SlidersHorizontal aria-hidden className="size-4" />
+          {tt("settingsLink")}
         </Link>
         {isStaff && (
           <Link role="menuitem" tabIndex={-1} href="/admin" className={ITEM}>

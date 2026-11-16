@@ -18,10 +18,12 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   const { email } = await requireUser();
   const ta = await getTranslations("admin");
   const tm = await getTranslations("map");
+  const tt = await getTranslations("tour");
   const { role } = await getStaffRole();
 
   const seg = (active: boolean) =>
-    cn("seg-item w-full", active && "bg-brand text-brand-contrast shadow-e1 hover:text-brand-contrast");
+    // basis-0: the items share the row equally (.seg-item never shrinks, so w-full made each one as wide as the row).
+    cn("seg-item basis-0", active && "bg-brand text-brand-contrast shadow-e1 hover:text-brand-contrast");
 
   return (
     <div className="page max-w-md space-y-4">
@@ -45,6 +47,15 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
       </section>
 
       <InstallApp />
+
+      <section className="card space-y-3 p-5" data-testid="tour-replay">
+        <h2 className="t-label">{tt("replayTitle")}</h2>
+        <p className="text-sm text-muted">{tt("replayBody")}</p>
+        {/* Plain link: a full load of Scout, where ?tour=1 starts the tour whatever was stored. */}
+        <a href={`${locale === "en" ? "/en" : "/"}?tour=1`} className="btn btn-ghost h-11 w-full">
+          {tt("replay")}
+        </a>
+      </section>
 
       <section className="card space-y-3 p-5" data-testid="account-delete">
         <h2 className="t-label">{tacc("delete.title")}</h2>

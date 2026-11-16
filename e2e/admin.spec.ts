@@ -18,7 +18,7 @@ test("the More page links to Administration for analysts only", async ({ page, c
     await context.clearCookies();
     await signIn(page, "member", "adm");
     await page.goto("/more");
-    await expect(page.getByRole("heading", { name: "Altro" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Impostazioni" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Amministrazione" })).toHaveCount(0);
   } finally {
     await admin.from("source_runs").delete().eq("requested_by", userId);

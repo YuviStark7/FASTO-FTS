@@ -678,6 +678,49 @@ details > summary::-webkit-details-marker {
 }
 
 /*
+ * Guided tour (components/tour/guided-tour.tsx). The spotlight is one box: a brand ring around the
+ * target and a very large shadow in the scrim colour that dims everything else. It and the card ease
+ * to a new target right after a step change (data-settling), then follow the target without delay.
+ */
+.tour-spot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px var(--brand),
+    0 0 0 200vmax var(--scrim);
+  animation: fade-in var(--dur-base) var(--ease-out);
+}
+.tour-spot[data-target="false"] {
+  box-shadow:
+    0 0 0 0 transparent,
+    0 0 0 200vmax var(--scrim);
+}
+.tour-card {
+  will-change: transform;
+}
+.tour[data-settling="true"] .tour-spot {
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    width var(--dur-slow) var(--ease-out),
+    height var(--dur-slow) var(--ease-out),
+    border-radius var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+.tour[data-settling="true"] .tour-card {
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot,
+  .tour-card,
+  .tour-card * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/*
  * Scout first-visit intro (components/cell/scout-intro.tsx). Everything hangs off one attribute on
  * <html>: "pending" shows the brand on the page background, "play" runs the choreography, removing it
  * is the final state. Transform and opacity only; nothing here changes layout.

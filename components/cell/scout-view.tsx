@@ -238,6 +238,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
           {/* Keyed on the cell: label and status cross-fade when the selection changes. */}
           <div
             key={`${catSlug}:${terSlug}`}
+            data-tour="verdict"
             className={cn(
               "flex origin-top animate-[verdict_420ms_cubic-bezier(0.16,1,0.3,1)] flex-col items-center gap-3 transition-transform duration-(--dur-flower) ease-out motion-reduce:transition-none",
               bloomed && "sm:scale-[0.82]",
@@ -257,9 +258,10 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
             className={cn("flex flex-col items-center gap-4", move, bloomed ? "pointer-events-none max-h-0 translate-y-2 overflow-hidden opacity-0" : "max-h-96 opacity-100")}
             inert={bloomed}
           >
-            <div className="pointer-events-auto mt-3 flex flex-wrap items-center justify-center gap-3 p-1">
+            <div data-tour="pills" className="pointer-events-auto mt-3 flex flex-wrap items-center justify-center gap-3 p-1">
               <Link
                 href={cellHref}
+                data-tour="open-cell"
                 className={cn(PILL, "group")}
               >
                 {t("openCell")}
@@ -267,6 +269,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
               </Link>
               <Link
                 href={mosHref}
+                data-tour="mos"
                 // The badge sits on the inverse pill: it takes the pill's ink.
                 className={cn(PILL, "num [&_.grade]:border-current! [&_.grade]:text-current!")}
               >
@@ -297,6 +300,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
       <div
         ref={zone}
         data-testid="scout-zone"
+        data-tour="flower"
         data-state={bloomed ? "bloomed" : "collapsed"}
         onPointerEnter={(e) => {
           if (e.pointerType !== "mouse") return; // touch collapses on a tap outside, never on "leave"
@@ -321,6 +325,7 @@ export function ScoutView({ categories, territories, cells, initialCategory, ini
         {/* Collapsed chips: category icon and location. Hover or tap blooms the flower again. */}
         <div
           data-intro-part="chips"
+          data-tour="chips"
           className={cn(
             "absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-3",
             move,
