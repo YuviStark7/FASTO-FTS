@@ -84,3 +84,24 @@ Known issues:
 - Under Playwright, a server action that revalidates sometimes leaves the client router suspended. The screens use a reload or plain links as a workaround.
 - The passport and opportunities specs collide when repeated in parallel (`--repeat-each 3`), because they seed the same demo category.
 - Local Docker stops on every session restart; restart `dockerd` and `supabase start`.
+
+## Day 5, 15–16 November (release)
+
+Merged:
+- PR 23: PDF margins.
+- PR 24: the map drew into a collapsed box.
+- PR 25: admin usage and spend with the kill switch, audit log, users and roles.
+- PR 26: Map in the header chip.
+- PR 27: account export and deletion, privacy notice.
+- PR 28 and 29: Scout intro, now on every reload.
+- PR 30: acceptance dashboard.
+- PR 31: PWA install.
+
+Production migrations `20261115090000` (admin users) and `20261116090000` (acceptance progress) are applied and fingerprint-verified.
+
+Release checks:
+- An axe WCAG 2.1 AA scan of every screen at both widths found two issues, both fixed.
+- Performance on the production build with throttling: all main screens under 1 s, layout shift 0.
+- Production deployment READY. Its only runtime errors were the two migration-timing incidents.
+
+`docs/HANDOVER.md` records what shipped, what was cut, the known gaps and the next steps. Release gate open item: four more published briefs and three sentiment reviews by a person.
